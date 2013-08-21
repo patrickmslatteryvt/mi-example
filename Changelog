@@ -1,6 +1,12 @@
-# Changelog for mi-example
+# Changelog for mi-perforce
 
-example-1.0.0
-* Change1
-* Change2
-* etc
+perforce-13.3.0
+* Initial release
+* Base image is base64-13.1.0
+* Added packages to base:
+	nano
+* Added SMF facility to handle the following Perforce daemons:
+	p4broker
+	p4d
+	p4p (proxy)
+	p4web

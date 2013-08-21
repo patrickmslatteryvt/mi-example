@@ -1,4 +1,5 @@
-mi-example
+mi-perforce
 ==========
 
-Please refer to https://github.com/joyent/mibe for use of this repo.
+mi-perforce is a SmartOS image builder script for Perforce r13.2
+
