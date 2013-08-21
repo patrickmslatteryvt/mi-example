@@ -23,11 +23,14 @@
         </dependency>	
 
         <method_context>
-            <method_credential user="perforce" group="p4admin"/>
+            <method_credential user="perforce" group="p4admin" privileges='basic'/>
         </method_context>
 
 		<exec_method type="method" name="start" exec="%{executables/p4broker} -d -c %{options/conf}" timeout_seconds="60"/>
 		<exec_method type="method" name="stop" exec=":kill" timeout_seconds="60"/>
+		<!-- Add a maint method that puts the broker in maint mode for scheduled downtimes -->
+		<exec_method type="method" name="maint_down" exec="sed" timeout_seconds="60"/>
+		<exec_method type="method" name="maint_up" exec="sed" timeout_seconds="60"/>
 
 		<property_group name="executables" type="application">
 			<propval name="p4broker" type="astring" value="/metadata/p4broker"/>
@@ -58,11 +61,10 @@
     </service>
 <!-- p4d -->
     <service name="application/perforce/p4d" type="service" version="1">
-
-        <create_default_instance enabled="true"/>
-        
-        <single_instance/>
-
+<!--
+#        <create_default_instance enabled="true"/>
+#        <single_instance/>
+-->
         <dependency name="network" grouping="require_all" restart_on="error" type="service">
             <service_fmri value="svc:/milestone/network:default"/>
         </dependency>
@@ -72,7 +74,7 @@
         </dependency>
 
         <method_context>
-            <method_credential user="perforce" group="p4admin"/>
+            <method_credential user="perforce" group="p4admin" privileges='basic'/>
         </method_context>
 
 		<!-- <exec_method type="method" name="start" exec="%{executables/server} -d -L %{options/P4LOG} -A %{options/P4AUDIT} -J %{options/P4JOURNAL} -r %{options/P4ROOT} -p %{options/P4PORT} -a %{options/P4AUTH} -g %{options/P4CHANGE} -Id %{options/P4DESCRIPTION} -In %{options/P4NAME} -v %{options/P4DEBUG}" timeout_seconds="60"/> -->
@@ -158,7 +160,7 @@
         </dependency>
 
         <method_context>
-            <method_credential user="perforce" group="p4admin"/>
+            <method_credential user="perforce" group="p4admin" privileges='basic'/>
         </method_context>
 
 		<exec_method type="method" name="start" exec="%{executables/proxy} -r %{options/P4CACHE} -p %{options/P4PORT} -t %{options/P4TARGET} -L %{options/P4LOG} -u %{options/P4SERVICEUSER} -v %{options/P4DEBUG}" timeout_seconds="60"/>
@@ -218,7 +220,7 @@
         </dependency>
 		
         <method_context>
-            <method_credential user="perforce" group="p4admin"/>
+            <method_credential user="perforce" group="p4admin" privileges='basic,net_privaddr'/>
         </method_context>
 
 		<exec_method type="method" name="start" exec="%{executables/p4web} -b -c %{options/P4CLIENT} -C %{options/P4CHARSET} -L %{options/P4WEB_LOG} -m %{options/P4WEB_MIMEFILE} -p %{options/P4WEB_TARGET} -u %{options/P4WEB_USER} -U %{options/P4USER} -w %{options/P4WEB_PORT}" timeout_seconds="60"/>
