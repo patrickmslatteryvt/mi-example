@@ -2,7 +2,7 @@
 <!DOCTYPE service_bundle SYSTEM '/usr/share/lib/xml/dtd/service_bundle.dtd.1'>
 
 <service_bundle type='manifest' name='perforce'>
-<!-- p4broker -->	
+<!-- ============================== p4broker ============================== -->
     <service name='application/perforce/p4broker' type='service' version='1'>
 
         <create_default_instance enabled='true'/>
@@ -16,9 +16,9 @@
             <service_fmri value='svc:/system/filesystem/local'/>
         </dependency>
 		
-		<!-- p4broker should not start without p4d having started first -->		
+		<!-- p4broker should not start without the p4d:depots instance having started first -->
         <dependency name='p4d' grouping='require_all' restart_on='error' type='service'>
-            <service_fmri value='svc:/application/perforce/p4d:default'/>
+            <service_fmri value='svc:/application/perforce/p4d:depots'/>
         </dependency>	
 
         <method_context>
@@ -84,7 +84,8 @@
 		</template>
 		
     </service>
-<!-- p4d -->
+
+<!-- ============================== p4d ============================== -->
     <service name='application/perforce/p4d' type='service' version='1'>
 
         <create_default_instance enabled='false'/>
@@ -167,6 +168,10 @@
 		</instance>
 
 		<instance name='sideload_p4web' enabled='true'>
+		<!-- p4d:sideload_p4web should not start without the p4d:depots instance having started first -->
+			<dependency name='p4d' grouping='require_all' restart_on='error' type='service'>
+				<service_fmri value='svc:/application/perforce/p4d:depots'/>
+			</dependency>		
 			<property_group name='options' type='application'>
 				<!-- Administrative user: edit this to the user (P4USER) that has administrative privileges -->
 				<propval name='adminuser' type='astring' value='superuser'/>
@@ -200,7 +205,7 @@
 		
     </service>
 	
-<!-- p4p -->
+<!-- ============================== p4p ============================== -->
     <service name='application/perforce/p4p' type='service' version='1'>
 
         <create_default_instance enabled='false'/>
@@ -278,7 +283,7 @@
 		
     </service>
 	
-<!-- p4web -->
+<!-- ============================== p4web ============================== -->
     <service name='application/perforce/p4web' type='service' version='1'>
 
         <create_default_instance enabled='true'/>
