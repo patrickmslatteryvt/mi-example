@@ -1,12 +1,18 @@
 <?xml version='1.0'?>
 <!DOCTYPE service_bundle SYSTEM '/usr/share/lib/xml/dtd/service_bundle.dtd.1'>
 
+<!-- basic dependancy graph
+p4d:depots
+	p4d:sideload_p4web
+		p4broker:sideload_p4web
+			p4web:default
+	p4broker:depots
+p4p:default	(optional)
+-->
+
 <service_bundle type='manifest' name='perforce'>
 <!-- ============================== p4broker ============================== -->
     <service name='application/perforce/p4broker' type='service' version='1'>
-
-        <create_default_instance enabled='true'/>
-        <single_instance/>
 
         <dependency name='network' grouping='require_all' restart_on='error' type='service'>
             <service_fmri value='svc:/milestone/network:default'/>
@@ -16,11 +22,6 @@
             <service_fmri value='svc:/system/filesystem/local'/>
         </dependency>
 		
-		<!-- p4broker should not start without the p4d:depots instance having started first -->
-        <dependency name='p4d' grouping='require_all' restart_on='error' type='service'>
-            <service_fmri value='svc:/application/perforce/p4d:depots'/>
-        </dependency>	
-
         <method_context>
             <method_credential user='perforce' group='p4admin' privileges='basic'/>
         </method_context>
@@ -64,12 +65,30 @@
 			<propval name='p4broker' type='astring' value='/metadata/p4broker'/>
 		</property_group>
 
-		<property_group name='options' type='application'>
-			<propval name='conf' type='astring' value='/metadata/p4broker.conf'/>
-			<propval name='conf_downtime' type='astring' value='/metadata/p4broker.conf.downtime'/>
-			<propval name='conf_backup' type='astring' value='/metadata/p4broker.conf.backup'/>
-		</property_group>
-      
+		<instance name='depots' enabled='true'>
+			<!-- p4broker:depots should not start without the p4d:depots instance having started first -->
+			<dependency name='p4d' grouping='require_all' restart_on='error' type='service'>
+				<service_fmri value='svc:/application/perforce/p4d:depots'/>
+			</dependency>	
+			<property_group name='options' type='application'>
+				<propval name='conf' type='astring' value='/metadata/p4broker.conf'/>
+				<propval name='conf_downtime' type='astring' value='/metadata/p4broker.conf.downtime'/>
+				<propval name='conf_backup' type='astring' value='/metadata/p4broker.conf.backup'/>
+			</property_group>
+		</instance>
+		
+		<instance name='sideload_p4web' enabled='true'>
+			<!-- p4broker:sideload_p4web should not start without the p4d:sideload_p4web instance having started first -->
+			<dependency name='p4d' grouping='require_all' restart_on='error' type='service'>
+				<service_fmri value='svc:/application/perforce/p4d:sideload_p4web'/>
+			</dependency>
+			<property_group name='options' type='application'>
+				<propval name='conf' type='astring' value='/metadata/p4broker_sideload_p4web.conf'/>
+				<propval name='conf_downtime' type='astring' value='/metadata/p4broker_sideload_p4web.conf.downtime'/>
+				<propval name='conf_backup' type='astring' value='/metadata/p4broker_sideload_p4web.conf.backup'/>
+			</property_group>
+		</instance>
+		
         <stability value='Evolving'/>
 
         <template>
@@ -171,7 +190,7 @@
 		<!-- p4d:sideload_p4web should not start without the p4d:depots instance having started first -->
 			<dependency name='p4d' grouping='require_all' restart_on='error' type='service'>
 				<service_fmri value='svc:/application/perforce/p4d:depots'/>
-			</dependency>		
+			</dependency>
 			<property_group name='options' type='application'>
 				<!-- Administrative user: edit this to the user (P4USER) that has administrative privileges -->
 				<propval name='adminuser' type='astring' value='superuser'/>
@@ -179,7 +198,7 @@
 				<propval name='P4AUDIT' type='astring' value='/p4logs/p4d_audit.log'/>
 				<propval name='P4JOURNAL' type='astring' value='/p4logs/p4d.journal'/>
 				<propval name='P4ROOT' type='astring' value='/metadata'/>
-				<propval name='P4PORT' type='astring' value='tcp:1668'/>
+				<propval name='P4PORT' type='astring' value='tcp:2667'/>
 		   <!-- <propval name='P4AUTH' type='astring' value='localhost:tcp:1667'/>
 				<propval name='P4CHANGE' type='astring' value='localhost:tcp:1667'/>
 				<propval name='P4TARGET' type='astring' value='remote_dr_server:tcp:1667'/> -->
@@ -347,7 +366,7 @@
 			<propval name='P4CHARSET' type='astring' value='utf8'/>
 			<propval name='P4WEB_LOG' type='astring' value='/p4logs/p4web.log'/>
 			<propval name='P4WEB_MIMEFILE' type='astring' value='/metadata/P4WEBMIMEFILE'/>
-			<propval name='P4WEB_TARGET' type='astring' value='localhost:1666'/>
+			<propval name='P4WEB_TARGET' type='astring' value='localhost:2666'/>
 			<propval name='P4WEB_USER' type='astring' value='www'/>
 			<propval name='P4PASSWORD' type='astring' value='MyWebGrocer2013#'/>
 			<propval name='P4WEB_PORT' type='astring' value='tcp:80'/>
