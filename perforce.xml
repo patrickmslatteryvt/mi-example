@@ -117,14 +117,6 @@ p4p:default	(optional)
             <service_fmri value='svc:/system/filesystem/local'/>
         </dependency>
 
-        <dependent name='p4broker' grouping='require_all' restart_on='error'>
-            <service_fmri value='svc:/application/perforce/p4broker:default'/>
-        </dependent>
-
-        <dependent name='p4web' grouping='require_all' restart_on='error'>
-            <service_fmri value='svc:/application/perforce/p4web:default'/>
-        </dependent>
-
         <method_context>
             <method_credential user='perforce' group='p4admin' privileges='basic'/>
         </method_context>
@@ -316,9 +308,9 @@ p4p:default	(optional)
             <service_fmri value='svc:/system/filesystem/local'/>
         </dependency>
 
-		<!-- p4web should not start without p4broker having started first -->
+		<!-- p4web should not start without p4broker:sideload_p4web having started first -->
         <dependency name='p4broker' grouping='require_all' restart_on='error' type='service'>
-            <service_fmri value='svc:/application/perforce/p4broker:default'/>
+            <service_fmri value='svc:/application/perforce/p4broker:sideload_p4web'/>
         </dependency>
 		
         <method_context>
