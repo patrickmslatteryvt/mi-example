@@ -317,7 +317,7 @@ p4p:default	(optional)
             <method_credential user='perforce' group='p4admin' privileges='basic,net_privaddr'/>
         </method_context>
 
-		<exec_method type='method' name='start' exec='%{executables/p4web} -b -c %{options/P4CLIENT} -C %{options/P4CHARSET} -L %{options/P4WEB_LOG} -m %{options/P4WEB_MIMEFILE} -p %{options/P4WEB_TARGET} -u %{options/P4WEB_USER} -w %{options/P4WEB_PORT}' timeout_seconds='60'/>
+		<exec_method type='method' name='start' exec='%{executables/p4web} -b -c %{options/P4CLIENT} -C %{options/P4CHARSET} -L %{options/P4WEB_LOG} -m %{options/P4WEB_MIMEFILE} -p %{options/P4WEB_TARGET} -u %{options/P4WEB_USER} -w %{options/P4WEB_PORT}' timeout_seconds='-1'/>
 		<exec_method type='method' name='stop' exec=':kill' timeout_seconds='30'/>
 
 		<notification_parameters>
@@ -345,7 +345,7 @@ p4p:default	(optional)
 		</notification_parameters>
 		
         <property_group name='startd' type='framework'>
-            <propval name='duration' type='astring' value='contract'/>
+            <propval name='duration' type='astring' value='child'/>
             <propval name='ignore_error' type='astring' value='core,signal'/>
         </property_group>
 		
