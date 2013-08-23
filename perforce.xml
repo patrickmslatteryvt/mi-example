@@ -313,8 +313,12 @@ p4p:default	(optional)
             <service_fmri value='svc:/application/perforce/p4broker:sideload_p4web'/>
         </dependency>
 		
+        <dependent name='nginx' grouping='require_all' restart_on='error'>
+            <service_fmri value='svc:/pkgsrc/nginx:default'/>
+        </dependent>
+	
         <method_context>
-            <method_credential user='perforce' group='p4admin' privileges='basic,net_privaddr'/>
+            <method_credential user='perforce' group='p4admin' privileges='basic'/>
         </method_context>
 
 		<exec_method type='method' name='start' exec='%{executables/p4web} -b -c %{options/P4CLIENT} -C %{options/P4CHARSET} -L %{options/P4WEB_LOG} -m %{options/P4WEB_MIMEFILE} -p %{options/P4WEB_TARGET} -u %{options/P4WEB_USER} -w %{options/P4WEB_PORT} -s%{options/P4WEB_SECURITY}' timeout_seconds='-1'/>
@@ -361,7 +365,7 @@ p4p:default	(optional)
 			<propval name='P4WEB_TARGET' type='astring' value='localhost:2666'/>
 			<propval name='P4WEB_USER' type='astring' value='www'/>
 			<propval name='P4PASSWORD' type='astring' value='MyWebGrocer2013#'/>
-			<propval name='P4WEB_PORT' type='astring' value='tcp:80'/>
+			<propval name='P4WEB_PORT' type='astring' value='tcp:8080'/>
 			<propval name='P4WEB_SECURITY' type='astring' value='ahirs'/>
 		</property_group>
        
