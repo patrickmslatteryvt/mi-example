@@ -317,7 +317,7 @@ p4p:default	(optional)
             <method_credential user='perforce' group='p4admin' privileges='basic,net_privaddr'/>
         </method_context>
 
-		<exec_method type='method' name='start' exec='%{executables/p4web} -b -c %{options/P4CLIENT} -C %{options/P4CHARSET} -L %{options/P4WEB_LOG} -m %{options/P4WEB_MIMEFILE} -p %{options/P4WEB_TARGET} -u %{options/P4WEB_USER} -w %{options/P4WEB_PORT}' timeout_seconds='-1'/>
+		<exec_method type='method' name='start' exec='%{executables/p4web} -b -c %{options/P4CLIENT} -C %{options/P4CHARSET} -L %{options/P4WEB_LOG} -m %{options/P4WEB_MIMEFILE} -p %{options/P4WEB_TARGET} -u %{options/P4WEB_USER} -w %{options/P4WEB_PORT} -s%{options/P4WEB_SECURITY}' timeout_seconds='-1'/>
 		<exec_method type='method' name='stop' exec=':kill' timeout_seconds='30'/>
 
 		<notification_parameters>
@@ -362,6 +362,7 @@ p4p:default	(optional)
 			<propval name='P4WEB_USER' type='astring' value='www'/>
 			<propval name='P4PASSWORD' type='astring' value='MyWebGrocer2013#'/>
 			<propval name='P4WEB_PORT' type='astring' value='tcp:80'/>
+			<propval name='P4WEB_SECURITY' type='astring' value='ahirs'/>
 		</property_group>
        
         <stability value='Evolving'/>
