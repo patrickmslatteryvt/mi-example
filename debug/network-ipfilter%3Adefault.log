@@ -1,0 +1,3308 @@
++ . /lib/svc/share/smf_include.sh
++ SMF_EXIT_OK=0
++ SMF_EXIT_NODAEMON=94
++ SMF_EXIT_ERR_FATAL=95
++ SMF_EXIT_ERR_CONFIG=96
++ SMF_EXIT_MON_DEGRADE=97
++ SMF_EXIT_MON_OFFLINE=98
++ SMF_EXIT_ERR_NOSMF=99
++ SMF_EXIT_ERR_PERM=100
++ . /lib/svc/share/ipf_include.sh
++ IPFILTER_FMRI=svc:/network/ipfilter:default
++ ETC_IPF_DIR=/etc/ipf
++ /usr/bin/svcprop -p config/ipf6_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IP6FILCONF=/etc/ipf/ipf6.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ipnat_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPNATCONF=/etc/ipf/ipnat.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ippool_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPPOOLCONF=/etc/ipf/ippool.conf
++ [ 0 -eq 1 ]
++ VAR_IPF_DIR=/var/run/ipf
++ IPFILCONF=/var/run/ipf/ipf.conf
++ IPFILOVRCONF=/var/run/ipf/ipf_ovr.conf
++ IPF_LOCK=/var/run/ipflock
++ CONF_FILES=''
++ NAT_FILES=''
++ IPF_SUFFIX=.ipf
++ NAT_SUFFIX=.nat
++ CURRENT_VERSION=1
++ IPF_FMRI=svc:/network/ipfilter:default
++ INETDFMRI=svc:/network/inetd:default
++ RPCBINDFMRI=svc:/network/rpc/bind:default
++ SMF_ONLINE=online
++ SMF_MAINT=maintenance
++ SMF_NONE=none
++ FW_CONTEXT_PG=firewall_context
++ METHOD_PROP=ipf_method
++ FW_CONFIG_PG=firewall_config
++ POLICY_PROP=policy
++ APPLY2_PROP=apply_to
++ EXCEPTIONS_PROP=exceptions
++ FW_CONFIG_DEF_PG=firewall_config_default
++ FW_CONFIG_OVR_PG=firewall_config_override
++ CUSTOM_FILE_PROP=custom_policy_file
++ OPEN_PORTS_PROP=open_ports
++ PREFIX_HOST=host:
++ PREFIX_NET=network:
++ PREFIX_POOL=pool:
++ PREFIX_IF=if:
++ GLOBAL_CONFIG=''
++ GLOBAL_POLICY=''
++ SERVINFO=/usr/lib/servinfo
++ server_port_list=''
++ global_init
++ awk '{$2=" "; print $0}'
++ svcprop -p firewall_config_override -p firewall_config_default svc:/network/ipfilter:default
++ 2> /dev/null
++ GLOBAL_CONFIG=$'firewall_config_default/apply_to   ""\nfirewall_config_default/exceptions   ""\nfirewall_config_default/open_ports   ""\nfirewall_config_default/value_authorization   solaris.smf.value.firewall.config\nfirewall_config_default/policy   custom\nfirewall_config_default/custom_policy_file   /etc/ipf/ipf.conf\nfirewall_config_default/version   1\nfirewall_config_override/apply_to   ""\nfirewall_config_override/policy   none\nfirewall_config_override/value_authorization   solaris.smf.value.firewall.config'
++ global_get_prop_value firewall_config_default policy
++ target_pg=firewall_config_default
++ prop=policy
++ [ firewall_config_default != firewall_config_override -a firewall_config_default != firewall_config_default ]
++ [ firewall_config_default == firewall_config_default ]
++ extra_pg=firewall_config_override
++ awk $'{\n\t\tfound=0\n\t\tfor (i=1; i<=NF; i++) {\n\t\t\tif (found == 1) {\n\t\t\t\tif (index($i, target_pg) == 1 || index($i, extra_pg) == 1)\n\t\t\t\t\tbreak;\n\n\t\t\t\tprint $i;\n\t\t\t}\n\n\t\t\tif (split($i, values, "/") < 2)\n\t\t\t\tcontinue;\n\n\t\t\tif (values[1] == target_pg && values[2] == prop)\n\t\t\t\tfound=1;\n\t\t}\n\t}' target_pg=firewall_config_default prop=policy extra_pg=firewall_config_override
++ echo firewall_config_default/apply_to '""' firewall_config_default/exceptions '""' firewall_config_default/open_ports '""' firewall_config_default/value_authorization solaris.smf.value.firewall.config firewall_config_default/policy custom firewall_config_default/custom_policy_file /etc/ipf/ipf.conf firewall_config_default/version 1 firewall_config_override/apply_to '""' firewall_config_override/policy none firewall_config_override/value_authorization solaris.smf.value.firewall.config
++ value=custom
++ echo custom
++ GLOBAL_POLICY=custom
++ PATH=/usr/sbin:/usr/bin:/usr/sbin:/usr/lib/ipf:/usr/sbin:/usr/lib/ipf
++ PIDFILE=/var/run/ipmon.pid
++ PFILCHECKED=no
++ smf_zonename
++ echo 2e7096fd-2743-4c3f-b172-d9f511279ee1
++ zone=2e7096fd-2743-4c3f-b172-d9f511279ee1
++ awk '/ipf/ { print $1 } ' -
++ 2> /dev/null
++ /usr/sbin/modinfo
++ 2>& 1
++ ipfid=202
++ [ -f /var/run/ipmon.pid ]
++ cat /var/run/ipmon.pid
++ 2> /dev/null
++ pid=31638
++ [ svc:/TEMP/application/perforce/p4broker:sideload_p4web = svc:/network/ipfilter:default ]
++ service_update svc:/TEMP/application/perforce/p4broker:sideload_p4web
++ svc=svc:/TEMP/application/perforce/p4broker:sideload_p4web
++ ret=0
++ [ custom = custom ]
++ return 0
++ exit 0
++ . /lib/svc/share/smf_include.sh
++ SMF_EXIT_OK=0
++ SMF_EXIT_NODAEMON=94
++ SMF_EXIT_ERR_FATAL=95
++ SMF_EXIT_ERR_CONFIG=96
++ SMF_EXIT_MON_DEGRADE=97
++ SMF_EXIT_MON_OFFLINE=98
++ SMF_EXIT_ERR_NOSMF=99
++ SMF_EXIT_ERR_PERM=100
++ . /lib/svc/share/ipf_include.sh
++ IPFILTER_FMRI=svc:/network/ipfilter:default
++ ETC_IPF_DIR=/etc/ipf
++ /usr/bin/svcprop -p config/ipf6_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IP6FILCONF=/etc/ipf/ipf6.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ipnat_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPNATCONF=/etc/ipf/ipnat.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ippool_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPPOOLCONF=/etc/ipf/ippool.conf
++ [ 0 -eq 1 ]
++ VAR_IPF_DIR=/var/run/ipf
++ IPFILCONF=/var/run/ipf/ipf.conf
++ IPFILOVRCONF=/var/run/ipf/ipf_ovr.conf
++ IPF_LOCK=/var/run/ipflock
++ CONF_FILES=''
++ NAT_FILES=''
++ IPF_SUFFIX=.ipf
++ NAT_SUFFIX=.nat
++ CURRENT_VERSION=1
++ IPF_FMRI=svc:/network/ipfilter:default
++ INETDFMRI=svc:/network/inetd:default
++ RPCBINDFMRI=svc:/network/rpc/bind:default
++ SMF_ONLINE=online
++ SMF_MAINT=maintenance
++ SMF_NONE=none
++ FW_CONTEXT_PG=firewall_context
++ METHOD_PROP=ipf_method
++ FW_CONFIG_PG=firewall_config
++ POLICY_PROP=policy
++ APPLY2_PROP=apply_to
++ EXCEPTIONS_PROP=exceptions
++ FW_CONFIG_DEF_PG=firewall_config_default
++ FW_CONFIG_OVR_PG=firewall_config_override
++ CUSTOM_FILE_PROP=custom_policy_file
++ OPEN_PORTS_PROP=open_ports
++ PREFIX_HOST=host:
++ PREFIX_NET=network:
++ PREFIX_POOL=pool:
++ PREFIX_IF=if:
++ GLOBAL_CONFIG=''
++ GLOBAL_POLICY=''
++ SERVINFO=/usr/lib/servinfo
++ server_port_list=''
++ global_init
++ awk '{$2=" "; print $0}'
++ svcprop -p firewall_config_override -p firewall_config_default svc:/network/ipfilter:default
++ 2> /dev/null
++ GLOBAL_CONFIG=$'firewall_config_default/apply_to   ""\nfirewall_config_default/exceptions   ""\nfirewall_config_default/open_ports   ""\nfirewall_config_default/value_authorization   solaris.smf.value.firewall.config\nfirewall_config_default/policy   custom\nfirewall_config_default/custom_policy_file   /etc/ipf/ipf.conf\nfirewall_config_default/version   1\nfirewall_config_override/apply_to   ""\nfirewall_config_override/policy   none\nfirewall_config_override/value_authorization   solaris.smf.value.firewall.config'
++ global_get_prop_value firewall_config_default policy
++ target_pg=firewall_config_default
++ prop=policy
++ [ firewall_config_default != firewall_config_override -a firewall_config_default != firewall_config_default ]
++ [ firewall_config_default == firewall_config_default ]
++ extra_pg=firewall_config_override
++ awk $'{\n\t\tfound=0\n\t\tfor (i=1; i<=NF; i++) {\n\t\t\tif (found == 1) {\n\t\t\t\tif (index($i, target_pg) == 1 || index($i, extra_pg) == 1)\n\t\t\t\t\tbreak;\n\n\t\t\t\tprint $i;\n\t\t\t}\n\n\t\t\tif (split($i, values, "/") < 2)\n\t\t\t\tcontinue;\n\n\t\t\tif (values[1] == target_pg && values[2] == prop)\n\t\t\t\tfound=1;\n\t\t}\n\t}' target_pg=firewall_config_default prop=policy extra_pg=firewall_config_override
++ echo firewall_config_default/apply_to '""' firewall_config_default/exceptions '""' firewall_config_default/open_ports '""' firewall_config_default/value_authorization solaris.smf.value.firewall.config firewall_config_default/policy custom firewall_config_default/custom_policy_file /etc/ipf/ipf.conf firewall_config_default/version 1 firewall_config_override/apply_to '""' firewall_config_override/policy none firewall_config_override/value_authorization solaris.smf.value.firewall.config
++ value=custom
++ echo custom
++ GLOBAL_POLICY=custom
++ PATH=/usr/sbin:/usr/bin:/usr/sbin:/usr/lib/ipf:/usr/sbin:/usr/lib/ipf
++ PIDFILE=/var/run/ipmon.pid
++ PFILCHECKED=no
++ smf_zonename
++ echo 2e7096fd-2743-4c3f-b172-d9f511279ee1
++ zone=2e7096fd-2743-4c3f-b172-d9f511279ee1
++ awk '/ipf/ { print $1 } ' -
++ 2> /dev/null
++ /usr/sbin/modinfo
++ 2>& 1
++ ipfid=202
++ [ -f /var/run/ipmon.pid ]
++ cat /var/run/ipmon.pid
++ 2> /dev/null
++ pid=31638
++ [ svc:/TEMP/application/perforce/p4broker:depots = svc:/network/ipfilter:default ]
++ service_update svc:/TEMP/application/perforce/p4broker:depots
++ svc=svc:/TEMP/application/perforce/p4broker:depots
++ ret=0
++ [ custom = custom ]
++ return 0
++ exit 0
++ . /lib/svc/share/smf_include.sh
++ SMF_EXIT_OK=0
++ SMF_EXIT_NODAEMON=94
++ SMF_EXIT_ERR_FATAL=95
++ SMF_EXIT_ERR_CONFIG=96
++ SMF_EXIT_MON_DEGRADE=97
++ SMF_EXIT_MON_OFFLINE=98
++ SMF_EXIT_ERR_NOSMF=99
++ SMF_EXIT_ERR_PERM=100
++ . /lib/svc/share/ipf_include.sh
++ IPFILTER_FMRI=svc:/network/ipfilter:default
++ ETC_IPF_DIR=/etc/ipf
++ /usr/bin/svcprop -p config/ipf6_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IP6FILCONF=/etc/ipf/ipf6.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ipnat_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPNATCONF=/etc/ipf/ipnat.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ippool_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPPOOLCONF=/etc/ipf/ippool.conf
++ [ 0 -eq 1 ]
++ VAR_IPF_DIR=/var/run/ipf
++ IPFILCONF=/var/run/ipf/ipf.conf
++ IPFILOVRCONF=/var/run/ipf/ipf_ovr.conf
++ IPF_LOCK=/var/run/ipflock
++ CONF_FILES=''
++ NAT_FILES=''
++ IPF_SUFFIX=.ipf
++ NAT_SUFFIX=.nat
++ CURRENT_VERSION=1
++ IPF_FMRI=svc:/network/ipfilter:default
++ INETDFMRI=svc:/network/inetd:default
++ RPCBINDFMRI=svc:/network/rpc/bind:default
++ SMF_ONLINE=online
++ SMF_MAINT=maintenance
++ SMF_NONE=none
++ FW_CONTEXT_PG=firewall_context
++ METHOD_PROP=ipf_method
++ FW_CONFIG_PG=firewall_config
++ POLICY_PROP=policy
++ APPLY2_PROP=apply_to
++ EXCEPTIONS_PROP=exceptions
++ FW_CONFIG_DEF_PG=firewall_config_default
++ FW_CONFIG_OVR_PG=firewall_config_override
++ CUSTOM_FILE_PROP=custom_policy_file
++ OPEN_PORTS_PROP=open_ports
++ PREFIX_HOST=host:
++ PREFIX_NET=network:
++ PREFIX_POOL=pool:
++ PREFIX_IF=if:
++ GLOBAL_CONFIG=''
++ GLOBAL_POLICY=''
++ SERVINFO=/usr/lib/servinfo
++ server_port_list=''
++ global_init
++ awk '{$2=" "; print $0}'
++ svcprop -p firewall_config_override -p firewall_config_default svc:/network/ipfilter:default
++ 2> /dev/null
++ GLOBAL_CONFIG=$'firewall_config_default/apply_to   ""\nfirewall_config_default/exceptions   ""\nfirewall_config_default/open_ports   ""\nfirewall_config_default/value_authorization   solaris.smf.value.firewall.config\nfirewall_config_default/policy   custom\nfirewall_config_default/custom_policy_file   /etc/ipf/ipf.conf\nfirewall_config_default/version   1\nfirewall_config_override/apply_to   ""\nfirewall_config_override/policy   none\nfirewall_config_override/value_authorization   solaris.smf.value.firewall.config'
++ global_get_prop_value firewall_config_default policy
++ target_pg=firewall_config_default
++ prop=policy
++ [ firewall_config_default != firewall_config_override -a firewall_config_default != firewall_config_default ]
++ [ firewall_config_default == firewall_config_default ]
++ extra_pg=firewall_config_override
++ awk $'{\n\t\tfound=0\n\t\tfor (i=1; i<=NF; i++) {\n\t\t\tif (found == 1) {\n\t\t\t\tif (index($i, target_pg) == 1 || index($i, extra_pg) == 1)\n\t\t\t\t\tbreak;\n\n\t\t\t\tprint $i;\n\t\t\t}\n\n\t\t\tif (split($i, values, "/") < 2)\n\t\t\t\tcontinue;\n\n\t\t\tif (values[1] == target_pg && values[2] == prop)\n\t\t\t\tfound=1;\n\t\t}\n\t}' target_pg=firewall_config_default prop=policy extra_pg=firewall_config_override
++ echo firewall_config_default/apply_to '""' firewall_config_default/exceptions '""' firewall_config_default/open_ports '""' firewall_config_default/value_authorization solaris.smf.value.firewall.config firewall_config_default/policy custom firewall_config_default/custom_policy_file /etc/ipf/ipf.conf firewall_config_default/version 1 firewall_config_override/apply_to '""' firewall_config_override/policy none firewall_config_override/value_authorization solaris.smf.value.firewall.config
++ value=custom
++ echo custom
++ GLOBAL_POLICY=custom
++ PATH=/usr/sbin:/usr/bin:/usr/sbin:/usr/lib/ipf:/usr/sbin:/usr/lib/ipf
++ PIDFILE=/var/run/ipmon.pid
++ PFILCHECKED=no
++ smf_zonename
++ echo 2e7096fd-2743-4c3f-b172-d9f511279ee1
++ zone=2e7096fd-2743-4c3f-b172-d9f511279ee1
++ awk '/ipf/ { print $1 } ' -
++ 2> /dev/null
++ /usr/sbin/modinfo
++ 2>& 1
++ ipfid=202
++ [ -f /var/run/ipmon.pid ]
++ cat /var/run/ipmon.pid
++ 2> /dev/null
++ pid=31638
++ [ svc:/TEMP/application/perforce/p4d:sideload_p4web = svc:/network/ipfilter:default ]
++ service_update svc:/TEMP/application/perforce/p4d:sideload_p4web
++ svc=svc:/TEMP/application/perforce/p4d:sideload_p4web
++ ret=0
++ [ custom = custom ]
++ return 0
++ exit 0
++ . /lib/svc/share/smf_include.sh
++ SMF_EXIT_OK=0
++ SMF_EXIT_NODAEMON=94
++ SMF_EXIT_ERR_FATAL=95
++ SMF_EXIT_ERR_CONFIG=96
++ SMF_EXIT_MON_DEGRADE=97
++ SMF_EXIT_MON_OFFLINE=98
++ SMF_EXIT_ERR_NOSMF=99
++ SMF_EXIT_ERR_PERM=100
++ . /lib/svc/share/ipf_include.sh
++ IPFILTER_FMRI=svc:/network/ipfilter:default
++ ETC_IPF_DIR=/etc/ipf
++ /usr/bin/svcprop -p config/ipf6_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IP6FILCONF=/etc/ipf/ipf6.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ipnat_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPNATCONF=/etc/ipf/ipnat.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ippool_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPPOOLCONF=/etc/ipf/ippool.conf
++ [ 0 -eq 1 ]
++ VAR_IPF_DIR=/var/run/ipf
++ IPFILCONF=/var/run/ipf/ipf.conf
++ IPFILOVRCONF=/var/run/ipf/ipf_ovr.conf
++ IPF_LOCK=/var/run/ipflock
++ CONF_FILES=''
++ NAT_FILES=''
++ IPF_SUFFIX=.ipf
++ NAT_SUFFIX=.nat
++ CURRENT_VERSION=1
++ IPF_FMRI=svc:/network/ipfilter:default
++ INETDFMRI=svc:/network/inetd:default
++ RPCBINDFMRI=svc:/network/rpc/bind:default
++ SMF_ONLINE=online
++ SMF_MAINT=maintenance
++ SMF_NONE=none
++ FW_CONTEXT_PG=firewall_context
++ METHOD_PROP=ipf_method
++ FW_CONFIG_PG=firewall_config
++ POLICY_PROP=policy
++ APPLY2_PROP=apply_to
++ EXCEPTIONS_PROP=exceptions
++ FW_CONFIG_DEF_PG=firewall_config_default
++ FW_CONFIG_OVR_PG=firewall_config_override
++ CUSTOM_FILE_PROP=custom_policy_file
++ OPEN_PORTS_PROP=open_ports
++ PREFIX_HOST=host:
++ PREFIX_NET=network:
++ PREFIX_POOL=pool:
++ PREFIX_IF=if:
++ GLOBAL_CONFIG=''
++ GLOBAL_POLICY=''
++ SERVINFO=/usr/lib/servinfo
++ server_port_list=''
++ global_init
++ awk '{$2=" "; print $0}'
++ svcprop -p firewall_config_override -p firewall_config_default svc:/network/ipfilter:default
++ 2> /dev/null
++ GLOBAL_CONFIG=$'firewall_config_default/apply_to   ""\nfirewall_config_default/exceptions   ""\nfirewall_config_default/open_ports   ""\nfirewall_config_default/value_authorization   solaris.smf.value.firewall.config\nfirewall_config_default/policy   custom\nfirewall_config_default/custom_policy_file   /etc/ipf/ipf.conf\nfirewall_config_default/version   1\nfirewall_config_override/apply_to   ""\nfirewall_config_override/policy   none\nfirewall_config_override/value_authorization   solaris.smf.value.firewall.config'
++ global_get_prop_value firewall_config_default policy
++ target_pg=firewall_config_default
++ prop=policy
++ [ firewall_config_default != firewall_config_override -a firewall_config_default != firewall_config_default ]
++ [ firewall_config_default == firewall_config_default ]
++ extra_pg=firewall_config_override
++ awk $'{\n\t\tfound=0\n\t\tfor (i=1; i<=NF; i++) {\n\t\t\tif (found == 1) {\n\t\t\t\tif (index($i, target_pg) == 1 || index($i, extra_pg) == 1)\n\t\t\t\t\tbreak;\n\n\t\t\t\tprint $i;\n\t\t\t}\n\n\t\t\tif (split($i, values, "/") < 2)\n\t\t\t\tcontinue;\n\n\t\t\tif (values[1] == target_pg && values[2] == prop)\n\t\t\t\tfound=1;\n\t\t}\n\t}' target_pg=firewall_config_default prop=policy extra_pg=firewall_config_override
++ echo firewall_config_default/apply_to '""' firewall_config_default/exceptions '""' firewall_config_default/open_ports '""' firewall_config_default/value_authorization solaris.smf.value.firewall.config firewall_config_default/policy custom firewall_config_default/custom_policy_file /etc/ipf/ipf.conf firewall_config_default/version 1 firewall_config_override/apply_to '""' firewall_config_override/policy none firewall_config_override/value_authorization solaris.smf.value.firewall.config
++ value=custom
++ echo custom
++ GLOBAL_POLICY=custom
++ PATH=/usr/sbin:/usr/bin:/usr/sbin:/usr/lib/ipf:/usr/sbin:/usr/lib/ipf
++ PIDFILE=/var/run/ipmon.pid
++ PFILCHECKED=no
++ smf_zonename
++ echo 2e7096fd-2743-4c3f-b172-d9f511279ee1
++ zone=2e7096fd-2743-4c3f-b172-d9f511279ee1
++ awk '/ipf/ { print $1 } ' -
++ 2> /dev/null
++ /usr/sbin/modinfo
++ 2>& 1
++ ipfid=202
++ [ -f /var/run/ipmon.pid ]
++ cat /var/run/ipmon.pid
++ 2> /dev/null
++ pid=31638
++ [ svc:/TEMP/application/perforce/p4d:depots = svc:/network/ipfilter:default ]
++ service_update svc:/TEMP/application/perforce/p4d:depots
++ svc=svc:/TEMP/application/perforce/p4d:depots
++ ret=0
++ [ custom = custom ]
++ return 0
++ exit 0
++ . /lib/svc/share/smf_include.sh
++ SMF_EXIT_OK=0
++ SMF_EXIT_NODAEMON=94
++ SMF_EXIT_ERR_FATAL=95
++ SMF_EXIT_ERR_CONFIG=96
++ SMF_EXIT_MON_DEGRADE=97
++ SMF_EXIT_MON_OFFLINE=98
++ SMF_EXIT_ERR_NOSMF=99
++ SMF_EXIT_ERR_PERM=100
++ . /lib/svc/share/ipf_include.sh
++ IPFILTER_FMRI=svc:/network/ipfilter:default
++ ETC_IPF_DIR=/etc/ipf
++ /usr/bin/svcprop -p config/ipf6_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IP6FILCONF=/etc/ipf/ipf6.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ipnat_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPNATCONF=/etc/ipf/ipnat.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ippool_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPPOOLCONF=/etc/ipf/ippool.conf
++ [ 0 -eq 1 ]
++ VAR_IPF_DIR=/var/run/ipf
++ IPFILCONF=/var/run/ipf/ipf.conf
++ IPFILOVRCONF=/var/run/ipf/ipf_ovr.conf
++ IPF_LOCK=/var/run/ipflock
++ CONF_FILES=''
++ NAT_FILES=''
++ IPF_SUFFIX=.ipf
++ NAT_SUFFIX=.nat
++ CURRENT_VERSION=1
++ IPF_FMRI=svc:/network/ipfilter:default
++ INETDFMRI=svc:/network/inetd:default
++ RPCBINDFMRI=svc:/network/rpc/bind:default
++ SMF_ONLINE=online
++ SMF_MAINT=maintenance
++ SMF_NONE=none
++ FW_CONTEXT_PG=firewall_context
++ METHOD_PROP=ipf_method
++ FW_CONFIG_PG=firewall_config
++ POLICY_PROP=policy
++ APPLY2_PROP=apply_to
++ EXCEPTIONS_PROP=exceptions
++ FW_CONFIG_DEF_PG=firewall_config_default
++ FW_CONFIG_OVR_PG=firewall_config_override
++ CUSTOM_FILE_PROP=custom_policy_file
++ OPEN_PORTS_PROP=open_ports
++ PREFIX_HOST=host:
++ PREFIX_NET=network:
++ PREFIX_POOL=pool:
++ PREFIX_IF=if:
++ GLOBAL_CONFIG=''
++ GLOBAL_POLICY=''
++ SERVINFO=/usr/lib/servinfo
++ server_port_list=''
++ global_init
++ awk '{$2=" "; print $0}'
++ svcprop -p firewall_config_override -p firewall_config_default svc:/network/ipfilter:default
++ 2> /dev/null
++ GLOBAL_CONFIG=$'firewall_config_default/apply_to   ""\nfirewall_config_default/exceptions   ""\nfirewall_config_default/open_ports   ""\nfirewall_config_default/value_authorization   solaris.smf.value.firewall.config\nfirewall_config_default/policy   custom\nfirewall_config_default/custom_policy_file   /etc/ipf/ipf.conf\nfirewall_config_default/version   1\nfirewall_config_override/apply_to   ""\nfirewall_config_override/policy   none\nfirewall_config_override/value_authorization   solaris.smf.value.firewall.config'
++ global_get_prop_value firewall_config_default policy
++ target_pg=firewall_config_default
++ prop=policy
++ [ firewall_config_default != firewall_config_override -a firewall_config_default != firewall_config_default ]
++ [ firewall_config_default == firewall_config_default ]
++ extra_pg=firewall_config_override
++ awk $'{\n\t\tfound=0\n\t\tfor (i=1; i<=NF; i++) {\n\t\t\tif (found == 1) {\n\t\t\t\tif (index($i, target_pg) == 1 || index($i, extra_pg) == 1)\n\t\t\t\t\tbreak;\n\n\t\t\t\tprint $i;\n\t\t\t}\n\n\t\t\tif (split($i, values, "/") < 2)\n\t\t\t\tcontinue;\n\n\t\t\tif (values[1] == target_pg && values[2] == prop)\n\t\t\t\tfound=1;\n\t\t}\n\t}' target_pg=firewall_config_default prop=policy extra_pg=firewall_config_override
++ echo firewall_config_default/apply_to '""' firewall_config_default/exceptions '""' firewall_config_default/open_ports '""' firewall_config_default/value_authorization solaris.smf.value.firewall.config firewall_config_default/policy custom firewall_config_default/custom_policy_file /etc/ipf/ipf.conf firewall_config_default/version 1 firewall_config_override/apply_to '""' firewall_config_override/policy none firewall_config_override/value_authorization solaris.smf.value.firewall.config
++ value=custom
++ echo custom
++ GLOBAL_POLICY=custom
++ PATH=/usr/sbin:/usr/bin:/usr/sbin:/usr/lib/ipf:/usr/sbin:/usr/lib/ipf
++ PIDFILE=/var/run/ipmon.pid
++ PFILCHECKED=no
++ smf_zonename
++ echo 2e7096fd-2743-4c3f-b172-d9f511279ee1
++ zone=2e7096fd-2743-4c3f-b172-d9f511279ee1
++ awk '/ipf/ { print $1 } ' -
++ 2> /dev/null
++ /usr/sbin/modinfo
++ 2>& 1
++ ipfid=202
++ [ -f /var/run/ipmon.pid ]
++ cat /var/run/ipmon.pid
++ 2> /dev/null
++ pid=31638
++ [ svc:/TEMP/application/perforce/p4d:default = svc:/network/ipfilter:default ]
++ service_update svc:/TEMP/application/perforce/p4d:default
++ svc=svc:/TEMP/application/perforce/p4d:default
++ ret=0
++ [ custom = custom ]
++ return 0
++ exit 0
++ . /lib/svc/share/smf_include.sh
++ SMF_EXIT_OK=0
++ SMF_EXIT_NODAEMON=94
++ SMF_EXIT_ERR_FATAL=95
++ SMF_EXIT_ERR_CONFIG=96
++ SMF_EXIT_MON_DEGRADE=97
++ SMF_EXIT_MON_OFFLINE=98
++ SMF_EXIT_ERR_NOSMF=99
++ SMF_EXIT_ERR_PERM=100
++ . /lib/svc/share/ipf_include.sh
++ IPFILTER_FMRI=svc:/network/ipfilter:default
++ ETC_IPF_DIR=/etc/ipf
++ /usr/bin/svcprop -p config/ipf6_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IP6FILCONF=/etc/ipf/ipf6.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ipnat_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPNATCONF=/etc/ipf/ipnat.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ippool_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPPOOLCONF=/etc/ipf/ippool.conf
++ [ 0 -eq 1 ]
++ VAR_IPF_DIR=/var/run/ipf
++ IPFILCONF=/var/run/ipf/ipf.conf
++ IPFILOVRCONF=/var/run/ipf/ipf_ovr.conf
++ IPF_LOCK=/var/run/ipflock
++ CONF_FILES=''
++ NAT_FILES=''
++ IPF_SUFFIX=.ipf
++ NAT_SUFFIX=.nat
++ CURRENT_VERSION=1
++ IPF_FMRI=svc:/network/ipfilter:default
++ INETDFMRI=svc:/network/inetd:default
++ RPCBINDFMRI=svc:/network/rpc/bind:default
++ SMF_ONLINE=online
++ SMF_MAINT=maintenance
++ SMF_NONE=none
++ FW_CONTEXT_PG=firewall_context
++ METHOD_PROP=ipf_method
++ FW_CONFIG_PG=firewall_config
++ POLICY_PROP=policy
++ APPLY2_PROP=apply_to
++ EXCEPTIONS_PROP=exceptions
++ FW_CONFIG_DEF_PG=firewall_config_default
++ FW_CONFIG_OVR_PG=firewall_config_override
++ CUSTOM_FILE_PROP=custom_policy_file
++ OPEN_PORTS_PROP=open_ports
++ PREFIX_HOST=host:
++ PREFIX_NET=network:
++ PREFIX_POOL=pool:
++ PREFIX_IF=if:
++ GLOBAL_CONFIG=''
++ GLOBAL_POLICY=''
++ SERVINFO=/usr/lib/servinfo
++ server_port_list=''
++ global_init
++ awk '{$2=" "; print $0}'
++ svcprop -p firewall_config_override -p firewall_config_default svc:/network/ipfilter:default
++ 2> /dev/null
++ GLOBAL_CONFIG=$'firewall_config_default/apply_to   ""\nfirewall_config_default/exceptions   ""\nfirewall_config_default/open_ports   ""\nfirewall_config_default/value_authorization   solaris.smf.value.firewall.config\nfirewall_config_default/policy   custom\nfirewall_config_default/custom_policy_file   /etc/ipf/ipf.conf\nfirewall_config_default/version   1\nfirewall_config_override/apply_to   ""\nfirewall_config_override/policy   none\nfirewall_config_override/value_authorization   solaris.smf.value.firewall.config'
++ global_get_prop_value firewall_config_default policy
++ target_pg=firewall_config_default
++ prop=policy
++ [ firewall_config_default != firewall_config_override -a firewall_config_default != firewall_config_default ]
++ [ firewall_config_default == firewall_config_default ]
++ extra_pg=firewall_config_override
++ awk $'{\n\t\tfound=0\n\t\tfor (i=1; i<=NF; i++) {\n\t\t\tif (found == 1) {\n\t\t\t\tif (index($i, target_pg) == 1 || index($i, extra_pg) == 1)\n\t\t\t\t\tbreak;\n\n\t\t\t\tprint $i;\n\t\t\t}\n\n\t\t\tif (split($i, values, "/") < 2)\n\t\t\t\tcontinue;\n\n\t\t\tif (values[1] == target_pg && values[2] == prop)\n\t\t\t\tfound=1;\n\t\t}\n\t}' target_pg=firewall_config_default prop=policy extra_pg=firewall_config_override
++ echo firewall_config_default/apply_to '""' firewall_config_default/exceptions '""' firewall_config_default/open_ports '""' firewall_config_default/value_authorization solaris.smf.value.firewall.config firewall_config_default/policy custom firewall_config_default/custom_policy_file /etc/ipf/ipf.conf firewall_config_default/version 1 firewall_config_override/apply_to '""' firewall_config_override/policy none firewall_config_override/value_authorization solaris.smf.value.firewall.config
++ value=custom
++ echo custom
++ GLOBAL_POLICY=custom
++ PATH=/usr/sbin:/usr/bin:/usr/sbin:/usr/lib/ipf:/usr/sbin:/usr/lib/ipf
++ PIDFILE=/var/run/ipmon.pid
++ PFILCHECKED=no
++ smf_zonename
++ echo 2e7096fd-2743-4c3f-b172-d9f511279ee1
++ zone=2e7096fd-2743-4c3f-b172-d9f511279ee1
++ awk '/ipf/ { print $1 } ' -
++ 2> /dev/null
++ /usr/sbin/modinfo
++ 2>& 1
++ ipfid=202
++ [ -f /var/run/ipmon.pid ]
++ cat /var/run/ipmon.pid
++ 2> /dev/null
++ pid=31638
++ [ svc:/TEMP/application/perforce/p4p:default = svc:/network/ipfilter:default ]
++ service_update svc:/TEMP/application/perforce/p4p:default
++ svc=svc:/TEMP/application/perforce/p4p:default
++ ret=0
++ [ custom = custom ]
++ return 0
++ exit 0
++ . /lib/svc/share/smf_include.sh
++ SMF_EXIT_OK=0
++ SMF_EXIT_NODAEMON=94
++ SMF_EXIT_ERR_FATAL=95
++ SMF_EXIT_ERR_CONFIG=96
++ SMF_EXIT_MON_DEGRADE=97
++ SMF_EXIT_MON_OFFLINE=98
++ SMF_EXIT_ERR_NOSMF=99
++ SMF_EXIT_ERR_PERM=100
++ . /lib/svc/share/ipf_include.sh
++ IPFILTER_FMRI=svc:/network/ipfilter:default
++ ETC_IPF_DIR=/etc/ipf
++ /usr/bin/svcprop -p config/ipf6_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IP6FILCONF=/etc/ipf/ipf6.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ipnat_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPNATCONF=/etc/ipf/ipnat.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ippool_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPPOOLCONF=/etc/ipf/ippool.conf
++ [ 0 -eq 1 ]
++ VAR_IPF_DIR=/var/run/ipf
++ IPFILCONF=/var/run/ipf/ipf.conf
++ IPFILOVRCONF=/var/run/ipf/ipf_ovr.conf
++ IPF_LOCK=/var/run/ipflock
++ CONF_FILES=''
++ NAT_FILES=''
++ IPF_SUFFIX=.ipf
++ NAT_SUFFIX=.nat
++ CURRENT_VERSION=1
++ IPF_FMRI=svc:/network/ipfilter:default
++ INETDFMRI=svc:/network/inetd:default
++ RPCBINDFMRI=svc:/network/rpc/bind:default
++ SMF_ONLINE=online
++ SMF_MAINT=maintenance
++ SMF_NONE=none
++ FW_CONTEXT_PG=firewall_context
++ METHOD_PROP=ipf_method
++ FW_CONFIG_PG=firewall_config
++ POLICY_PROP=policy
++ APPLY2_PROP=apply_to
++ EXCEPTIONS_PROP=exceptions
++ FW_CONFIG_DEF_PG=firewall_config_default
++ FW_CONFIG_OVR_PG=firewall_config_override
++ CUSTOM_FILE_PROP=custom_policy_file
++ OPEN_PORTS_PROP=open_ports
++ PREFIX_HOST=host:
++ PREFIX_NET=network:
++ PREFIX_POOL=pool:
++ PREFIX_IF=if:
++ GLOBAL_CONFIG=''
++ GLOBAL_POLICY=''
++ SERVINFO=/usr/lib/servinfo
++ server_port_list=''
++ global_init
++ awk '{$2=" "; print $0}'
++ svcprop -p firewall_config_override -p firewall_config_default svc:/network/ipfilter:default
++ 2> /dev/null
++ GLOBAL_CONFIG=$'firewall_config_default/apply_to   ""\nfirewall_config_default/exceptions   ""\nfirewall_config_default/open_ports   ""\nfirewall_config_default/value_authorization   solaris.smf.value.firewall.config\nfirewall_config_default/policy   custom\nfirewall_config_default/custom_policy_file   /etc/ipf/ipf.conf\nfirewall_config_default/version   1\nfirewall_config_override/apply_to   ""\nfirewall_config_override/policy   none\nfirewall_config_override/value_authorization   solaris.smf.value.firewall.config'
++ global_get_prop_value firewall_config_default policy
++ target_pg=firewall_config_default
++ prop=policy
++ [ firewall_config_default != firewall_config_override -a firewall_config_default != firewall_config_default ]
++ [ firewall_config_default == firewall_config_default ]
++ extra_pg=firewall_config_override
++ awk $'{\n\t\tfound=0\n\t\tfor (i=1; i<=NF; i++) {\n\t\t\tif (found == 1) {\n\t\t\t\tif (index($i, target_pg) == 1 || index($i, extra_pg) == 1)\n\t\t\t\t\tbreak;\n\n\t\t\t\tprint $i;\n\t\t\t}\n\n\t\t\tif (split($i, values, "/") < 2)\n\t\t\t\tcontinue;\n\n\t\t\tif (values[1] == target_pg && values[2] == prop)\n\t\t\t\tfound=1;\n\t\t}\n\t}' target_pg=firewall_config_default prop=policy extra_pg=firewall_config_override
++ echo firewall_config_default/apply_to '""' firewall_config_default/exceptions '""' firewall_config_default/open_ports '""' firewall_config_default/value_authorization solaris.smf.value.firewall.config firewall_config_default/policy custom firewall_config_default/custom_policy_file /etc/ipf/ipf.conf firewall_config_default/version 1 firewall_config_override/apply_to '""' firewall_config_override/policy none firewall_config_override/value_authorization solaris.smf.value.firewall.config
++ value=custom
++ echo custom
++ GLOBAL_POLICY=custom
++ PATH=/usr/sbin:/usr/bin:/usr/sbin:/usr/lib/ipf:/usr/sbin:/usr/lib/ipf
++ PIDFILE=/var/run/ipmon.pid
++ PFILCHECKED=no
++ smf_zonename
++ echo 2e7096fd-2743-4c3f-b172-d9f511279ee1
++ zone=2e7096fd-2743-4c3f-b172-d9f511279ee1
++ awk '/ipf/ { print $1 } ' -
++ 2> /dev/null
++ /usr/sbin/modinfo
++ 2>& 1
++ ipfid=202
++ [ -f /var/run/ipmon.pid ]
++ cat /var/run/ipmon.pid
++ 2> /dev/null
++ pid=31638
++ [ svc:/TEMP/application/perforce/p4web:default = svc:/network/ipfilter:default ]
++ service_update svc:/TEMP/application/perforce/p4web:default
++ svc=svc:/TEMP/application/perforce/p4web:default
++ ret=0
++ [ custom = custom ]
++ return 0
++ exit 0
++ . /lib/svc/share/smf_include.sh
++ SMF_EXIT_OK=0
++ SMF_EXIT_NODAEMON=94
++ SMF_EXIT_ERR_FATAL=95
++ SMF_EXIT_ERR_CONFIG=96
++ SMF_EXIT_MON_DEGRADE=97
++ SMF_EXIT_MON_OFFLINE=98
++ SMF_EXIT_ERR_NOSMF=99
++ SMF_EXIT_ERR_PERM=100
++ . /lib/svc/share/ipf_include.sh
++ IPFILTER_FMRI=svc:/network/ipfilter:default
++ ETC_IPF_DIR=/etc/ipf
++ /usr/bin/svcprop -p config/ipf6_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IP6FILCONF=/etc/ipf/ipf6.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ipnat_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPNATCONF=/etc/ipf/ipnat.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ippool_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPPOOLCONF=/etc/ipf/ippool.conf
++ [ 0 -eq 1 ]
++ VAR_IPF_DIR=/var/run/ipf
++ IPFILCONF=/var/run/ipf/ipf.conf
++ IPFILOVRCONF=/var/run/ipf/ipf_ovr.conf
++ IPF_LOCK=/var/run/ipflock
++ CONF_FILES=''
++ NAT_FILES=''
++ IPF_SUFFIX=.ipf
++ NAT_SUFFIX=.nat
++ CURRENT_VERSION=1
++ IPF_FMRI=svc:/network/ipfilter:default
++ INETDFMRI=svc:/network/inetd:default
++ RPCBINDFMRI=svc:/network/rpc/bind:default
++ SMF_ONLINE=online
++ SMF_MAINT=maintenance
++ SMF_NONE=none
++ FW_CONTEXT_PG=firewall_context
++ METHOD_PROP=ipf_method
++ FW_CONFIG_PG=firewall_config
++ POLICY_PROP=policy
++ APPLY2_PROP=apply_to
++ EXCEPTIONS_PROP=exceptions
++ FW_CONFIG_DEF_PG=firewall_config_default
++ FW_CONFIG_OVR_PG=firewall_config_override
++ CUSTOM_FILE_PROP=custom_policy_file
++ OPEN_PORTS_PROP=open_ports
++ PREFIX_HOST=host:
++ PREFIX_NET=network:
++ PREFIX_POOL=pool:
++ PREFIX_IF=if:
++ GLOBAL_CONFIG=''
++ GLOBAL_POLICY=''
++ SERVINFO=/usr/lib/servinfo
++ server_port_list=''
++ global_init
++ awk '{$2=" "; print $0}'
++ svcprop -p firewall_config_override -p firewall_config_default svc:/network/ipfilter:default
++ 2> /dev/null
++ GLOBAL_CONFIG=$'firewall_config_default/apply_to   ""\nfirewall_config_default/exceptions   ""\nfirewall_config_default/open_ports   ""\nfirewall_config_default/value_authorization   solaris.smf.value.firewall.config\nfirewall_config_default/policy   custom\nfirewall_config_default/custom_policy_file   /etc/ipf/ipf.conf\nfirewall_config_default/version   1\nfirewall_config_override/apply_to   ""\nfirewall_config_override/policy   none\nfirewall_config_override/value_authorization   solaris.smf.value.firewall.config'
++ global_get_prop_value firewall_config_default policy
++ target_pg=firewall_config_default
++ prop=policy
++ [ firewall_config_default != firewall_config_override -a firewall_config_default != firewall_config_default ]
++ [ firewall_config_default == firewall_config_default ]
++ extra_pg=firewall_config_override
++ awk $'{\n\t\tfound=0\n\t\tfor (i=1; i<=NF; i++) {\n\t\t\tif (found == 1) {\n\t\t\t\tif (index($i, target_pg) == 1 || index($i, extra_pg) == 1)\n\t\t\t\t\tbreak;\n\n\t\t\t\tprint $i;\n\t\t\t}\n\n\t\t\tif (split($i, values, "/") < 2)\n\t\t\t\tcontinue;\n\n\t\t\tif (values[1] == target_pg && values[2] == prop)\n\t\t\t\tfound=1;\n\t\t}\n\t}' target_pg=firewall_config_default prop=policy extra_pg=firewall_config_override
++ echo firewall_config_default/apply_to '""' firewall_config_default/exceptions '""' firewall_config_default/open_ports '""' firewall_config_default/value_authorization solaris.smf.value.firewall.config firewall_config_default/policy custom firewall_config_default/custom_policy_file /etc/ipf/ipf.conf firewall_config_default/version 1 firewall_config_override/apply_to '""' firewall_config_override/policy none firewall_config_override/value_authorization solaris.smf.value.firewall.config
++ value=custom
++ echo custom
++ GLOBAL_POLICY=custom
++ PATH=/usr/sbin:/usr/bin:/usr/sbin:/usr/lib/ipf:/usr/sbin:/usr/lib/ipf
++ PIDFILE=/var/run/ipmon.pid
++ PFILCHECKED=no
++ smf_zonename
++ echo 2e7096fd-2743-4c3f-b172-d9f511279ee1
++ zone=2e7096fd-2743-4c3f-b172-d9f511279ee1
++ awk '/ipf/ { print $1 } ' -
++ 2> /dev/null
++ /usr/sbin/modinfo
++ 2>& 1
++ ipfid=202
++ [ -f /var/run/ipmon.pid ]
++ cat /var/run/ipmon.pid
++ 2> /dev/null
++ pid=31638
++ [ svc:/application/perforce/p4broker:depots = svc:/network/ipfilter:default ]
++ service_update svc:/application/perforce/p4broker:depots
++ svc=svc:/application/perforce/p4broker:depots
++ ret=0
++ [ custom = custom ]
++ return 0
++ exit 0
++ . /lib/svc/share/smf_include.sh
++ SMF_EXIT_OK=0
++ SMF_EXIT_NODAEMON=94
++ SMF_EXIT_ERR_FATAL=95
++ SMF_EXIT_ERR_CONFIG=96
++ SMF_EXIT_MON_DEGRADE=97
++ SMF_EXIT_MON_OFFLINE=98
++ SMF_EXIT_ERR_NOSMF=99
++ SMF_EXIT_ERR_PERM=100
++ . /lib/svc/share/ipf_include.sh
++ IPFILTER_FMRI=svc:/network/ipfilter:default
++ ETC_IPF_DIR=/etc/ipf
++ /usr/bin/svcprop -p config/ipf6_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IP6FILCONF=/etc/ipf/ipf6.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ipnat_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPNATCONF=/etc/ipf/ipnat.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ippool_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPPOOLCONF=/etc/ipf/ippool.conf
++ [ 0 -eq 1 ]
++ VAR_IPF_DIR=/var/run/ipf
++ IPFILCONF=/var/run/ipf/ipf.conf
++ IPFILOVRCONF=/var/run/ipf/ipf_ovr.conf
++ IPF_LOCK=/var/run/ipflock
++ CONF_FILES=''
++ NAT_FILES=''
++ IPF_SUFFIX=.ipf
++ NAT_SUFFIX=.nat
++ CURRENT_VERSION=1
++ IPF_FMRI=svc:/network/ipfilter:default
++ INETDFMRI=svc:/network/inetd:default
++ RPCBINDFMRI=svc:/network/rpc/bind:default
++ SMF_ONLINE=online
++ SMF_MAINT=maintenance
++ SMF_NONE=none
++ FW_CONTEXT_PG=firewall_context
++ METHOD_PROP=ipf_method
++ FW_CONFIG_PG=firewall_config
++ POLICY_PROP=policy
++ APPLY2_PROP=apply_to
++ EXCEPTIONS_PROP=exceptions
++ FW_CONFIG_DEF_PG=firewall_config_default
++ FW_CONFIG_OVR_PG=firewall_config_override
++ CUSTOM_FILE_PROP=custom_policy_file
++ OPEN_PORTS_PROP=open_ports
++ PREFIX_HOST=host:
++ PREFIX_NET=network:
++ PREFIX_POOL=pool:
++ PREFIX_IF=if:
++ GLOBAL_CONFIG=''
++ GLOBAL_POLICY=''
++ SERVINFO=/usr/lib/servinfo
++ server_port_list=''
++ global_init
++ awk '{$2=" "; print $0}'
++ svcprop -p firewall_config_override -p firewall_config_default svc:/network/ipfilter:default
++ 2> /dev/null
++ GLOBAL_CONFIG=$'firewall_config_default/apply_to   ""\nfirewall_config_default/exceptions   ""\nfirewall_config_default/open_ports   ""\nfirewall_config_default/value_authorization   solaris.smf.value.firewall.config\nfirewall_config_default/policy   custom\nfirewall_config_default/custom_policy_file   /etc/ipf/ipf.conf\nfirewall_config_default/version   1\nfirewall_config_override/apply_to   ""\nfirewall_config_override/policy   none\nfirewall_config_override/value_authorization   solaris.smf.value.firewall.config'
++ global_get_prop_value firewall_config_default policy
++ target_pg=firewall_config_default
++ prop=policy
++ [ firewall_config_default != firewall_config_override -a firewall_config_default != firewall_config_default ]
++ [ firewall_config_default == firewall_config_default ]
++ extra_pg=firewall_config_override
++ awk $'{\n\t\tfound=0\n\t\tfor (i=1; i<=NF; i++) {\n\t\t\tif (found == 1) {\n\t\t\t\tif (index($i, target_pg) == 1 || index($i, extra_pg) == 1)\n\t\t\t\t\tbreak;\n\n\t\t\t\tprint $i;\n\t\t\t}\n\n\t\t\tif (split($i, values, "/") < 2)\n\t\t\t\tcontinue;\n\n\t\t\tif (values[1] == target_pg && values[2] == prop)\n\t\t\t\tfound=1;\n\t\t}\n\t}' target_pg=firewall_config_default prop=policy extra_pg=firewall_config_override
++ echo firewall_config_default/apply_to '""' firewall_config_default/exceptions '""' firewall_config_default/open_ports '""' firewall_config_default/value_authorization solaris.smf.value.firewall.config firewall_config_default/policy custom firewall_config_default/custom_policy_file /etc/ipf/ipf.conf firewall_config_default/version 1 firewall_config_override/apply_to '""' firewall_config_override/policy none firewall_config_override/value_authorization solaris.smf.value.firewall.config
++ value=custom
++ echo custom
++ GLOBAL_POLICY=custom
++ PATH=/usr/sbin:/usr/bin:/usr/sbin:/usr/lib/ipf:/usr/sbin:/usr/lib/ipf
++ PIDFILE=/var/run/ipmon.pid
++ PFILCHECKED=no
++ smf_zonename
++ echo 2e7096fd-2743-4c3f-b172-d9f511279ee1
++ zone=2e7096fd-2743-4c3f-b172-d9f511279ee1
++ awk '/ipf/ { print $1 } ' -
++ 2> /dev/null
++ /usr/sbin/modinfo
++ 2>& 1
++ ipfid=202
++ [ -f /var/run/ipmon.pid ]
++ cat /var/run/ipmon.pid
++ 2> /dev/null
++ pid=31638
++ [ svc:/application/perforce/p4broker:sideload_p4web = svc:/network/ipfilter:default ]
++ service_update svc:/application/perforce/p4broker:sideload_p4web
++ svc=svc:/application/perforce/p4broker:sideload_p4web
++ ret=0
++ [ custom = custom ]
++ return 0
++ exit 0
++ . /lib/svc/share/smf_include.sh
++ SMF_EXIT_OK=0
++ SMF_EXIT_NODAEMON=94
++ SMF_EXIT_ERR_FATAL=95
++ SMF_EXIT_ERR_CONFIG=96
++ SMF_EXIT_MON_DEGRADE=97
++ SMF_EXIT_MON_OFFLINE=98
++ SMF_EXIT_ERR_NOSMF=99
++ SMF_EXIT_ERR_PERM=100
++ . /lib/svc/share/ipf_include.sh
++ IPFILTER_FMRI=svc:/network/ipfilter:default
++ ETC_IPF_DIR=/etc/ipf
++ /usr/bin/svcprop -p config/ipf6_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IP6FILCONF=/etc/ipf/ipf6.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ipnat_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPNATCONF=/etc/ipf/ipnat.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ippool_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPPOOLCONF=/etc/ipf/ippool.conf
++ [ 0 -eq 1 ]
++ VAR_IPF_DIR=/var/run/ipf
++ IPFILCONF=/var/run/ipf/ipf.conf
++ IPFILOVRCONF=/var/run/ipf/ipf_ovr.conf
++ IPF_LOCK=/var/run/ipflock
++ CONF_FILES=''
++ NAT_FILES=''
++ IPF_SUFFIX=.ipf
++ NAT_SUFFIX=.nat
++ CURRENT_VERSION=1
++ IPF_FMRI=svc:/network/ipfilter:default
++ INETDFMRI=svc:/network/inetd:default
++ RPCBINDFMRI=svc:/network/rpc/bind:default
++ SMF_ONLINE=online
++ SMF_MAINT=maintenance
++ SMF_NONE=none
++ FW_CONTEXT_PG=firewall_context
++ METHOD_PROP=ipf_method
++ FW_CONFIG_PG=firewall_config
++ POLICY_PROP=policy
++ APPLY2_PROP=apply_to
++ EXCEPTIONS_PROP=exceptions
++ FW_CONFIG_DEF_PG=firewall_config_default
++ FW_CONFIG_OVR_PG=firewall_config_override
++ CUSTOM_FILE_PROP=custom_policy_file
++ OPEN_PORTS_PROP=open_ports
++ PREFIX_HOST=host:
++ PREFIX_NET=network:
++ PREFIX_POOL=pool:
++ PREFIX_IF=if:
++ GLOBAL_CONFIG=''
++ GLOBAL_POLICY=''
++ SERVINFO=/usr/lib/servinfo
++ server_port_list=''
++ global_init
++ awk '{$2=" "; print $0}'
++ svcprop -p firewall_config_override -p firewall_config_default svc:/network/ipfilter:default
++ 2> /dev/null
++ GLOBAL_CONFIG=$'firewall_config_default/apply_to   ""\nfirewall_config_default/exceptions   ""\nfirewall_config_default/open_ports   ""\nfirewall_config_default/value_authorization   solaris.smf.value.firewall.config\nfirewall_config_default/policy   custom\nfirewall_config_default/custom_policy_file   /etc/ipf/ipf.conf\nfirewall_config_default/version   1\nfirewall_config_override/apply_to   ""\nfirewall_config_override/policy   none\nfirewall_config_override/value_authorization   solaris.smf.value.firewall.config'
++ global_get_prop_value firewall_config_default policy
++ target_pg=firewall_config_default
++ prop=policy
++ [ firewall_config_default != firewall_config_override -a firewall_config_default != firewall_config_default ]
++ [ firewall_config_default == firewall_config_default ]
++ extra_pg=firewall_config_override
++ awk $'{\n\t\tfound=0\n\t\tfor (i=1; i<=NF; i++) {\n\t\t\tif (found == 1) {\n\t\t\t\tif (index($i, target_pg) == 1 || index($i, extra_pg) == 1)\n\t\t\t\t\tbreak;\n\n\t\t\t\tprint $i;\n\t\t\t}\n\n\t\t\tif (split($i, values, "/") < 2)\n\t\t\t\tcontinue;\n\n\t\t\tif (values[1] == target_pg && values[2] == prop)\n\t\t\t\tfound=1;\n\t\t}\n\t}' target_pg=firewall_config_default prop=policy extra_pg=firewall_config_override
++ echo firewall_config_default/apply_to '""' firewall_config_default/exceptions '""' firewall_config_default/open_ports '""' firewall_config_default/value_authorization solaris.smf.value.firewall.config firewall_config_default/policy custom firewall_config_default/custom_policy_file /etc/ipf/ipf.conf firewall_config_default/version 1 firewall_config_override/apply_to '""' firewall_config_override/policy none firewall_config_override/value_authorization solaris.smf.value.firewall.config
++ value=custom
++ echo custom
++ GLOBAL_POLICY=custom
++ PATH=/usr/sbin:/usr/bin:/usr/sbin:/usr/lib/ipf:/usr/sbin:/usr/lib/ipf
++ PIDFILE=/var/run/ipmon.pid
++ PFILCHECKED=no
++ smf_zonename
++ echo 2e7096fd-2743-4c3f-b172-d9f511279ee1
++ zone=2e7096fd-2743-4c3f-b172-d9f511279ee1
++ awk '/ipf/ { print $1 } ' -
++ 2> /dev/null
++ /usr/sbin/modinfo
++ 2>& 1
++ ipfid=202
++ [ -f /var/run/ipmon.pid ]
++ cat /var/run/ipmon.pid
++ 2> /dev/null
++ pid=31638
++ [ svc:/application/perforce/p4web:default = svc:/network/ipfilter:default ]
++ service_update svc:/application/perforce/p4web:default
++ svc=svc:/application/perforce/p4web:default
++ ret=0
++ [ custom = custom ]
++ return 0
++ exit 0
++ . /lib/svc/share/smf_include.sh
++ SMF_EXIT_OK=0
++ SMF_EXIT_NODAEMON=94
++ SMF_EXIT_ERR_FATAL=95
++ SMF_EXIT_ERR_CONFIG=96
++ SMF_EXIT_MON_DEGRADE=97
++ SMF_EXIT_MON_OFFLINE=98
++ SMF_EXIT_ERR_NOSMF=99
++ SMF_EXIT_ERR_PERM=100
++ . /lib/svc/share/ipf_include.sh
++ IPFILTER_FMRI=svc:/network/ipfilter:default
++ ETC_IPF_DIR=/etc/ipf
++ /usr/bin/svcprop -p config/ipf6_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IP6FILCONF=/etc/ipf/ipf6.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ipnat_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPNATCONF=/etc/ipf/ipnat.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ippool_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPPOOLCONF=/etc/ipf/ippool.conf
++ [ 0 -eq 1 ]
++ VAR_IPF_DIR=/var/run/ipf
++ IPFILCONF=/var/run/ipf/ipf.conf
++ IPFILOVRCONF=/var/run/ipf/ipf_ovr.conf
++ IPF_LOCK=/var/run/ipflock
++ CONF_FILES=''
++ NAT_FILES=''
++ IPF_SUFFIX=.ipf
++ NAT_SUFFIX=.nat
++ CURRENT_VERSION=1
++ IPF_FMRI=svc:/network/ipfilter:default
++ INETDFMRI=svc:/network/inetd:default
++ RPCBINDFMRI=svc:/network/rpc/bind:default
++ SMF_ONLINE=online
++ SMF_MAINT=maintenance
++ SMF_NONE=none
++ FW_CONTEXT_PG=firewall_context
++ METHOD_PROP=ipf_method
++ FW_CONFIG_PG=firewall_config
++ POLICY_PROP=policy
++ APPLY2_PROP=apply_to
++ EXCEPTIONS_PROP=exceptions
++ FW_CONFIG_DEF_PG=firewall_config_default
++ FW_CONFIG_OVR_PG=firewall_config_override
++ CUSTOM_FILE_PROP=custom_policy_file
++ OPEN_PORTS_PROP=open_ports
++ PREFIX_HOST=host:
++ PREFIX_NET=network:
++ PREFIX_POOL=pool:
++ PREFIX_IF=if:
++ GLOBAL_CONFIG=''
++ GLOBAL_POLICY=''
++ SERVINFO=/usr/lib/servinfo
++ server_port_list=''
++ global_init
++ awk '{$2=" "; print $0}'
++ svcprop -p firewall_config_override -p firewall_config_default svc:/network/ipfilter:default
++ 2> /dev/null
++ GLOBAL_CONFIG=$'firewall_config_default/apply_to   ""\nfirewall_config_default/exceptions   ""\nfirewall_config_default/open_ports   ""\nfirewall_config_default/value_authorization   solaris.smf.value.firewall.config\nfirewall_config_default/policy   custom\nfirewall_config_default/custom_policy_file   /etc/ipf/ipf.conf\nfirewall_config_default/version   1\nfirewall_config_override/apply_to   ""\nfirewall_config_override/policy   none\nfirewall_config_override/value_authorization   solaris.smf.value.firewall.config'
++ global_get_prop_value firewall_config_default policy
++ target_pg=firewall_config_default
++ prop=policy
++ [ firewall_config_default != firewall_config_override -a firewall_config_default != firewall_config_default ]
++ [ firewall_config_default == firewall_config_default ]
++ extra_pg=firewall_config_override
++ awk $'{\n\t\tfound=0\n\t\tfor (i=1; i<=NF; i++) {\n\t\t\tif (found == 1) {\n\t\t\t\tif (index($i, target_pg) == 1 || index($i, extra_pg) == 1)\n\t\t\t\t\tbreak;\n\n\t\t\t\tprint $i;\n\t\t\t}\n\n\t\t\tif (split($i, values, "/") < 2)\n\t\t\t\tcontinue;\n\n\t\t\tif (values[1] == target_pg && values[2] == prop)\n\t\t\t\tfound=1;\n\t\t}\n\t}' target_pg=firewall_config_default prop=policy extra_pg=firewall_config_override
++ echo firewall_config_default/apply_to '""' firewall_config_default/exceptions '""' firewall_config_default/open_ports '""' firewall_config_default/value_authorization solaris.smf.value.firewall.config firewall_config_default/policy custom firewall_config_default/custom_policy_file /etc/ipf/ipf.conf firewall_config_default/version 1 firewall_config_override/apply_to '""' firewall_config_override/policy none firewall_config_override/value_authorization solaris.smf.value.firewall.config
++ value=custom
++ echo custom
++ GLOBAL_POLICY=custom
++ PATH=/usr/sbin:/usr/bin:/usr/sbin:/usr/lib/ipf:/usr/sbin:/usr/lib/ipf
++ PIDFILE=/var/run/ipmon.pid
++ PFILCHECKED=no
++ smf_zonename
++ echo 2e7096fd-2743-4c3f-b172-d9f511279ee1
++ zone=2e7096fd-2743-4c3f-b172-d9f511279ee1
++ awk '/ipf/ { print $1 } ' -
++ /usr/sbin/modinfo
++ 2>& 1
++ 2> /dev/null
++ ipfid=202
++ [ -f /var/run/ipmon.pid ]
++ cat /var/run/ipmon.pid
++ 2> /dev/null
++ pid=31638
++ [ svc:/application/perforce/p4d:sideload_p4web = svc:/network/ipfilter:default ]
++ service_update svc:/application/perforce/p4d:sideload_p4web
++ svc=svc:/application/perforce/p4d:sideload_p4web
++ ret=0
++ [ custom = custom ]
++ return 0
++ exit 0
++ . /lib/svc/share/smf_include.sh
++ SMF_EXIT_OK=0
++ SMF_EXIT_NODAEMON=94
++ SMF_EXIT_ERR_FATAL=95
++ SMF_EXIT_ERR_CONFIG=96
++ SMF_EXIT_MON_DEGRADE=97
++ SMF_EXIT_MON_OFFLINE=98
++ SMF_EXIT_ERR_NOSMF=99
++ SMF_EXIT_ERR_PERM=100
++ . /lib/svc/share/ipf_include.sh
++ IPFILTER_FMRI=svc:/network/ipfilter:default
++ ETC_IPF_DIR=/etc/ipf
++ /usr/bin/svcprop -p config/ipf6_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IP6FILCONF=/etc/ipf/ipf6.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ipnat_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPNATCONF=/etc/ipf/ipnat.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ippool_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPPOOLCONF=/etc/ipf/ippool.conf
++ [ 0 -eq 1 ]
++ VAR_IPF_DIR=/var/run/ipf
++ IPFILCONF=/var/run/ipf/ipf.conf
++ IPFILOVRCONF=/var/run/ipf/ipf_ovr.conf
++ IPF_LOCK=/var/run/ipflock
++ CONF_FILES=''
++ NAT_FILES=''
++ IPF_SUFFIX=.ipf
++ NAT_SUFFIX=.nat
++ CURRENT_VERSION=1
++ IPF_FMRI=svc:/network/ipfilter:default
++ INETDFMRI=svc:/network/inetd:default
++ RPCBINDFMRI=svc:/network/rpc/bind:default
++ SMF_ONLINE=online
++ SMF_MAINT=maintenance
++ SMF_NONE=none
++ FW_CONTEXT_PG=firewall_context
++ METHOD_PROP=ipf_method
++ FW_CONFIG_PG=firewall_config
++ POLICY_PROP=policy
++ APPLY2_PROP=apply_to
++ EXCEPTIONS_PROP=exceptions
++ FW_CONFIG_DEF_PG=firewall_config_default
++ FW_CONFIG_OVR_PG=firewall_config_override
++ CUSTOM_FILE_PROP=custom_policy_file
++ OPEN_PORTS_PROP=open_ports
++ PREFIX_HOST=host:
++ PREFIX_NET=network:
++ PREFIX_POOL=pool:
++ PREFIX_IF=if:
++ GLOBAL_CONFIG=''
++ GLOBAL_POLICY=''
++ SERVINFO=/usr/lib/servinfo
++ server_port_list=''
++ global_init
++ awk '{$2=" "; print $0}'
++ svcprop -p firewall_config_override -p firewall_config_default svc:/network/ipfilter:default
++ 2> /dev/null
++ GLOBAL_CONFIG=$'firewall_config_default/apply_to   ""\nfirewall_config_default/exceptions   ""\nfirewall_config_default/open_ports   ""\nfirewall_config_default/value_authorization   solaris.smf.value.firewall.config\nfirewall_config_default/policy   custom\nfirewall_config_default/custom_policy_file   /etc/ipf/ipf.conf\nfirewall_config_default/version   1\nfirewall_config_override/apply_to   ""\nfirewall_config_override/policy   none\nfirewall_config_override/value_authorization   solaris.smf.value.firewall.config'
++ global_get_prop_value firewall_config_default policy
++ target_pg=firewall_config_default
++ prop=policy
++ [ firewall_config_default != firewall_config_override -a firewall_config_default != firewall_config_default ]
++ [ firewall_config_default == firewall_config_default ]
++ extra_pg=firewall_config_override
++ awk $'{\n\t\tfound=0\n\t\tfor (i=1; i<=NF; i++) {\n\t\t\tif (found == 1) {\n\t\t\t\tif (index($i, target_pg) == 1 || index($i, extra_pg) == 1)\n\t\t\t\t\tbreak;\n\n\t\t\t\tprint $i;\n\t\t\t}\n\n\t\t\tif (split($i, values, "/") < 2)\n\t\t\t\tcontinue;\n\n\t\t\tif (values[1] == target_pg && values[2] == prop)\n\t\t\t\tfound=1;\n\t\t}\n\t}' target_pg=firewall_config_default prop=policy extra_pg=firewall_config_override
++ echo firewall_config_default/apply_to '""' firewall_config_default/exceptions '""' firewall_config_default/open_ports '""' firewall_config_default/value_authorization solaris.smf.value.firewall.config firewall_config_default/policy custom firewall_config_default/custom_policy_file /etc/ipf/ipf.conf firewall_config_default/version 1 firewall_config_override/apply_to '""' firewall_config_override/policy none firewall_config_override/value_authorization solaris.smf.value.firewall.config
++ value=custom
++ echo custom
++ GLOBAL_POLICY=custom
++ PATH=/usr/sbin:/usr/bin:/usr/sbin:/usr/lib/ipf:/usr/sbin:/usr/lib/ipf
++ PIDFILE=/var/run/ipmon.pid
++ PFILCHECKED=no
++ smf_zonename
++ echo 2e7096fd-2743-4c3f-b172-d9f511279ee1
++ zone=2e7096fd-2743-4c3f-b172-d9f511279ee1
++ awk '/ipf/ { print $1 } ' -
++ 2> /dev/null
++ /usr/sbin/modinfo
++ 2>& 1
++ ipfid=202
++ [ -f /var/run/ipmon.pid ]
++ cat /var/run/ipmon.pid
++ 2> /dev/null
++ pid=31638
++ [ svc:/application/perforce/p4d:depots = svc:/network/ipfilter:default ]
++ service_update svc:/application/perforce/p4d:depots
++ svc=svc:/application/perforce/p4d:depots
++ ret=0
++ [ custom = custom ]
++ return 0
++ exit 0
++ . /lib/svc/share/smf_include.sh
++ SMF_EXIT_OK=0
++ SMF_EXIT_NODAEMON=94
++ SMF_EXIT_ERR_FATAL=95
++ SMF_EXIT_ERR_CONFIG=96
++ SMF_EXIT_MON_DEGRADE=97
++ SMF_EXIT_MON_OFFLINE=98
++ SMF_EXIT_ERR_NOSMF=99
++ SMF_EXIT_ERR_PERM=100
++ . /lib/svc/share/ipf_include.sh
++ IPFILTER_FMRI=svc:/network/ipfilter:default
++ ETC_IPF_DIR=/etc/ipf
++ /usr/bin/svcprop -p config/ipf6_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IP6FILCONF=/etc/ipf/ipf6.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ipnat_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPNATCONF=/etc/ipf/ipnat.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ippool_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPPOOLCONF=/etc/ipf/ippool.conf
++ [ 0 -eq 1 ]
++ VAR_IPF_DIR=/var/run/ipf
++ IPFILCONF=/var/run/ipf/ipf.conf
++ IPFILOVRCONF=/var/run/ipf/ipf_ovr.conf
++ IPF_LOCK=/var/run/ipflock
++ CONF_FILES=''
++ NAT_FILES=''
++ IPF_SUFFIX=.ipf
++ NAT_SUFFIX=.nat
++ CURRENT_VERSION=1
++ IPF_FMRI=svc:/network/ipfilter:default
++ INETDFMRI=svc:/network/inetd:default
++ RPCBINDFMRI=svc:/network/rpc/bind:default
++ SMF_ONLINE=online
++ SMF_MAINT=maintenance
++ SMF_NONE=none
++ FW_CONTEXT_PG=firewall_context
++ METHOD_PROP=ipf_method
++ FW_CONFIG_PG=firewall_config
++ POLICY_PROP=policy
++ APPLY2_PROP=apply_to
++ EXCEPTIONS_PROP=exceptions
++ FW_CONFIG_DEF_PG=firewall_config_default
++ FW_CONFIG_OVR_PG=firewall_config_override
++ CUSTOM_FILE_PROP=custom_policy_file
++ OPEN_PORTS_PROP=open_ports
++ PREFIX_HOST=host:
++ PREFIX_NET=network:
++ PREFIX_POOL=pool:
++ PREFIX_IF=if:
++ GLOBAL_CONFIG=''
++ GLOBAL_POLICY=''
++ SERVINFO=/usr/lib/servinfo
++ server_port_list=''
++ global_init
++ awk '{$2=" "; print $0}'
++ svcprop -p firewall_config_override -p firewall_config_default svc:/network/ipfilter:default
++ 2> /dev/null
++ GLOBAL_CONFIG=$'firewall_config_default/apply_to   ""\nfirewall_config_default/exceptions   ""\nfirewall_config_default/open_ports   ""\nfirewall_config_default/value_authorization   solaris.smf.value.firewall.config\nfirewall_config_default/policy   custom\nfirewall_config_default/custom_policy_file   /etc/ipf/ipf.conf\nfirewall_config_default/version   1\nfirewall_config_override/apply_to   ""\nfirewall_config_override/policy   none\nfirewall_config_override/value_authorization   solaris.smf.value.firewall.config'
++ global_get_prop_value firewall_config_default policy
++ target_pg=firewall_config_default
++ prop=policy
++ [ firewall_config_default != firewall_config_override -a firewall_config_default != firewall_config_default ]
++ [ firewall_config_default == firewall_config_default ]
++ extra_pg=firewall_config_override
++ awk $'{\n\t\tfound=0\n\t\tfor (i=1; i<=NF; i++) {\n\t\t\tif (found == 1) {\n\t\t\t\tif (index($i, target_pg) == 1 || index($i, extra_pg) == 1)\n\t\t\t\t\tbreak;\n\n\t\t\t\tprint $i;\n\t\t\t}\n\n\t\t\tif (split($i, values, "/") < 2)\n\t\t\t\tcontinue;\n\n\t\t\tif (values[1] == target_pg && values[2] == prop)\n\t\t\t\tfound=1;\n\t\t}\n\t}' target_pg=firewall_config_default prop=policy extra_pg=firewall_config_override
++ echo firewall_config_default/apply_to '""' firewall_config_default/exceptions '""' firewall_config_default/open_ports '""' firewall_config_default/value_authorization solaris.smf.value.firewall.config firewall_config_default/policy custom firewall_config_default/custom_policy_file /etc/ipf/ipf.conf firewall_config_default/version 1 firewall_config_override/apply_to '""' firewall_config_override/policy none firewall_config_override/value_authorization solaris.smf.value.firewall.config
++ value=custom
++ echo custom
++ GLOBAL_POLICY=custom
++ PATH=/usr/sbin:/usr/bin:/usr/sbin:/usr/lib/ipf:/usr/sbin:/usr/lib/ipf
++ PIDFILE=/var/run/ipmon.pid
++ PFILCHECKED=no
++ smf_zonename
++ echo 2e7096fd-2743-4c3f-b172-d9f511279ee1
++ zone=2e7096fd-2743-4c3f-b172-d9f511279ee1
++ awk '/ipf/ { print $1 } ' -
++ 2> /dev/null
++ /usr/sbin/modinfo
++ 2>& 1
++ ipfid=202
++ [ -f /var/run/ipmon.pid ]
++ cat /var/run/ipmon.pid
++ 2> /dev/null
++ pid=31638
++ [ svc:/TEMP/application/perforce/p4broker:sideload_p4web = svc:/network/ipfilter:default ]
++ service_update svc:/TEMP/application/perforce/p4broker:sideload_p4web
++ svc=svc:/TEMP/application/perforce/p4broker:sideload_p4web
++ ret=0
++ [ custom = custom ]
++ return 0
++ exit 0
++ . /lib/svc/share/smf_include.sh
++ SMF_EXIT_OK=0
++ SMF_EXIT_NODAEMON=94
++ SMF_EXIT_ERR_FATAL=95
++ SMF_EXIT_ERR_CONFIG=96
++ SMF_EXIT_MON_DEGRADE=97
++ SMF_EXIT_MON_OFFLINE=98
++ SMF_EXIT_ERR_NOSMF=99
++ SMF_EXIT_ERR_PERM=100
++ . /lib/svc/share/ipf_include.sh
++ IPFILTER_FMRI=svc:/network/ipfilter:default
++ ETC_IPF_DIR=/etc/ipf
++ /usr/bin/svcprop -p config/ipf6_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IP6FILCONF=/etc/ipf/ipf6.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ipnat_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPNATCONF=/etc/ipf/ipnat.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ippool_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPPOOLCONF=/etc/ipf/ippool.conf
++ [ 0 -eq 1 ]
++ VAR_IPF_DIR=/var/run/ipf
++ IPFILCONF=/var/run/ipf/ipf.conf
++ IPFILOVRCONF=/var/run/ipf/ipf_ovr.conf
++ IPF_LOCK=/var/run/ipflock
++ CONF_FILES=''
++ NAT_FILES=''
++ IPF_SUFFIX=.ipf
++ NAT_SUFFIX=.nat
++ CURRENT_VERSION=1
++ IPF_FMRI=svc:/network/ipfilter:default
++ INETDFMRI=svc:/network/inetd:default
++ RPCBINDFMRI=svc:/network/rpc/bind:default
++ SMF_ONLINE=online
++ SMF_MAINT=maintenance
++ SMF_NONE=none
++ FW_CONTEXT_PG=firewall_context
++ METHOD_PROP=ipf_method
++ FW_CONFIG_PG=firewall_config
++ POLICY_PROP=policy
++ APPLY2_PROP=apply_to
++ EXCEPTIONS_PROP=exceptions
++ FW_CONFIG_DEF_PG=firewall_config_default
++ FW_CONFIG_OVR_PG=firewall_config_override
++ CUSTOM_FILE_PROP=custom_policy_file
++ OPEN_PORTS_PROP=open_ports
++ PREFIX_HOST=host:
++ PREFIX_NET=network:
++ PREFIX_POOL=pool:
++ PREFIX_IF=if:
++ GLOBAL_CONFIG=''
++ GLOBAL_POLICY=''
++ SERVINFO=/usr/lib/servinfo
++ server_port_list=''
++ global_init
++ awk '{$2=" "; print $0}'
++ svcprop -p firewall_config_override -p firewall_config_default svc:/network/ipfilter:default
++ 2> /dev/null
++ GLOBAL_CONFIG=$'firewall_config_default/apply_to   ""\nfirewall_config_default/exceptions   ""\nfirewall_config_default/open_ports   ""\nfirewall_config_default/value_authorization   solaris.smf.value.firewall.config\nfirewall_config_default/policy   custom\nfirewall_config_default/custom_policy_file   /etc/ipf/ipf.conf\nfirewall_config_default/version   1\nfirewall_config_override/apply_to   ""\nfirewall_config_override/policy   none\nfirewall_config_override/value_authorization   solaris.smf.value.firewall.config'
++ global_get_prop_value firewall_config_default policy
++ target_pg=firewall_config_default
++ prop=policy
++ [ firewall_config_default != firewall_config_override -a firewall_config_default != firewall_config_default ]
++ [ firewall_config_default == firewall_config_default ]
++ extra_pg=firewall_config_override
++ awk $'{\n\t\tfound=0\n\t\tfor (i=1; i<=NF; i++) {\n\t\t\tif (found == 1) {\n\t\t\t\tif (index($i, target_pg) == 1 || index($i, extra_pg) == 1)\n\t\t\t\t\tbreak;\n\n\t\t\t\tprint $i;\n\t\t\t}\n\n\t\t\tif (split($i, values, "/") < 2)\n\t\t\t\tcontinue;\n\n\t\t\tif (values[1] == target_pg && values[2] == prop)\n\t\t\t\tfound=1;\n\t\t}\n\t}' target_pg=firewall_config_default prop=policy extra_pg=firewall_config_override
++ echo firewall_config_default/apply_to '""' firewall_config_default/exceptions '""' firewall_config_default/open_ports '""' firewall_config_default/value_authorization solaris.smf.value.firewall.config firewall_config_default/policy custom firewall_config_default/custom_policy_file /etc/ipf/ipf.conf firewall_config_default/version 1 firewall_config_override/apply_to '""' firewall_config_override/policy none firewall_config_override/value_authorization solaris.smf.value.firewall.config
++ value=custom
++ echo custom
++ GLOBAL_POLICY=custom
++ PATH=/usr/sbin:/usr/bin:/usr/sbin:/usr/lib/ipf:/usr/sbin:/usr/lib/ipf
++ PIDFILE=/var/run/ipmon.pid
++ PFILCHECKED=no
++ smf_zonename
++ echo 2e7096fd-2743-4c3f-b172-d9f511279ee1
++ zone=2e7096fd-2743-4c3f-b172-d9f511279ee1
++ awk '/ipf/ { print $1 } ' -
++ 2> /dev/null
++ /usr/sbin/modinfo
++ 2>& 1
++ ipfid=202
++ [ -f /var/run/ipmon.pid ]
++ cat /var/run/ipmon.pid
++ 2> /dev/null
++ pid=31638
++ [ svc:/TEMP/application/perforce/p4broker:depots = svc:/network/ipfilter:default ]
++ service_update svc:/TEMP/application/perforce/p4broker:depots
++ svc=svc:/TEMP/application/perforce/p4broker:depots
++ ret=0
++ [ custom = custom ]
++ return 0
++ exit 0
++ . /lib/svc/share/smf_include.sh
++ SMF_EXIT_OK=0
++ SMF_EXIT_NODAEMON=94
++ SMF_EXIT_ERR_FATAL=95
++ SMF_EXIT_ERR_CONFIG=96
++ SMF_EXIT_MON_DEGRADE=97
++ SMF_EXIT_MON_OFFLINE=98
++ SMF_EXIT_ERR_NOSMF=99
++ SMF_EXIT_ERR_PERM=100
++ . /lib/svc/share/ipf_include.sh
++ IPFILTER_FMRI=svc:/network/ipfilter:default
++ ETC_IPF_DIR=/etc/ipf
++ /usr/bin/svcprop -p config/ipf6_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IP6FILCONF=/etc/ipf/ipf6.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ipnat_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPNATCONF=/etc/ipf/ipnat.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ippool_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPPOOLCONF=/etc/ipf/ippool.conf
++ [ 0 -eq 1 ]
++ VAR_IPF_DIR=/var/run/ipf
++ IPFILCONF=/var/run/ipf/ipf.conf
++ IPFILOVRCONF=/var/run/ipf/ipf_ovr.conf
++ IPF_LOCK=/var/run/ipflock
++ CONF_FILES=''
++ NAT_FILES=''
++ IPF_SUFFIX=.ipf
++ NAT_SUFFIX=.nat
++ CURRENT_VERSION=1
++ IPF_FMRI=svc:/network/ipfilter:default
++ INETDFMRI=svc:/network/inetd:default
++ RPCBINDFMRI=svc:/network/rpc/bind:default
++ SMF_ONLINE=online
++ SMF_MAINT=maintenance
++ SMF_NONE=none
++ FW_CONTEXT_PG=firewall_context
++ METHOD_PROP=ipf_method
++ FW_CONFIG_PG=firewall_config
++ POLICY_PROP=policy
++ APPLY2_PROP=apply_to
++ EXCEPTIONS_PROP=exceptions
++ FW_CONFIG_DEF_PG=firewall_config_default
++ FW_CONFIG_OVR_PG=firewall_config_override
++ CUSTOM_FILE_PROP=custom_policy_file
++ OPEN_PORTS_PROP=open_ports
++ PREFIX_HOST=host:
++ PREFIX_NET=network:
++ PREFIX_POOL=pool:
++ PREFIX_IF=if:
++ GLOBAL_CONFIG=''
++ GLOBAL_POLICY=''
++ SERVINFO=/usr/lib/servinfo
++ server_port_list=''
++ global_init
++ awk '{$2=" "; print $0}'
++ svcprop -p firewall_config_override -p firewall_config_default svc:/network/ipfilter:default
++ 2> /dev/null
++ GLOBAL_CONFIG=$'firewall_config_default/apply_to   ""\nfirewall_config_default/exceptions   ""\nfirewall_config_default/open_ports   ""\nfirewall_config_default/value_authorization   solaris.smf.value.firewall.config\nfirewall_config_default/policy   custom\nfirewall_config_default/custom_policy_file   /etc/ipf/ipf.conf\nfirewall_config_default/version   1\nfirewall_config_override/apply_to   ""\nfirewall_config_override/policy   none\nfirewall_config_override/value_authorization   solaris.smf.value.firewall.config'
++ global_get_prop_value firewall_config_default policy
++ target_pg=firewall_config_default
++ prop=policy
++ [ firewall_config_default != firewall_config_override -a firewall_config_default != firewall_config_default ]
++ [ firewall_config_default == firewall_config_default ]
++ extra_pg=firewall_config_override
++ awk $'{\n\t\tfound=0\n\t\tfor (i=1; i<=NF; i++) {\n\t\t\tif (found == 1) {\n\t\t\t\tif (index($i, target_pg) == 1 || index($i, extra_pg) == 1)\n\t\t\t\t\tbreak;\n\n\t\t\t\tprint $i;\n\t\t\t}\n\n\t\t\tif (split($i, values, "/") < 2)\n\t\t\t\tcontinue;\n\n\t\t\tif (values[1] == target_pg && values[2] == prop)\n\t\t\t\tfound=1;\n\t\t}\n\t}' target_pg=firewall_config_default prop=policy extra_pg=firewall_config_override
++ echo firewall_config_default/apply_to '""' firewall_config_default/exceptions '""' firewall_config_default/open_ports '""' firewall_config_default/value_authorization solaris.smf.value.firewall.config firewall_config_default/policy custom firewall_config_default/custom_policy_file /etc/ipf/ipf.conf firewall_config_default/version 1 firewall_config_override/apply_to '""' firewall_config_override/policy none firewall_config_override/value_authorization solaris.smf.value.firewall.config
++ value=custom
++ echo custom
++ GLOBAL_POLICY=custom
++ PATH=/usr/sbin:/usr/bin:/usr/sbin:/usr/lib/ipf:/usr/sbin:/usr/lib/ipf
++ PIDFILE=/var/run/ipmon.pid
++ PFILCHECKED=no
++ smf_zonename
++ echo 2e7096fd-2743-4c3f-b172-d9f511279ee1
++ zone=2e7096fd-2743-4c3f-b172-d9f511279ee1
++ awk '/ipf/ { print $1 } ' -
++ 2> /dev/null
++ /usr/sbin/modinfo
++ 2>& 1
++ ipfid=202
++ [ -f /var/run/ipmon.pid ]
++ cat /var/run/ipmon.pid
++ 2> /dev/null
++ pid=31638
++ [ svc:/TEMP/application/perforce/p4d:sideload_p4web = svc:/network/ipfilter:default ]
++ service_update svc:/TEMP/application/perforce/p4d:sideload_p4web
++ svc=svc:/TEMP/application/perforce/p4d:sideload_p4web
++ ret=0
++ [ custom = custom ]
++ return 0
++ exit 0
++ . /lib/svc/share/smf_include.sh
++ SMF_EXIT_OK=0
++ SMF_EXIT_NODAEMON=94
++ SMF_EXIT_ERR_FATAL=95
++ SMF_EXIT_ERR_CONFIG=96
++ SMF_EXIT_MON_DEGRADE=97
++ SMF_EXIT_MON_OFFLINE=98
++ SMF_EXIT_ERR_NOSMF=99
++ SMF_EXIT_ERR_PERM=100
++ . /lib/svc/share/ipf_include.sh
++ IPFILTER_FMRI=svc:/network/ipfilter:default
++ ETC_IPF_DIR=/etc/ipf
++ /usr/bin/svcprop -p config/ipf6_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IP6FILCONF=/etc/ipf/ipf6.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ipnat_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPNATCONF=/etc/ipf/ipnat.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ippool_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPPOOLCONF=/etc/ipf/ippool.conf
++ [ 0 -eq 1 ]
++ VAR_IPF_DIR=/var/run/ipf
++ IPFILCONF=/var/run/ipf/ipf.conf
++ IPFILOVRCONF=/var/run/ipf/ipf_ovr.conf
++ IPF_LOCK=/var/run/ipflock
++ CONF_FILES=''
++ NAT_FILES=''
++ IPF_SUFFIX=.ipf
++ NAT_SUFFIX=.nat
++ CURRENT_VERSION=1
++ IPF_FMRI=svc:/network/ipfilter:default
++ INETDFMRI=svc:/network/inetd:default
++ RPCBINDFMRI=svc:/network/rpc/bind:default
++ SMF_ONLINE=online
++ SMF_MAINT=maintenance
++ SMF_NONE=none
++ FW_CONTEXT_PG=firewall_context
++ METHOD_PROP=ipf_method
++ FW_CONFIG_PG=firewall_config
++ POLICY_PROP=policy
++ APPLY2_PROP=apply_to
++ EXCEPTIONS_PROP=exceptions
++ FW_CONFIG_DEF_PG=firewall_config_default
++ FW_CONFIG_OVR_PG=firewall_config_override
++ CUSTOM_FILE_PROP=custom_policy_file
++ OPEN_PORTS_PROP=open_ports
++ PREFIX_HOST=host:
++ PREFIX_NET=network:
++ PREFIX_POOL=pool:
++ PREFIX_IF=if:
++ GLOBAL_CONFIG=''
++ GLOBAL_POLICY=''
++ SERVINFO=/usr/lib/servinfo
++ server_port_list=''
++ global_init
++ awk '{$2=" "; print $0}'
++ svcprop -p firewall_config_override -p firewall_config_default svc:/network/ipfilter:default
++ 2> /dev/null
++ GLOBAL_CONFIG=$'firewall_config_default/apply_to   ""\nfirewall_config_default/exceptions   ""\nfirewall_config_default/open_ports   ""\nfirewall_config_default/value_authorization   solaris.smf.value.firewall.config\nfirewall_config_default/policy   custom\nfirewall_config_default/custom_policy_file   /etc/ipf/ipf.conf\nfirewall_config_default/version   1\nfirewall_config_override/apply_to   ""\nfirewall_config_override/policy   none\nfirewall_config_override/value_authorization   solaris.smf.value.firewall.config'
++ global_get_prop_value firewall_config_default policy
++ target_pg=firewall_config_default
++ prop=policy
++ [ firewall_config_default != firewall_config_override -a firewall_config_default != firewall_config_default ]
++ [ firewall_config_default == firewall_config_default ]
++ extra_pg=firewall_config_override
++ awk $'{\n\t\tfound=0\n\t\tfor (i=1; i<=NF; i++) {\n\t\t\tif (found == 1) {\n\t\t\t\tif (index($i, target_pg) == 1 || index($i, extra_pg) == 1)\n\t\t\t\t\tbreak;\n\n\t\t\t\tprint $i;\n\t\t\t}\n\n\t\t\tif (split($i, values, "/") < 2)\n\t\t\t\tcontinue;\n\n\t\t\tif (values[1] == target_pg && values[2] == prop)\n\t\t\t\tfound=1;\n\t\t}\n\t}' target_pg=firewall_config_default prop=policy extra_pg=firewall_config_override
++ echo firewall_config_default/apply_to '""' firewall_config_default/exceptions '""' firewall_config_default/open_ports '""' firewall_config_default/value_authorization solaris.smf.value.firewall.config firewall_config_default/policy custom firewall_config_default/custom_policy_file /etc/ipf/ipf.conf firewall_config_default/version 1 firewall_config_override/apply_to '""' firewall_config_override/policy none firewall_config_override/value_authorization solaris.smf.value.firewall.config
++ value=custom
++ echo custom
++ GLOBAL_POLICY=custom
++ PATH=/usr/sbin:/usr/bin:/usr/sbin:/usr/lib/ipf:/usr/sbin:/usr/lib/ipf
++ PIDFILE=/var/run/ipmon.pid
++ PFILCHECKED=no
++ smf_zonename
++ echo 2e7096fd-2743-4c3f-b172-d9f511279ee1
++ zone=2e7096fd-2743-4c3f-b172-d9f511279ee1
++ awk '/ipf/ { print $1 } ' -
++ 2> /dev/null
++ /usr/sbin/modinfo
++ 2>& 1
++ ipfid=202
++ [ -f /var/run/ipmon.pid ]
++ cat /var/run/ipmon.pid
++ 2> /dev/null
++ pid=31638
++ [ svc:/TEMP/application/perforce/p4d:depots = svc:/network/ipfilter:default ]
++ service_update svc:/TEMP/application/perforce/p4d:depots
++ svc=svc:/TEMP/application/perforce/p4d:depots
++ ret=0
++ [ custom = custom ]
++ return 0
++ exit 0
++ . /lib/svc/share/smf_include.sh
++ SMF_EXIT_OK=0
++ SMF_EXIT_NODAEMON=94
++ SMF_EXIT_ERR_FATAL=95
++ SMF_EXIT_ERR_CONFIG=96
++ SMF_EXIT_MON_DEGRADE=97
++ SMF_EXIT_MON_OFFLINE=98
++ SMF_EXIT_ERR_NOSMF=99
++ SMF_EXIT_ERR_PERM=100
++ . /lib/svc/share/ipf_include.sh
++ IPFILTER_FMRI=svc:/network/ipfilter:default
++ ETC_IPF_DIR=/etc/ipf
++ /usr/bin/svcprop -p config/ipf6_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IP6FILCONF=/etc/ipf/ipf6.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ipnat_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPNATCONF=/etc/ipf/ipnat.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ippool_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPPOOLCONF=/etc/ipf/ippool.conf
++ [ 0 -eq 1 ]
++ VAR_IPF_DIR=/var/run/ipf
++ IPFILCONF=/var/run/ipf/ipf.conf
++ IPFILOVRCONF=/var/run/ipf/ipf_ovr.conf
++ IPF_LOCK=/var/run/ipflock
++ CONF_FILES=''
++ NAT_FILES=''
++ IPF_SUFFIX=.ipf
++ NAT_SUFFIX=.nat
++ CURRENT_VERSION=1
++ IPF_FMRI=svc:/network/ipfilter:default
++ INETDFMRI=svc:/network/inetd:default
++ RPCBINDFMRI=svc:/network/rpc/bind:default
++ SMF_ONLINE=online
++ SMF_MAINT=maintenance
++ SMF_NONE=none
++ FW_CONTEXT_PG=firewall_context
++ METHOD_PROP=ipf_method
++ FW_CONFIG_PG=firewall_config
++ POLICY_PROP=policy
++ APPLY2_PROP=apply_to
++ EXCEPTIONS_PROP=exceptions
++ FW_CONFIG_DEF_PG=firewall_config_default
++ FW_CONFIG_OVR_PG=firewall_config_override
++ CUSTOM_FILE_PROP=custom_policy_file
++ OPEN_PORTS_PROP=open_ports
++ PREFIX_HOST=host:
++ PREFIX_NET=network:
++ PREFIX_POOL=pool:
++ PREFIX_IF=if:
++ GLOBAL_CONFIG=''
++ GLOBAL_POLICY=''
++ SERVINFO=/usr/lib/servinfo
++ server_port_list=''
++ global_init
++ awk '{$2=" "; print $0}'
++ svcprop -p firewall_config_override -p firewall_config_default svc:/network/ipfilter:default
++ 2> /dev/null
++ GLOBAL_CONFIG=$'firewall_config_default/apply_to   ""\nfirewall_config_default/exceptions   ""\nfirewall_config_default/open_ports   ""\nfirewall_config_default/value_authorization   solaris.smf.value.firewall.config\nfirewall_config_default/policy   custom\nfirewall_config_default/custom_policy_file   /etc/ipf/ipf.conf\nfirewall_config_default/version   1\nfirewall_config_override/apply_to   ""\nfirewall_config_override/policy   none\nfirewall_config_override/value_authorization   solaris.smf.value.firewall.config'
++ global_get_prop_value firewall_config_default policy
++ target_pg=firewall_config_default
++ prop=policy
++ [ firewall_config_default != firewall_config_override -a firewall_config_default != firewall_config_default ]
++ [ firewall_config_default == firewall_config_default ]
++ extra_pg=firewall_config_override
++ awk $'{\n\t\tfound=0\n\t\tfor (i=1; i<=NF; i++) {\n\t\t\tif (found == 1) {\n\t\t\t\tif (index($i, target_pg) == 1 || index($i, extra_pg) == 1)\n\t\t\t\t\tbreak;\n\n\t\t\t\tprint $i;\n\t\t\t}\n\n\t\t\tif (split($i, values, "/") < 2)\n\t\t\t\tcontinue;\n\n\t\t\tif (values[1] == target_pg && values[2] == prop)\n\t\t\t\tfound=1;\n\t\t}\n\t}' target_pg=firewall_config_default prop=policy extra_pg=firewall_config_override
++ echo firewall_config_default/apply_to '""' firewall_config_default/exceptions '""' firewall_config_default/open_ports '""' firewall_config_default/value_authorization solaris.smf.value.firewall.config firewall_config_default/policy custom firewall_config_default/custom_policy_file /etc/ipf/ipf.conf firewall_config_default/version 1 firewall_config_override/apply_to '""' firewall_config_override/policy none firewall_config_override/value_authorization solaris.smf.value.firewall.config
++ value=custom
++ echo custom
++ GLOBAL_POLICY=custom
++ PATH=/usr/sbin:/usr/bin:/usr/sbin:/usr/lib/ipf:/usr/sbin:/usr/lib/ipf
++ PIDFILE=/var/run/ipmon.pid
++ PFILCHECKED=no
++ smf_zonename
++ echo 2e7096fd-2743-4c3f-b172-d9f511279ee1
++ zone=2e7096fd-2743-4c3f-b172-d9f511279ee1
++ awk '/ipf/ { print $1 } ' -
++ 2> /dev/null
++ /usr/sbin/modinfo
++ 2>& 1
++ ipfid=202
++ [ -f /var/run/ipmon.pid ]
++ cat /var/run/ipmon.pid
++ 2> /dev/null
++ pid=31638
++ [ svc:/TEMP/application/perforce/p4d:default = svc:/network/ipfilter:default ]
++ service_update svc:/TEMP/application/perforce/p4d:default
++ svc=svc:/TEMP/application/perforce/p4d:default
++ ret=0
++ [ custom = custom ]
++ return 0
++ exit 0
++ . /lib/svc/share/smf_include.sh
++ SMF_EXIT_OK=0
++ SMF_EXIT_NODAEMON=94
++ SMF_EXIT_ERR_FATAL=95
++ SMF_EXIT_ERR_CONFIG=96
++ SMF_EXIT_MON_DEGRADE=97
++ SMF_EXIT_MON_OFFLINE=98
++ SMF_EXIT_ERR_NOSMF=99
++ SMF_EXIT_ERR_PERM=100
++ . /lib/svc/share/ipf_include.sh
++ IPFILTER_FMRI=svc:/network/ipfilter:default
++ ETC_IPF_DIR=/etc/ipf
++ /usr/bin/svcprop -p config/ipf6_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IP6FILCONF=/etc/ipf/ipf6.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ipnat_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPNATCONF=/etc/ipf/ipnat.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ippool_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPPOOLCONF=/etc/ipf/ippool.conf
++ [ 0 -eq 1 ]
++ VAR_IPF_DIR=/var/run/ipf
++ IPFILCONF=/var/run/ipf/ipf.conf
++ IPFILOVRCONF=/var/run/ipf/ipf_ovr.conf
++ IPF_LOCK=/var/run/ipflock
++ CONF_FILES=''
++ NAT_FILES=''
++ IPF_SUFFIX=.ipf
++ NAT_SUFFIX=.nat
++ CURRENT_VERSION=1
++ IPF_FMRI=svc:/network/ipfilter:default
++ INETDFMRI=svc:/network/inetd:default
++ RPCBINDFMRI=svc:/network/rpc/bind:default
++ SMF_ONLINE=online
++ SMF_MAINT=maintenance
++ SMF_NONE=none
++ FW_CONTEXT_PG=firewall_context
++ METHOD_PROP=ipf_method
++ FW_CONFIG_PG=firewall_config
++ POLICY_PROP=policy
++ APPLY2_PROP=apply_to
++ EXCEPTIONS_PROP=exceptions
++ FW_CONFIG_DEF_PG=firewall_config_default
++ FW_CONFIG_OVR_PG=firewall_config_override
++ CUSTOM_FILE_PROP=custom_policy_file
++ OPEN_PORTS_PROP=open_ports
++ PREFIX_HOST=host:
++ PREFIX_NET=network:
++ PREFIX_POOL=pool:
++ PREFIX_IF=if:
++ GLOBAL_CONFIG=''
++ GLOBAL_POLICY=''
++ SERVINFO=/usr/lib/servinfo
++ server_port_list=''
++ global_init
++ awk '{$2=" "; print $0}'
++ svcprop -p firewall_config_override -p firewall_config_default svc:/network/ipfilter:default
++ 2> /dev/null
++ GLOBAL_CONFIG=$'firewall_config_default/apply_to   ""\nfirewall_config_default/exceptions   ""\nfirewall_config_default/open_ports   ""\nfirewall_config_default/value_authorization   solaris.smf.value.firewall.config\nfirewall_config_default/policy   custom\nfirewall_config_default/custom_policy_file   /etc/ipf/ipf.conf\nfirewall_config_default/version   1\nfirewall_config_override/apply_to   ""\nfirewall_config_override/policy   none\nfirewall_config_override/value_authorization   solaris.smf.value.firewall.config'
++ global_get_prop_value firewall_config_default policy
++ target_pg=firewall_config_default
++ prop=policy
++ [ firewall_config_default != firewall_config_override -a firewall_config_default != firewall_config_default ]
++ [ firewall_config_default == firewall_config_default ]
++ extra_pg=firewall_config_override
++ awk $'{\n\t\tfound=0\n\t\tfor (i=1; i<=NF; i++) {\n\t\t\tif (found == 1) {\n\t\t\t\tif (index($i, target_pg) == 1 || index($i, extra_pg) == 1)\n\t\t\t\t\tbreak;\n\n\t\t\t\tprint $i;\n\t\t\t}\n\n\t\t\tif (split($i, values, "/") < 2)\n\t\t\t\tcontinue;\n\n\t\t\tif (values[1] == target_pg && values[2] == prop)\n\t\t\t\tfound=1;\n\t\t}\n\t}' target_pg=firewall_config_default prop=policy extra_pg=firewall_config_override
++ echo firewall_config_default/apply_to '""' firewall_config_default/exceptions '""' firewall_config_default/open_ports '""' firewall_config_default/value_authorization solaris.smf.value.firewall.config firewall_config_default/policy custom firewall_config_default/custom_policy_file /etc/ipf/ipf.conf firewall_config_default/version 1 firewall_config_override/apply_to '""' firewall_config_override/policy none firewall_config_override/value_authorization solaris.smf.value.firewall.config
++ value=custom
++ echo custom
++ GLOBAL_POLICY=custom
++ PATH=/usr/sbin:/usr/bin:/usr/sbin:/usr/lib/ipf:/usr/sbin:/usr/lib/ipf
++ PIDFILE=/var/run/ipmon.pid
++ PFILCHECKED=no
++ smf_zonename
++ echo 2e7096fd-2743-4c3f-b172-d9f511279ee1
++ zone=2e7096fd-2743-4c3f-b172-d9f511279ee1
++ awk '/ipf/ { print $1 } ' -
++ 2> /dev/null
++ /usr/sbin/modinfo
++ 2>& 1
++ ipfid=202
++ [ -f /var/run/ipmon.pid ]
++ cat /var/run/ipmon.pid
++ 2> /dev/null
++ pid=31638
++ [ svc:/TEMP/application/perforce/p4p:default = svc:/network/ipfilter:default ]
++ service_update svc:/TEMP/application/perforce/p4p:default
++ svc=svc:/TEMP/application/perforce/p4p:default
++ ret=0
++ [ custom = custom ]
++ return 0
++ exit 0
++ . /lib/svc/share/smf_include.sh
++ SMF_EXIT_OK=0
++ SMF_EXIT_NODAEMON=94
++ SMF_EXIT_ERR_FATAL=95
++ SMF_EXIT_ERR_CONFIG=96
++ SMF_EXIT_MON_DEGRADE=97
++ SMF_EXIT_MON_OFFLINE=98
++ SMF_EXIT_ERR_NOSMF=99
++ SMF_EXIT_ERR_PERM=100
++ . /lib/svc/share/ipf_include.sh
++ IPFILTER_FMRI=svc:/network/ipfilter:default
++ ETC_IPF_DIR=/etc/ipf
++ /usr/bin/svcprop -p config/ipf6_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IP6FILCONF=/etc/ipf/ipf6.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ipnat_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPNATCONF=/etc/ipf/ipnat.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ippool_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPPOOLCONF=/etc/ipf/ippool.conf
++ [ 0 -eq 1 ]
++ VAR_IPF_DIR=/var/run/ipf
++ IPFILCONF=/var/run/ipf/ipf.conf
++ IPFILOVRCONF=/var/run/ipf/ipf_ovr.conf
++ IPF_LOCK=/var/run/ipflock
++ CONF_FILES=''
++ NAT_FILES=''
++ IPF_SUFFIX=.ipf
++ NAT_SUFFIX=.nat
++ CURRENT_VERSION=1
++ IPF_FMRI=svc:/network/ipfilter:default
++ INETDFMRI=svc:/network/inetd:default
++ RPCBINDFMRI=svc:/network/rpc/bind:default
++ SMF_ONLINE=online
++ SMF_MAINT=maintenance
++ SMF_NONE=none
++ FW_CONTEXT_PG=firewall_context
++ METHOD_PROP=ipf_method
++ FW_CONFIG_PG=firewall_config
++ POLICY_PROP=policy
++ APPLY2_PROP=apply_to
++ EXCEPTIONS_PROP=exceptions
++ FW_CONFIG_DEF_PG=firewall_config_default
++ FW_CONFIG_OVR_PG=firewall_config_override
++ CUSTOM_FILE_PROP=custom_policy_file
++ OPEN_PORTS_PROP=open_ports
++ PREFIX_HOST=host:
++ PREFIX_NET=network:
++ PREFIX_POOL=pool:
++ PREFIX_IF=if:
++ GLOBAL_CONFIG=''
++ GLOBAL_POLICY=''
++ SERVINFO=/usr/lib/servinfo
++ server_port_list=''
++ global_init
++ awk '{$2=" "; print $0}'
++ svcprop -p firewall_config_override -p firewall_config_default svc:/network/ipfilter:default
++ 2> /dev/null
++ GLOBAL_CONFIG=$'firewall_config_default/apply_to   ""\nfirewall_config_default/exceptions   ""\nfirewall_config_default/open_ports   ""\nfirewall_config_default/value_authorization   solaris.smf.value.firewall.config\nfirewall_config_default/policy   custom\nfirewall_config_default/custom_policy_file   /etc/ipf/ipf.conf\nfirewall_config_default/version   1\nfirewall_config_override/apply_to   ""\nfirewall_config_override/policy   none\nfirewall_config_override/value_authorization   solaris.smf.value.firewall.config'
++ global_get_prop_value firewall_config_default policy
++ target_pg=firewall_config_default
++ prop=policy
++ [ firewall_config_default != firewall_config_override -a firewall_config_default != firewall_config_default ]
++ [ firewall_config_default == firewall_config_default ]
++ extra_pg=firewall_config_override
++ awk $'{\n\t\tfound=0\n\t\tfor (i=1; i<=NF; i++) {\n\t\t\tif (found == 1) {\n\t\t\t\tif (index($i, target_pg) == 1 || index($i, extra_pg) == 1)\n\t\t\t\t\tbreak;\n\n\t\t\t\tprint $i;\n\t\t\t}\n\n\t\t\tif (split($i, values, "/") < 2)\n\t\t\t\tcontinue;\n\n\t\t\tif (values[1] == target_pg && values[2] == prop)\n\t\t\t\tfound=1;\n\t\t}\n\t}' target_pg=firewall_config_default prop=policy extra_pg=firewall_config_override
++ echo firewall_config_default/apply_to '""' firewall_config_default/exceptions '""' firewall_config_default/open_ports '""' firewall_config_default/value_authorization solaris.smf.value.firewall.config firewall_config_default/policy custom firewall_config_default/custom_policy_file /etc/ipf/ipf.conf firewall_config_default/version 1 firewall_config_override/apply_to '""' firewall_config_override/policy none firewall_config_override/value_authorization solaris.smf.value.firewall.config
++ value=custom
++ echo custom
++ GLOBAL_POLICY=custom
++ PATH=/usr/sbin:/usr/bin:/usr/sbin:/usr/lib/ipf:/usr/sbin:/usr/lib/ipf
++ PIDFILE=/var/run/ipmon.pid
++ PFILCHECKED=no
++ smf_zonename
++ echo 2e7096fd-2743-4c3f-b172-d9f511279ee1
++ zone=2e7096fd-2743-4c3f-b172-d9f511279ee1
++ awk '/ipf/ { print $1 } ' -
++ 2> /dev/null
++ /usr/sbin/modinfo
++ 2>& 1
++ ipfid=202
++ [ -f /var/run/ipmon.pid ]
++ cat /var/run/ipmon.pid
++ 2> /dev/null
++ pid=31638
++ [ svc:/TEMP/application/perforce/p4web:default = svc:/network/ipfilter:default ]
++ service_update svc:/TEMP/application/perforce/p4web:default
++ svc=svc:/TEMP/application/perforce/p4web:default
++ ret=0
++ [ custom = custom ]
++ return 0
++ exit 0
++ . /lib/svc/share/smf_include.sh
++ SMF_EXIT_OK=0
++ SMF_EXIT_NODAEMON=94
++ SMF_EXIT_ERR_FATAL=95
++ SMF_EXIT_ERR_CONFIG=96
++ SMF_EXIT_MON_DEGRADE=97
++ SMF_EXIT_MON_OFFLINE=98
++ SMF_EXIT_ERR_NOSMF=99
++ SMF_EXIT_ERR_PERM=100
++ . /lib/svc/share/ipf_include.sh
++ IPFILTER_FMRI=svc:/network/ipfilter:default
++ ETC_IPF_DIR=/etc/ipf
++ /usr/bin/svcprop -p config/ipf6_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IP6FILCONF=/etc/ipf/ipf6.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ipnat_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPNATCONF=/etc/ipf/ipnat.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ippool_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPPOOLCONF=/etc/ipf/ippool.conf
++ [ 0 -eq 1 ]
++ VAR_IPF_DIR=/var/run/ipf
++ IPFILCONF=/var/run/ipf/ipf.conf
++ IPFILOVRCONF=/var/run/ipf/ipf_ovr.conf
++ IPF_LOCK=/var/run/ipflock
++ CONF_FILES=''
++ NAT_FILES=''
++ IPF_SUFFIX=.ipf
++ NAT_SUFFIX=.nat
++ CURRENT_VERSION=1
++ IPF_FMRI=svc:/network/ipfilter:default
++ INETDFMRI=svc:/network/inetd:default
++ RPCBINDFMRI=svc:/network/rpc/bind:default
++ SMF_ONLINE=online
++ SMF_MAINT=maintenance
++ SMF_NONE=none
++ FW_CONTEXT_PG=firewall_context
++ METHOD_PROP=ipf_method
++ FW_CONFIG_PG=firewall_config
++ POLICY_PROP=policy
++ APPLY2_PROP=apply_to
++ EXCEPTIONS_PROP=exceptions
++ FW_CONFIG_DEF_PG=firewall_config_default
++ FW_CONFIG_OVR_PG=firewall_config_override
++ CUSTOM_FILE_PROP=custom_policy_file
++ OPEN_PORTS_PROP=open_ports
++ PREFIX_HOST=host:
++ PREFIX_NET=network:
++ PREFIX_POOL=pool:
++ PREFIX_IF=if:
++ GLOBAL_CONFIG=''
++ GLOBAL_POLICY=''
++ SERVINFO=/usr/lib/servinfo
++ server_port_list=''
++ global_init
++ awk '{$2=" "; print $0}'
++ svcprop -p firewall_config_override -p firewall_config_default svc:/network/ipfilter:default
++ 2> /dev/null
++ GLOBAL_CONFIG=$'firewall_config_default/apply_to   ""\nfirewall_config_default/exceptions   ""\nfirewall_config_default/open_ports   ""\nfirewall_config_default/value_authorization   solaris.smf.value.firewall.config\nfirewall_config_default/policy   custom\nfirewall_config_default/custom_policy_file   /etc/ipf/ipf.conf\nfirewall_config_default/version   1\nfirewall_config_override/apply_to   ""\nfirewall_config_override/policy   none\nfirewall_config_override/value_authorization   solaris.smf.value.firewall.config'
++ global_get_prop_value firewall_config_default policy
++ target_pg=firewall_config_default
++ prop=policy
++ [ firewall_config_default != firewall_config_override -a firewall_config_default != firewall_config_default ]
++ [ firewall_config_default == firewall_config_default ]
++ extra_pg=firewall_config_override
++ awk $'{\n\t\tfound=0\n\t\tfor (i=1; i<=NF; i++) {\n\t\t\tif (found == 1) {\n\t\t\t\tif (index($i, target_pg) == 1 || index($i, extra_pg) == 1)\n\t\t\t\t\tbreak;\n\n\t\t\t\tprint $i;\n\t\t\t}\n\n\t\t\tif (split($i, values, "/") < 2)\n\t\t\t\tcontinue;\n\n\t\t\tif (values[1] == target_pg && values[2] == prop)\n\t\t\t\tfound=1;\n\t\t}\n\t}' target_pg=firewall_config_default prop=policy extra_pg=firewall_config_override
++ echo firewall_config_default/apply_to '""' firewall_config_default/exceptions '""' firewall_config_default/open_ports '""' firewall_config_default/value_authorization solaris.smf.value.firewall.config firewall_config_default/policy custom firewall_config_default/custom_policy_file /etc/ipf/ipf.conf firewall_config_default/version 1 firewall_config_override/apply_to '""' firewall_config_override/policy none firewall_config_override/value_authorization solaris.smf.value.firewall.config
++ value=custom
++ echo custom
++ GLOBAL_POLICY=custom
++ PATH=/usr/sbin:/usr/bin:/usr/sbin:/usr/lib/ipf:/usr/sbin:/usr/lib/ipf
++ PIDFILE=/var/run/ipmon.pid
++ PFILCHECKED=no
++ smf_zonename
++ echo 2e7096fd-2743-4c3f-b172-d9f511279ee1
++ zone=2e7096fd-2743-4c3f-b172-d9f511279ee1
++ awk '/ipf/ { print $1 } ' -
++ 2> /dev/null
++ /usr/sbin/modinfo
++ 2>& 1
++ ipfid=202
++ [ -f /var/run/ipmon.pid ]
++ cat /var/run/ipmon.pid
++ 2> /dev/null
++ pid=31638
++ [ svc:/application/perforce/p4d:default = svc:/network/ipfilter:default ]
++ service_update svc:/application/perforce/p4d:default
++ svc=svc:/application/perforce/p4d:default
++ ret=0
++ [ custom = custom ]
++ return 0
++ exit 0
++ . /lib/svc/share/smf_include.sh
++ SMF_EXIT_OK=0
++ SMF_EXIT_NODAEMON=94
++ SMF_EXIT_ERR_FATAL=95
++ SMF_EXIT_ERR_CONFIG=96
++ SMF_EXIT_MON_DEGRADE=97
++ SMF_EXIT_MON_OFFLINE=98
++ SMF_EXIT_ERR_NOSMF=99
++ SMF_EXIT_ERR_PERM=100
++ . /lib/svc/share/ipf_include.sh
++ IPFILTER_FMRI=svc:/network/ipfilter:default
++ ETC_IPF_DIR=/etc/ipf
++ /usr/bin/svcprop -p config/ipf6_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IP6FILCONF=/etc/ipf/ipf6.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ipnat_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPNATCONF=/etc/ipf/ipnat.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ippool_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPPOOLCONF=/etc/ipf/ippool.conf
++ [ 0 -eq 1 ]
++ VAR_IPF_DIR=/var/run/ipf
++ IPFILCONF=/var/run/ipf/ipf.conf
++ IPFILOVRCONF=/var/run/ipf/ipf_ovr.conf
++ IPF_LOCK=/var/run/ipflock
++ CONF_FILES=''
++ NAT_FILES=''
++ IPF_SUFFIX=.ipf
++ NAT_SUFFIX=.nat
++ CURRENT_VERSION=1
++ IPF_FMRI=svc:/network/ipfilter:default
++ INETDFMRI=svc:/network/inetd:default
++ RPCBINDFMRI=svc:/network/rpc/bind:default
++ SMF_ONLINE=online
++ SMF_MAINT=maintenance
++ SMF_NONE=none
++ FW_CONTEXT_PG=firewall_context
++ METHOD_PROP=ipf_method
++ FW_CONFIG_PG=firewall_config
++ POLICY_PROP=policy
++ APPLY2_PROP=apply_to
++ EXCEPTIONS_PROP=exceptions
++ FW_CONFIG_DEF_PG=firewall_config_default
++ FW_CONFIG_OVR_PG=firewall_config_override
++ CUSTOM_FILE_PROP=custom_policy_file
++ OPEN_PORTS_PROP=open_ports
++ PREFIX_HOST=host:
++ PREFIX_NET=network:
++ PREFIX_POOL=pool:
++ PREFIX_IF=if:
++ GLOBAL_CONFIG=''
++ GLOBAL_POLICY=''
++ SERVINFO=/usr/lib/servinfo
++ server_port_list=''
++ global_init
++ awk '{$2=" "; print $0}'
++ svcprop -p firewall_config_override -p firewall_config_default svc:/network/ipfilter:default
++ 2> /dev/null
++ GLOBAL_CONFIG=$'firewall_config_default/apply_to   ""\nfirewall_config_default/exceptions   ""\nfirewall_config_default/open_ports   ""\nfirewall_config_default/value_authorization   solaris.smf.value.firewall.config\nfirewall_config_default/policy   custom\nfirewall_config_default/custom_policy_file   /etc/ipf/ipf.conf\nfirewall_config_default/version   1\nfirewall_config_override/apply_to   ""\nfirewall_config_override/policy   none\nfirewall_config_override/value_authorization   solaris.smf.value.firewall.config'
++ global_get_prop_value firewall_config_default policy
++ target_pg=firewall_config_default
++ prop=policy
++ [ firewall_config_default != firewall_config_override -a firewall_config_default != firewall_config_default ]
++ [ firewall_config_default == firewall_config_default ]
++ extra_pg=firewall_config_override
++ awk $'{\n\t\tfound=0\n\t\tfor (i=1; i<=NF; i++) {\n\t\t\tif (found == 1) {\n\t\t\t\tif (index($i, target_pg) == 1 || index($i, extra_pg) == 1)\n\t\t\t\t\tbreak;\n\n\t\t\t\tprint $i;\n\t\t\t}\n\n\t\t\tif (split($i, values, "/") < 2)\n\t\t\t\tcontinue;\n\n\t\t\tif (values[1] == target_pg && values[2] == prop)\n\t\t\t\tfound=1;\n\t\t}\n\t}' target_pg=firewall_config_default prop=policy extra_pg=firewall_config_override
++ echo firewall_config_default/apply_to '""' firewall_config_default/exceptions '""' firewall_config_default/open_ports '""' firewall_config_default/value_authorization solaris.smf.value.firewall.config firewall_config_default/policy custom firewall_config_default/custom_policy_file /etc/ipf/ipf.conf firewall_config_default/version 1 firewall_config_override/apply_to '""' firewall_config_override/policy none firewall_config_override/value_authorization solaris.smf.value.firewall.config
++ value=custom
++ echo custom
++ GLOBAL_POLICY=custom
++ PATH=/usr/sbin:/usr/bin:/usr/sbin:/usr/lib/ipf:/usr/sbin:/usr/lib/ipf
++ PIDFILE=/var/run/ipmon.pid
++ PFILCHECKED=no
++ smf_zonename
++ echo 2e7096fd-2743-4c3f-b172-d9f511279ee1
++ zone=2e7096fd-2743-4c3f-b172-d9f511279ee1
++ awk '/ipf/ { print $1 } ' -
++ 2> /dev/null
++ /usr/sbin/modinfo
++ 2>& 1
++ ipfid=202
++ [ -f /var/run/ipmon.pid ]
++ cat /var/run/ipmon.pid
++ 2> /dev/null
++ pid=31638
++ [ svc:/application/perforce/p4p:default = svc:/network/ipfilter:default ]
++ service_update svc:/application/perforce/p4p:default
++ svc=svc:/application/perforce/p4p:default
++ ret=0
++ [ custom = custom ]
++ return 0
++ exit 0
+[ Aug 23 13:56:54 Enabled. ]
+[ Aug 23 13:57:09 Executing start method ("/lib/svc/method/ipfilter start"). ]
++ . /lib/svc/share/smf_include.sh
++ SMF_EXIT_OK=0
++ SMF_EXIT_NODAEMON=94
++ SMF_EXIT_ERR_FATAL=95
++ SMF_EXIT_ERR_CONFIG=96
++ SMF_EXIT_MON_DEGRADE=97
++ SMF_EXIT_MON_OFFLINE=98
++ SMF_EXIT_ERR_NOSMF=99
++ SMF_EXIT_ERR_PERM=100
++ . /lib/svc/share/ipf_include.sh
++ IPFILTER_FMRI=svc:/network/ipfilter:default
++ ETC_IPF_DIR=/etc/ipf
++ /usr/bin/svcprop -p config/ipf6_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IP6FILCONF=/etc/ipf/ipf6.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ipnat_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPNATCONF=/etc/ipf/ipnat.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ippool_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPPOOLCONF=/etc/ipf/ippool.conf
++ [ 0 -eq 1 ]
++ VAR_IPF_DIR=/var/run/ipf
++ IPFILCONF=/var/run/ipf/ipf.conf
++ IPFILOVRCONF=/var/run/ipf/ipf_ovr.conf
++ IPF_LOCK=/var/run/ipflock
++ CONF_FILES=''
++ NAT_FILES=''
++ IPF_SUFFIX=.ipf
++ NAT_SUFFIX=.nat
++ CURRENT_VERSION=1
++ IPF_FMRI=svc:/network/ipfilter:default
++ INETDFMRI=svc:/network/inetd:default
++ RPCBINDFMRI=svc:/network/rpc/bind:default
++ SMF_ONLINE=online
++ SMF_MAINT=maintenance
++ SMF_NONE=none
++ FW_CONTEXT_PG=firewall_context
++ METHOD_PROP=ipf_method
++ FW_CONFIG_PG=firewall_config
++ POLICY_PROP=policy
++ APPLY2_PROP=apply_to
++ EXCEPTIONS_PROP=exceptions
++ FW_CONFIG_DEF_PG=firewall_config_default
++ FW_CONFIG_OVR_PG=firewall_config_override
++ CUSTOM_FILE_PROP=custom_policy_file
++ OPEN_PORTS_PROP=open_ports
++ PREFIX_HOST=host:
++ PREFIX_NET=network:
++ PREFIX_POOL=pool:
++ PREFIX_IF=if:
++ GLOBAL_CONFIG=''
++ GLOBAL_POLICY=''
++ SERVINFO=/usr/lib/servinfo
++ server_port_list=''
++ global_init
++ awk '{$2=" "; print $0}'
++ svcprop -p firewall_config_override -p firewall_config_default svc:/network/ipfilter:default
++ 2> /dev/null
++ GLOBAL_CONFIG=$'firewall_config_default/apply_to   ""\nfirewall_config_default/exceptions   ""\nfirewall_config_default/open_ports   ""\nfirewall_config_default/value_authorization   solaris.smf.value.firewall.config\nfirewall_config_default/policy   custom\nfirewall_config_default/custom_policy_file   /etc/ipf/ipf.conf\nfirewall_config_default/version   1\nfirewall_config_override/apply_to   ""\nfirewall_config_override/policy   none\nfirewall_config_override/value_authorization   solaris.smf.value.firewall.config'
++ global_get_prop_value firewall_config_default policy
++ target_pg=firewall_config_default
++ prop=policy
++ [ firewall_config_default != firewall_config_override -a firewall_config_default != firewall_config_default ]
++ [ firewall_config_default == firewall_config_default ]
++ extra_pg=firewall_config_override
++ awk $'{\n\t\tfound=0\n\t\tfor (i=1; i<=NF; i++) {\n\t\t\tif (found == 1) {\n\t\t\t\tif (index($i, target_pg) == 1 || index($i, extra_pg) == 1)\n\t\t\t\t\tbreak;\n\n\t\t\t\tprint $i;\n\t\t\t}\n\n\t\t\tif (split($i, values, "/") < 2)\n\t\t\t\tcontinue;\n\n\t\t\tif (values[1] == target_pg && values[2] == prop)\n\t\t\t\tfound=1;\n\t\t}\n\t}' target_pg=firewall_config_default prop=policy extra_pg=firewall_config_override
++ echo firewall_config_default/apply_to '""' firewall_config_default/exceptions '""' firewall_config_default/open_ports '""' firewall_config_default/value_authorization solaris.smf.value.firewall.config firewall_config_default/policy custom firewall_config_default/custom_policy_file /etc/ipf/ipf.conf firewall_config_default/version 1 firewall_config_override/apply_to '""' firewall_config_override/policy none firewall_config_override/value_authorization solaris.smf.value.firewall.config
++ value=custom
++ echo custom
++ GLOBAL_POLICY=custom
++ PATH=/usr/sbin:/usr/bin:/usr/sbin:/usr/lib/ipf
++ PIDFILE=/var/run/ipmon.pid
++ PFILCHECKED=no
++ smf_zonename
++ echo 2e7096fd-2743-4c3f-b172-d9f511279ee1
++ zone=2e7096fd-2743-4c3f-b172-d9f511279ee1
++ awk '/ipf/ { print $1 } ' -
++ 2> /dev/null
++ /usr/sbin/modinfo
++ 2>& 1
++ ipfid=202
++ [ -f /var/run/ipmon.pid ]
++ pgrep -z 2e7096fd-2743-4c3f-b172-d9f511279ee1 ipmon
++ pid=''
++ config_get_version
++ svcprop -p firewall_config_default/version svc:/network/ipfilter:default
++ 2> /dev/null
++ ver=1
++ [ 0 -ne 0 -o -z 1 ]
++ echo 1
++ ver=1
++ [ 0 -eq 1 ]
++ [ 1 -ne 1 ]
++ configure_firewall
++ symlink_persistent_file ipnat.conf
++ persist_file=/var/fw/ipnat.conf
++ etc_file=/etc/ipf/ipnat.conf
++ [ ! -e /var/fw/ipnat.conf ]
++ return 0
++ symlink_persistent_file ipf.conf
++ persist_file=/var/fw/ipf.conf
++ etc_file=/etc/ipf/ipf.conf
++ [ ! -e /var/fw/ipf.conf ]
++ return 0
++ create_global_rules
++ [ custom = custom ]
++ global_get_prop_value firewall_config_default custom_policy_file
++ target_pg=firewall_config_default
++ prop=custom_policy_file
++ [ firewall_config_default != firewall_config_override -a firewall_config_default != firewall_config_default ]
++ [ firewall_config_default == firewall_config_default ]
++ extra_pg=firewall_config_override
++ awk $'{\n\t\tfound=0\n\t\tfor (i=1; i<=NF; i++) {\n\t\t\tif (found == 1) {\n\t\t\t\tif (index($i, target_pg) == 1 || index($i, extra_pg) == 1)\n\t\t\t\t\tbreak;\n\n\t\t\t\tprint $i;\n\t\t\t}\n\n\t\t\tif (split($i, values, "/") < 2)\n\t\t\t\tcontinue;\n\n\t\t\tif (values[1] == target_pg && values[2] == prop)\n\t\t\t\tfound=1;\n\t\t}\n\t}' target_pg=firewall_config_default prop=custom_policy_file extra_pg=firewall_config_override
++ echo firewall_config_default/apply_to '""' firewall_config_default/exceptions '""' firewall_config_default/open_ports '""' firewall_config_default/value_authorization solaris.smf.value.firewall.config firewall_config_default/policy custom firewall_config_default/custom_policy_file /etc/ipf/ipf.conf firewall_config_default/version 1 firewall_config_override/apply_to '""' firewall_config_override/policy none firewall_config_override/value_authorization solaris.smf.value.firewall.config
++ value=/etc/ipf/ipf.conf
++ echo /etc/ipf/ipf.conf
++ file=/etc/ipf/ipf.conf
++ [ -n /etc/ipf/ipf.conf ]
++ custom_set_symlink /etc/ipf/ipf.conf
++ [ ! -f /etc/ipf/ipf.conf ]
++ check_ipf_dir
++ [ -d /var/run/ipf ]
++ mkdir /var/run/ipf
++ 1> /dev/null 2>& 1
++ rm /var/run/ipf/ipf.conf
++ 1> /dev/null 2>& 1
++ ln -s /etc/ipf/ipf.conf /var/run/ipf/ipf.conf
++ 1> /dev/null 2>& 1
++ return 0
++ create_global_ovr_rules
++ [ custom = custom ]
++ echo $'# \'custom\' global policy'
++ 1> /var/run/ipf/ipf_ovr.conf
++ return 0
++ create_services_rules
++ [ custom = custom ]
++ return 0
++ [ ! -f /var/run/ipf/ipf.conf -a ! -f /etc/ipf/ipnat.conf ]
++ ipf -E
++ load_ippool
++ [ -r /etc/ipf/ippool.conf ]
++ return 0
++ load_ipf
++ bad=0
++ ipf -IFa
++ [ -r /var/run/ipf/ipf_ovr.conf ]
++ ipf -I -f /var/run/ipf/ipf_ovr.conf
++ [ 0 != 0 ]
++ [ -r /var/run/ipf/ipf.conf ]
++ ipf -I -f /var/run/ipf/ipf.conf
++ [ 0 != 0 ]
++ [ -r /etc/ipf/ipf6.conf ]
++ [ 0 -eq 0 ]
++ ipf -s -y
+Set 0 now inactive
+filter sync'd
++ return 0
++ load_ipnat
++ ipnat -CF
+0 entries flushed from NAT table
+4 entries flushed from NAT list
++ [ -r /etc/ipf/ipnat.conf ]
++ /lib/svc/bin/svc.ipfd
++ /usr/sbin/ipmon -Ds
++ exit 0
+[ Aug 23 13:57:09 Method "start" exited with status 0. ]
++ . /lib/svc/share/smf_include.sh
++ SMF_EXIT_OK=0
++ SMF_EXIT_NODAEMON=94
++ SMF_EXIT_ERR_FATAL=95
++ SMF_EXIT_ERR_CONFIG=96
++ SMF_EXIT_MON_DEGRADE=97
++ SMF_EXIT_MON_OFFLINE=98
++ SMF_EXIT_ERR_NOSMF=99
++ SMF_EXIT_ERR_PERM=100
++ . /lib/svc/share/ipf_include.sh
++ IPFILTER_FMRI=svc:/network/ipfilter:default
++ ETC_IPF_DIR=/etc/ipf
++ /usr/bin/svcprop -p config/ipf6_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IP6FILCONF=/etc/ipf/ipf6.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ipnat_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPNATCONF=/etc/ipf/ipnat.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ippool_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPPOOLCONF=/etc/ipf/ippool.conf
++ [ 0 -eq 1 ]
++ VAR_IPF_DIR=/var/run/ipf
++ IPFILCONF=/var/run/ipf/ipf.conf
++ IPFILOVRCONF=/var/run/ipf/ipf_ovr.conf
++ IPF_LOCK=/var/run/ipflock
++ CONF_FILES=''
++ NAT_FILES=''
++ IPF_SUFFIX=.ipf
++ NAT_SUFFIX=.nat
++ CURRENT_VERSION=1
++ IPF_FMRI=svc:/network/ipfilter:default
++ INETDFMRI=svc:/network/inetd:default
++ RPCBINDFMRI=svc:/network/rpc/bind:default
++ SMF_ONLINE=online
++ SMF_MAINT=maintenance
++ SMF_NONE=none
++ FW_CONTEXT_PG=firewall_context
++ METHOD_PROP=ipf_method
++ FW_CONFIG_PG=firewall_config
++ POLICY_PROP=policy
++ APPLY2_PROP=apply_to
++ EXCEPTIONS_PROP=exceptions
++ FW_CONFIG_DEF_PG=firewall_config_default
++ FW_CONFIG_OVR_PG=firewall_config_override
++ CUSTOM_FILE_PROP=custom_policy_file
++ OPEN_PORTS_PROP=open_ports
++ PREFIX_HOST=host:
++ PREFIX_NET=network:
++ PREFIX_POOL=pool:
++ PREFIX_IF=if:
++ GLOBAL_CONFIG=''
++ GLOBAL_POLICY=''
++ SERVINFO=/usr/lib/servinfo
++ server_port_list=''
++ global_init
++ awk '{$2=" "; print $0}'
++ svcprop -p firewall_config_override -p firewall_config_default svc:/network/ipfilter:default
++ 2> /dev/null
++ GLOBAL_CONFIG=$'firewall_config_default/apply_to   ""\nfirewall_config_default/exceptions   ""\nfirewall_config_default/open_ports   ""\nfirewall_config_default/value_authorization   solaris.smf.value.firewall.config\nfirewall_config_default/policy   custom\nfirewall_config_default/custom_policy_file   /etc/ipf/ipf.conf\nfirewall_config_default/version   1\nfirewall_config_override/apply_to   ""\nfirewall_config_override/policy   none\nfirewall_config_override/value_authorization   solaris.smf.value.firewall.config'
++ global_get_prop_value firewall_config_default policy
++ target_pg=firewall_config_default
++ prop=policy
++ [ firewall_config_default != firewall_config_override -a firewall_config_default != firewall_config_default ]
++ [ firewall_config_default == firewall_config_default ]
++ extra_pg=firewall_config_override
++ awk $'{\n\t\tfound=0\n\t\tfor (i=1; i<=NF; i++) {\n\t\t\tif (found == 1) {\n\t\t\t\tif (index($i, target_pg) == 1 || index($i, extra_pg) == 1)\n\t\t\t\t\tbreak;\n\n\t\t\t\tprint $i;\n\t\t\t}\n\n\t\t\tif (split($i, values, "/") < 2)\n\t\t\t\tcontinue;\n\n\t\t\tif (values[1] == target_pg && values[2] == prop)\n\t\t\t\tfound=1;\n\t\t}\n\t}' target_pg=firewall_config_default prop=policy extra_pg=firewall_config_override
++ echo firewall_config_default/apply_to '""' firewall_config_default/exceptions '""' firewall_config_default/open_ports '""' firewall_config_default/value_authorization solaris.smf.value.firewall.config firewall_config_default/policy custom firewall_config_default/custom_policy_file /etc/ipf/ipf.conf firewall_config_default/version 1 firewall_config_override/apply_to '""' firewall_config_override/policy none firewall_config_override/value_authorization solaris.smf.value.firewall.config
++ value=custom
++ echo custom
++ GLOBAL_POLICY=custom
++ PATH=/usr/sbin:/usr/bin:/usr/sbin:/usr/lib/ipf:/usr/sbin:/usr/lib/ipf
++ PIDFILE=/var/run/ipmon.pid
++ PFILCHECKED=no
++ smf_zonename
++ echo 2e7096fd-2743-4c3f-b172-d9f511279ee1
++ zone=2e7096fd-2743-4c3f-b172-d9f511279ee1
++ awk '/ipf/ { print $1 } ' -
++ 2> /dev/null
++ /usr/sbin/modinfo
++ 2>& 1
++ ipfid=202
++ [ -f /var/run/ipmon.pid ]
++ cat /var/run/ipmon.pid
++ 2> /dev/null
++ pid=73540
++ [ svc:/network/routing/route:default = svc:/network/ipfilter:default ]
++ service_update svc:/network/routing/route:default
++ svc=svc:/network/routing/route:default
++ ret=0
++ [ custom = custom ]
++ return 0
++ exit 0
++ . /lib/svc/share/smf_include.sh
++ SMF_EXIT_OK=0
++ SMF_EXIT_NODAEMON=94
++ SMF_EXIT_ERR_FATAL=95
++ SMF_EXIT_ERR_CONFIG=96
++ SMF_EXIT_MON_DEGRADE=97
++ SMF_EXIT_MON_OFFLINE=98
++ SMF_EXIT_ERR_NOSMF=99
++ SMF_EXIT_ERR_PERM=100
++ . /lib/svc/share/ipf_include.sh
++ IPFILTER_FMRI=svc:/network/ipfilter:default
++ ETC_IPF_DIR=/etc/ipf
++ /usr/bin/svcprop -p config/ipf6_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IP6FILCONF=/etc/ipf/ipf6.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ipnat_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPNATCONF=/etc/ipf/ipnat.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ippool_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPPOOLCONF=/etc/ipf/ippool.conf
++ [ 0 -eq 1 ]
++ VAR_IPF_DIR=/var/run/ipf
++ IPFILCONF=/var/run/ipf/ipf.conf
++ IPFILOVRCONF=/var/run/ipf/ipf_ovr.conf
++ IPF_LOCK=/var/run/ipflock
++ CONF_FILES=''
++ NAT_FILES=''
++ IPF_SUFFIX=.ipf
++ NAT_SUFFIX=.nat
++ CURRENT_VERSION=1
++ IPF_FMRI=svc:/network/ipfilter:default
++ INETDFMRI=svc:/network/inetd:default
++ RPCBINDFMRI=svc:/network/rpc/bind:default
++ SMF_ONLINE=online
++ SMF_MAINT=maintenance
++ SMF_NONE=none
++ FW_CONTEXT_PG=firewall_context
++ METHOD_PROP=ipf_method
++ FW_CONFIG_PG=firewall_config
++ POLICY_PROP=policy
++ APPLY2_PROP=apply_to
++ EXCEPTIONS_PROP=exceptions
++ FW_CONFIG_DEF_PG=firewall_config_default
++ FW_CONFIG_OVR_PG=firewall_config_override
++ CUSTOM_FILE_PROP=custom_policy_file
++ OPEN_PORTS_PROP=open_ports
++ PREFIX_HOST=host:
++ PREFIX_NET=network:
++ PREFIX_POOL=pool:
++ PREFIX_IF=if:
++ GLOBAL_CONFIG=''
++ GLOBAL_POLICY=''
++ SERVINFO=/usr/lib/servinfo
++ server_port_list=''
++ global_init
++ awk '{$2=" "; print $0}'
++ svcprop -p firewall_config_override -p firewall_config_default svc:/network/ipfilter:default
++ 2> /dev/null
++ GLOBAL_CONFIG=$'firewall_config_default/apply_to   ""\nfirewall_config_default/exceptions   ""\nfirewall_config_default/open_ports   ""\nfirewall_config_default/value_authorization   solaris.smf.value.firewall.config\nfirewall_config_default/policy   custom\nfirewall_config_default/custom_policy_file   /etc/ipf/ipf.conf\nfirewall_config_default/version   1\nfirewall_config_override/apply_to   ""\nfirewall_config_override/policy   none\nfirewall_config_override/value_authorization   solaris.smf.value.firewall.config'
++ global_get_prop_value firewall_config_default policy
++ target_pg=firewall_config_default
++ prop=policy
++ [ firewall_config_default != firewall_config_override -a firewall_config_default != firewall_config_default ]
++ [ firewall_config_default == firewall_config_default ]
++ extra_pg=firewall_config_override
++ awk $'{\n\t\tfound=0\n\t\tfor (i=1; i<=NF; i++) {\n\t\t\tif (found == 1) {\n\t\t\t\tif (index($i, target_pg) == 1 || index($i, extra_pg) == 1)\n\t\t\t\t\tbreak;\n\n\t\t\t\tprint $i;\n\t\t\t}\n\n\t\t\tif (split($i, values, "/") < 2)\n\t\t\t\tcontinue;\n\n\t\t\tif (values[1] == target_pg && values[2] == prop)\n\t\t\t\tfound=1;\n\t\t}\n\t}' target_pg=firewall_config_default prop=policy extra_pg=firewall_config_override
++ echo firewall_config_default/apply_to '""' firewall_config_default/exceptions '""' firewall_config_default/open_ports '""' firewall_config_default/value_authorization solaris.smf.value.firewall.config firewall_config_default/policy custom firewall_config_default/custom_policy_file /etc/ipf/ipf.conf firewall_config_default/version 1 firewall_config_override/apply_to '""' firewall_config_override/policy none firewall_config_override/value_authorization solaris.smf.value.firewall.config
++ value=custom
++ echo custom
++ GLOBAL_POLICY=custom
++ PATH=/usr/sbin:/usr/bin:/usr/sbin:/usr/lib/ipf:/usr/sbin:/usr/lib/ipf
++ PIDFILE=/var/run/ipmon.pid
++ PFILCHECKED=no
++ smf_zonename
++ echo 2e7096fd-2743-4c3f-b172-d9f511279ee1
++ zone=2e7096fd-2743-4c3f-b172-d9f511279ee1
++ awk '/ipf/ { print $1 } ' -
++ /usr/sbin/modinfo
++ 2>& 1
++ 2> /dev/null
++ ipfid=202
++ [ -f /var/run/ipmon.pid ]
++ cat /var/run/ipmon.pid
++ 2> /dev/null
++ pid=73540
++ [ svc:/network/routing/rdisc:default = svc:/network/ipfilter:default ]
++ service_update svc:/network/routing/rdisc:default
++ svc=svc:/network/routing/rdisc:default
++ ret=0
++ [ custom = custom ]
++ return 0
++ exit 0
++ . /lib/svc/share/smf_include.sh
++ SMF_EXIT_OK=0
++ SMF_EXIT_NODAEMON=94
++ SMF_EXIT_ERR_FATAL=95
++ SMF_EXIT_ERR_CONFIG=96
++ SMF_EXIT_MON_DEGRADE=97
++ SMF_EXIT_MON_OFFLINE=98
++ SMF_EXIT_ERR_NOSMF=99
++ SMF_EXIT_ERR_PERM=100
++ . /lib/svc/share/ipf_include.sh
++ IPFILTER_FMRI=svc:/network/ipfilter:default
++ ETC_IPF_DIR=/etc/ipf
++ /usr/bin/svcprop -p config/ipf6_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IP6FILCONF=/etc/ipf/ipf6.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ipnat_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPNATCONF=/etc/ipf/ipnat.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ippool_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPPOOLCONF=/etc/ipf/ippool.conf
++ [ 0 -eq 1 ]
++ VAR_IPF_DIR=/var/run/ipf
++ IPFILCONF=/var/run/ipf/ipf.conf
++ IPFILOVRCONF=/var/run/ipf/ipf_ovr.conf
++ IPF_LOCK=/var/run/ipflock
++ CONF_FILES=''
++ NAT_FILES=''
++ IPF_SUFFIX=.ipf
++ NAT_SUFFIX=.nat
++ CURRENT_VERSION=1
++ IPF_FMRI=svc:/network/ipfilter:default
++ INETDFMRI=svc:/network/inetd:default
++ RPCBINDFMRI=svc:/network/rpc/bind:default
++ SMF_ONLINE=online
++ SMF_MAINT=maintenance
++ SMF_NONE=none
++ FW_CONTEXT_PG=firewall_context
++ METHOD_PROP=ipf_method
++ FW_CONFIG_PG=firewall_config
++ POLICY_PROP=policy
++ APPLY2_PROP=apply_to
++ EXCEPTIONS_PROP=exceptions
++ FW_CONFIG_DEF_PG=firewall_config_default
++ FW_CONFIG_OVR_PG=firewall_config_override
++ CUSTOM_FILE_PROP=custom_policy_file
++ OPEN_PORTS_PROP=open_ports
++ PREFIX_HOST=host:
++ PREFIX_NET=network:
++ PREFIX_POOL=pool:
++ PREFIX_IF=if:
++ GLOBAL_CONFIG=''
++ GLOBAL_POLICY=''
++ SERVINFO=/usr/lib/servinfo
++ server_port_list=''
++ global_init
++ awk '{$2=" "; print $0}'
++ svcprop -p firewall_config_override -p firewall_config_default svc:/network/ipfilter:default
++ 2> /dev/null
++ GLOBAL_CONFIG=$'firewall_config_default/apply_to   ""\nfirewall_config_default/exceptions   ""\nfirewall_config_default/open_ports   ""\nfirewall_config_default/value_authorization   solaris.smf.value.firewall.config\nfirewall_config_default/policy   custom\nfirewall_config_default/custom_policy_file   /etc/ipf/ipf.conf\nfirewall_config_default/version   1\nfirewall_config_override/apply_to   ""\nfirewall_config_override/policy   none\nfirewall_config_override/value_authorization   solaris.smf.value.firewall.config'
++ global_get_prop_value firewall_config_default policy
++ target_pg=firewall_config_default
++ prop=policy
++ [ firewall_config_default != firewall_config_override -a firewall_config_default != firewall_config_default ]
++ [ firewall_config_default == firewall_config_default ]
++ extra_pg=firewall_config_override
++ awk $'{\n\t\tfound=0\n\t\tfor (i=1; i<=NF; i++) {\n\t\t\tif (found == 1) {\n\t\t\t\tif (index($i, target_pg) == 1 || index($i, extra_pg) == 1)\n\t\t\t\t\tbreak;\n\n\t\t\t\tprint $i;\n\t\t\t}\n\n\t\t\tif (split($i, values, "/") < 2)\n\t\t\t\tcontinue;\n\n\t\t\tif (values[1] == target_pg && values[2] == prop)\n\t\t\t\tfound=1;\n\t\t}\n\t}' target_pg=firewall_config_default prop=policy extra_pg=firewall_config_override
++ echo firewall_config_default/apply_to '""' firewall_config_default/exceptions '""' firewall_config_default/open_ports '""' firewall_config_default/value_authorization solaris.smf.value.firewall.config firewall_config_default/policy custom firewall_config_default/custom_policy_file /etc/ipf/ipf.conf firewall_config_default/version 1 firewall_config_override/apply_to '""' firewall_config_override/policy none firewall_config_override/value_authorization solaris.smf.value.firewall.config
++ value=custom
++ echo custom
++ GLOBAL_POLICY=custom
++ PATH=/usr/sbin:/usr/bin:/usr/sbin:/usr/lib/ipf:/usr/sbin:/usr/lib/ipf
++ PIDFILE=/var/run/ipmon.pid
++ PFILCHECKED=no
++ smf_zonename
++ echo 2e7096fd-2743-4c3f-b172-d9f511279ee1
++ zone=2e7096fd-2743-4c3f-b172-d9f511279ee1
++ awk '/ipf/ { print $1 } ' -
++ 2> /dev/null
++ /usr/sbin/modinfo
++ 2>& 1
++ ipfid=202
++ [ -f /var/run/ipmon.pid ]
++ cat /var/run/ipmon.pid
++ 2> /dev/null
++ pid=73540
++ [ svc:/network/routing/route:default = svc:/network/ipfilter:default ]
++ service_update svc:/network/routing/route:default
++ svc=svc:/network/routing/route:default
++ ret=0
++ [ custom = custom ]
++ return 0
++ exit 0
++ . /lib/svc/share/smf_include.sh
++ SMF_EXIT_OK=0
++ SMF_EXIT_NODAEMON=94
++ SMF_EXIT_ERR_FATAL=95
++ SMF_EXIT_ERR_CONFIG=96
++ SMF_EXIT_MON_DEGRADE=97
++ SMF_EXIT_MON_OFFLINE=98
++ SMF_EXIT_ERR_NOSMF=99
++ SMF_EXIT_ERR_PERM=100
++ . /lib/svc/share/ipf_include.sh
++ IPFILTER_FMRI=svc:/network/ipfilter:default
++ ETC_IPF_DIR=/etc/ipf
++ /usr/bin/svcprop -p config/ipf6_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IP6FILCONF=/etc/ipf/ipf6.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ipnat_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPNATCONF=/etc/ipf/ipnat.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ippool_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPPOOLCONF=/etc/ipf/ippool.conf
++ [ 0 -eq 1 ]
++ VAR_IPF_DIR=/var/run/ipf
++ IPFILCONF=/var/run/ipf/ipf.conf
++ IPFILOVRCONF=/var/run/ipf/ipf_ovr.conf
++ IPF_LOCK=/var/run/ipflock
++ CONF_FILES=''
++ NAT_FILES=''
++ IPF_SUFFIX=.ipf
++ NAT_SUFFIX=.nat
++ CURRENT_VERSION=1
++ IPF_FMRI=svc:/network/ipfilter:default
++ INETDFMRI=svc:/network/inetd:default
++ RPCBINDFMRI=svc:/network/rpc/bind:default
++ SMF_ONLINE=online
++ SMF_MAINT=maintenance
++ SMF_NONE=none
++ FW_CONTEXT_PG=firewall_context
++ METHOD_PROP=ipf_method
++ FW_CONFIG_PG=firewall_config
++ POLICY_PROP=policy
++ APPLY2_PROP=apply_to
++ EXCEPTIONS_PROP=exceptions
++ FW_CONFIG_DEF_PG=firewall_config_default
++ FW_CONFIG_OVR_PG=firewall_config_override
++ CUSTOM_FILE_PROP=custom_policy_file
++ OPEN_PORTS_PROP=open_ports
++ PREFIX_HOST=host:
++ PREFIX_NET=network:
++ PREFIX_POOL=pool:
++ PREFIX_IF=if:
++ GLOBAL_CONFIG=''
++ GLOBAL_POLICY=''
++ SERVINFO=/usr/lib/servinfo
++ server_port_list=''
++ global_init
++ awk '{$2=" "; print $0}'
++ svcprop -p firewall_config_override -p firewall_config_default svc:/network/ipfilter:default
++ 2> /dev/null
++ GLOBAL_CONFIG=$'firewall_config_default/apply_to   ""\nfirewall_config_default/exceptions   ""\nfirewall_config_default/open_ports   ""\nfirewall_config_default/value_authorization   solaris.smf.value.firewall.config\nfirewall_config_default/policy   custom\nfirewall_config_default/custom_policy_file   /etc/ipf/ipf.conf\nfirewall_config_default/version   1\nfirewall_config_override/apply_to   ""\nfirewall_config_override/policy   none\nfirewall_config_override/value_authorization   solaris.smf.value.firewall.config'
++ global_get_prop_value firewall_config_default policy
++ target_pg=firewall_config_default
++ prop=policy
++ [ firewall_config_default != firewall_config_override -a firewall_config_default != firewall_config_default ]
++ [ firewall_config_default == firewall_config_default ]
++ extra_pg=firewall_config_override
++ awk $'{\n\t\tfound=0\n\t\tfor (i=1; i<=NF; i++) {\n\t\t\tif (found == 1) {\n\t\t\t\tif (index($i, target_pg) == 1 || index($i, extra_pg) == 1)\n\t\t\t\t\tbreak;\n\n\t\t\t\tprint $i;\n\t\t\t}\n\n\t\t\tif (split($i, values, "/") < 2)\n\t\t\t\tcontinue;\n\n\t\t\tif (values[1] == target_pg && values[2] == prop)\n\t\t\t\tfound=1;\n\t\t}\n\t}' target_pg=firewall_config_default prop=policy extra_pg=firewall_config_override
++ echo firewall_config_default/apply_to '""' firewall_config_default/exceptions '""' firewall_config_default/open_ports '""' firewall_config_default/value_authorization solaris.smf.value.firewall.config firewall_config_default/policy custom firewall_config_default/custom_policy_file /etc/ipf/ipf.conf firewall_config_default/version 1 firewall_config_override/apply_to '""' firewall_config_override/policy none firewall_config_override/value_authorization solaris.smf.value.firewall.config
++ value=custom
++ echo custom
++ GLOBAL_POLICY=custom
++ PATH=/usr/sbin:/usr/bin:/usr/sbin:/usr/lib/ipf:/usr/sbin:/usr/lib/ipf
++ PIDFILE=/var/run/ipmon.pid
++ PFILCHECKED=no
++ smf_zonename
++ echo 2e7096fd-2743-4c3f-b172-d9f511279ee1
++ zone=2e7096fd-2743-4c3f-b172-d9f511279ee1
++ awk '/ipf/ { print $1 } ' -
++ 2> /dev/null
++ /usr/sbin/modinfo
++ 2>& 1
++ ipfid=202
++ [ -f /var/run/ipmon.pid ]
++ cat /var/run/ipmon.pid
++ 2> /dev/null
++ pid=73540
++ [ svc:/network/routing/route:default = svc:/network/ipfilter:default ]
++ service_update svc:/network/routing/route:default
++ svc=svc:/network/routing/route:default
++ ret=0
++ [ custom = custom ]
++ return 0
++ exit 0
++ . /lib/svc/share/smf_include.sh
++ SMF_EXIT_OK=0
++ SMF_EXIT_NODAEMON=94
++ SMF_EXIT_ERR_FATAL=95
++ SMF_EXIT_ERR_CONFIG=96
++ SMF_EXIT_MON_DEGRADE=97
++ SMF_EXIT_MON_OFFLINE=98
++ SMF_EXIT_ERR_NOSMF=99
++ SMF_EXIT_ERR_PERM=100
++ . /lib/svc/share/ipf_include.sh
++ IPFILTER_FMRI=svc:/network/ipfilter:default
++ ETC_IPF_DIR=/etc/ipf
++ /usr/bin/svcprop -p config/ipf6_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IP6FILCONF=/etc/ipf/ipf6.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ipnat_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPNATCONF=/etc/ipf/ipnat.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ippool_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPPOOLCONF=/etc/ipf/ippool.conf
++ [ 0 -eq 1 ]
++ VAR_IPF_DIR=/var/run/ipf
++ IPFILCONF=/var/run/ipf/ipf.conf
++ IPFILOVRCONF=/var/run/ipf/ipf_ovr.conf
++ IPF_LOCK=/var/run/ipflock
++ CONF_FILES=''
++ NAT_FILES=''
++ IPF_SUFFIX=.ipf
++ NAT_SUFFIX=.nat
++ CURRENT_VERSION=1
++ IPF_FMRI=svc:/network/ipfilter:default
++ INETDFMRI=svc:/network/inetd:default
++ RPCBINDFMRI=svc:/network/rpc/bind:default
++ SMF_ONLINE=online
++ SMF_MAINT=maintenance
++ SMF_NONE=none
++ FW_CONTEXT_PG=firewall_context
++ METHOD_PROP=ipf_method
++ FW_CONFIG_PG=firewall_config
++ POLICY_PROP=policy
++ APPLY2_PROP=apply_to
++ EXCEPTIONS_PROP=exceptions
++ FW_CONFIG_DEF_PG=firewall_config_default
++ FW_CONFIG_OVR_PG=firewall_config_override
++ CUSTOM_FILE_PROP=custom_policy_file
++ OPEN_PORTS_PROP=open_ports
++ PREFIX_HOST=host:
++ PREFIX_NET=network:
++ PREFIX_POOL=pool:
++ PREFIX_IF=if:
++ GLOBAL_CONFIG=''
++ GLOBAL_POLICY=''
++ SERVINFO=/usr/lib/servinfo
++ server_port_list=''
++ global_init
++ awk '{$2=" "; print $0}'
++ svcprop -p firewall_config_override -p firewall_config_default svc:/network/ipfilter:default
++ 2> /dev/null
++ GLOBAL_CONFIG=$'firewall_config_default/apply_to   ""\nfirewall_config_default/exceptions   ""\nfirewall_config_default/open_ports   ""\nfirewall_config_default/value_authorization   solaris.smf.value.firewall.config\nfirewall_config_default/policy   custom\nfirewall_config_default/custom_policy_file   /etc/ipf/ipf.conf\nfirewall_config_default/version   1\nfirewall_config_override/apply_to   ""\nfirewall_config_override/policy   none\nfirewall_config_override/value_authorization   solaris.smf.value.firewall.config'
++ global_get_prop_value firewall_config_default policy
++ target_pg=firewall_config_default
++ prop=policy
++ [ firewall_config_default != firewall_config_override -a firewall_config_default != firewall_config_default ]
++ [ firewall_config_default == firewall_config_default ]
++ extra_pg=firewall_config_override
++ awk $'{\n\t\tfound=0\n\t\tfor (i=1; i<=NF; i++) {\n\t\t\tif (found == 1) {\n\t\t\t\tif (index($i, target_pg) == 1 || index($i, extra_pg) == 1)\n\t\t\t\t\tbreak;\n\n\t\t\t\tprint $i;\n\t\t\t}\n\n\t\t\tif (split($i, values, "/") < 2)\n\t\t\t\tcontinue;\n\n\t\t\tif (values[1] == target_pg && values[2] == prop)\n\t\t\t\tfound=1;\n\t\t}\n\t}' target_pg=firewall_config_default prop=policy extra_pg=firewall_config_override
++ echo firewall_config_default/apply_to '""' firewall_config_default/exceptions '""' firewall_config_default/open_ports '""' firewall_config_default/value_authorization solaris.smf.value.firewall.config firewall_config_default/policy custom firewall_config_default/custom_policy_file /etc/ipf/ipf.conf firewall_config_default/version 1 firewall_config_override/apply_to '""' firewall_config_override/policy none firewall_config_override/value_authorization solaris.smf.value.firewall.config
++ value=custom
++ echo custom
++ GLOBAL_POLICY=custom
++ PATH=/usr/sbin:/usr/bin:/usr/sbin:/usr/lib/ipf:/usr/sbin:/usr/lib/ipf
++ PIDFILE=/var/run/ipmon.pid
++ PFILCHECKED=no
++ smf_zonename
++ echo 2e7096fd-2743-4c3f-b172-d9f511279ee1
++ zone=2e7096fd-2743-4c3f-b172-d9f511279ee1
++ awk '/ipf/ { print $1 } ' -
++ 2> /dev/null
++ /usr/sbin/modinfo
++ 2>& 1
++ ipfid=202
++ [ -f /var/run/ipmon.pid ]
++ cat /var/run/ipmon.pid
++ 2> /dev/null
++ pid=73540
++ [ svc:/network/routing/rdisc:default = svc:/network/ipfilter:default ]
++ service_update svc:/network/routing/rdisc:default
++ svc=svc:/network/routing/rdisc:default
++ ret=0
++ [ custom = custom ]
++ return 0
++ exit 0
++ . /lib/svc/share/smf_include.sh
++ SMF_EXIT_OK=0
++ SMF_EXIT_NODAEMON=94
++ SMF_EXIT_ERR_FATAL=95
++ SMF_EXIT_ERR_CONFIG=96
++ SMF_EXIT_MON_DEGRADE=97
++ SMF_EXIT_MON_OFFLINE=98
++ SMF_EXIT_ERR_NOSMF=99
++ SMF_EXIT_ERR_PERM=100
++ . /lib/svc/share/ipf_include.sh
++ IPFILTER_FMRI=svc:/network/ipfilter:default
++ ETC_IPF_DIR=/etc/ipf
++ /usr/bin/svcprop -p config/ipf6_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IP6FILCONF=/etc/ipf/ipf6.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ipnat_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPNATCONF=/etc/ipf/ipnat.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ippool_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPPOOLCONF=/etc/ipf/ippool.conf
++ [ 0 -eq 1 ]
++ VAR_IPF_DIR=/var/run/ipf
++ IPFILCONF=/var/run/ipf/ipf.conf
++ IPFILOVRCONF=/var/run/ipf/ipf_ovr.conf
++ IPF_LOCK=/var/run/ipflock
++ CONF_FILES=''
++ NAT_FILES=''
++ IPF_SUFFIX=.ipf
++ NAT_SUFFIX=.nat
++ CURRENT_VERSION=1
++ IPF_FMRI=svc:/network/ipfilter:default
++ INETDFMRI=svc:/network/inetd:default
++ RPCBINDFMRI=svc:/network/rpc/bind:default
++ SMF_ONLINE=online
++ SMF_MAINT=maintenance
++ SMF_NONE=none
++ FW_CONTEXT_PG=firewall_context
++ METHOD_PROP=ipf_method
++ FW_CONFIG_PG=firewall_config
++ POLICY_PROP=policy
++ APPLY2_PROP=apply_to
++ EXCEPTIONS_PROP=exceptions
++ FW_CONFIG_DEF_PG=firewall_config_default
++ FW_CONFIG_OVR_PG=firewall_config_override
++ CUSTOM_FILE_PROP=custom_policy_file
++ OPEN_PORTS_PROP=open_ports
++ PREFIX_HOST=host:
++ PREFIX_NET=network:
++ PREFIX_POOL=pool:
++ PREFIX_IF=if:
++ GLOBAL_CONFIG=''
++ GLOBAL_POLICY=''
++ SERVINFO=/usr/lib/servinfo
++ server_port_list=''
++ global_init
++ awk '{$2=" "; print $0}'
++ svcprop -p firewall_config_override -p firewall_config_default svc:/network/ipfilter:default
++ 2> /dev/null
++ GLOBAL_CONFIG=$'firewall_config_default/apply_to   ""\nfirewall_config_default/exceptions   ""\nfirewall_config_default/open_ports   ""\nfirewall_config_default/value_authorization   solaris.smf.value.firewall.config\nfirewall_config_default/policy   custom\nfirewall_config_default/custom_policy_file   /etc/ipf/ipf.conf\nfirewall_config_default/version   1\nfirewall_config_override/apply_to   ""\nfirewall_config_override/policy   none\nfirewall_config_override/value_authorization   solaris.smf.value.firewall.config'
++ global_get_prop_value firewall_config_default policy
++ target_pg=firewall_config_default
++ prop=policy
++ [ firewall_config_default != firewall_config_override -a firewall_config_default != firewall_config_default ]
++ [ firewall_config_default == firewall_config_default ]
++ extra_pg=firewall_config_override
++ awk $'{\n\t\tfound=0\n\t\tfor (i=1; i<=NF; i++) {\n\t\t\tif (found == 1) {\n\t\t\t\tif (index($i, target_pg) == 1 || index($i, extra_pg) == 1)\n\t\t\t\t\tbreak;\n\n\t\t\t\tprint $i;\n\t\t\t}\n\n\t\t\tif (split($i, values, "/") < 2)\n\t\t\t\tcontinue;\n\n\t\t\tif (values[1] == target_pg && values[2] == prop)\n\t\t\t\tfound=1;\n\t\t}\n\t}' target_pg=firewall_config_default prop=policy extra_pg=firewall_config_override
++ echo firewall_config_default/apply_to '""' firewall_config_default/exceptions '""' firewall_config_default/open_ports '""' firewall_config_default/value_authorization solaris.smf.value.firewall.config firewall_config_default/policy custom firewall_config_default/custom_policy_file /etc/ipf/ipf.conf firewall_config_default/version 1 firewall_config_override/apply_to '""' firewall_config_override/policy none firewall_config_override/value_authorization solaris.smf.value.firewall.config
++ value=custom
++ echo custom
++ GLOBAL_POLICY=custom
++ PATH=/usr/sbin:/usr/bin:/usr/sbin:/usr/lib/ipf:/usr/sbin:/usr/lib/ipf
++ PIDFILE=/var/run/ipmon.pid
++ PFILCHECKED=no
++ smf_zonename
++ echo 2e7096fd-2743-4c3f-b172-d9f511279ee1
++ zone=2e7096fd-2743-4c3f-b172-d9f511279ee1
++ awk '/ipf/ { print $1 } ' -
++ 2> /dev/null
++ /usr/sbin/modinfo
++ 2>& 1
++ ipfid=202
++ [ -f /var/run/ipmon.pid ]
++ cat /var/run/ipmon.pid
++ 2> /dev/null
++ pid=73540
++ [ svc:/network/routing/rdisc:default = svc:/network/ipfilter:default ]
++ service_update svc:/network/routing/rdisc:default
++ svc=svc:/network/routing/rdisc:default
++ ret=0
++ [ custom = custom ]
++ return 0
++ exit 0
++ . /lib/svc/share/smf_include.sh
++ SMF_EXIT_OK=0
++ SMF_EXIT_NODAEMON=94
++ SMF_EXIT_ERR_FATAL=95
++ SMF_EXIT_ERR_CONFIG=96
++ SMF_EXIT_MON_DEGRADE=97
++ SMF_EXIT_MON_OFFLINE=98
++ SMF_EXIT_ERR_NOSMF=99
++ SMF_EXIT_ERR_PERM=100
++ . /lib/svc/share/ipf_include.sh
++ IPFILTER_FMRI=svc:/network/ipfilter:default
++ ETC_IPF_DIR=/etc/ipf
++ /usr/bin/svcprop -p config/ipf6_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IP6FILCONF=/etc/ipf/ipf6.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ipnat_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPNATCONF=/etc/ipf/ipnat.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ippool_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPPOOLCONF=/etc/ipf/ippool.conf
++ [ 0 -eq 1 ]
++ VAR_IPF_DIR=/var/run/ipf
++ IPFILCONF=/var/run/ipf/ipf.conf
++ IPFILOVRCONF=/var/run/ipf/ipf_ovr.conf
++ IPF_LOCK=/var/run/ipflock
++ CONF_FILES=''
++ NAT_FILES=''
++ IPF_SUFFIX=.ipf
++ NAT_SUFFIX=.nat
++ CURRENT_VERSION=1
++ IPF_FMRI=svc:/network/ipfilter:default
++ INETDFMRI=svc:/network/inetd:default
++ RPCBINDFMRI=svc:/network/rpc/bind:default
++ SMF_ONLINE=online
++ SMF_MAINT=maintenance
++ SMF_NONE=none
++ FW_CONTEXT_PG=firewall_context
++ METHOD_PROP=ipf_method
++ FW_CONFIG_PG=firewall_config
++ POLICY_PROP=policy
++ APPLY2_PROP=apply_to
++ EXCEPTIONS_PROP=exceptions
++ FW_CONFIG_DEF_PG=firewall_config_default
++ FW_CONFIG_OVR_PG=firewall_config_override
++ CUSTOM_FILE_PROP=custom_policy_file
++ OPEN_PORTS_PROP=open_ports
++ PREFIX_HOST=host:
++ PREFIX_NET=network:
++ PREFIX_POOL=pool:
++ PREFIX_IF=if:
++ GLOBAL_CONFIG=''
++ GLOBAL_POLICY=''
++ SERVINFO=/usr/lib/servinfo
++ server_port_list=''
++ global_init
++ awk '{$2=" "; print $0}'
++ svcprop -p firewall_config_override -p firewall_config_default svc:/network/ipfilter:default
++ 2> /dev/null
++ GLOBAL_CONFIG=$'firewall_config_default/apply_to   ""\nfirewall_config_default/exceptions   ""\nfirewall_config_default/open_ports   ""\nfirewall_config_default/value_authorization   solaris.smf.value.firewall.config\nfirewall_config_default/policy   custom\nfirewall_config_default/custom_policy_file   /etc/ipf/ipf.conf\nfirewall_config_default/version   1\nfirewall_config_override/apply_to   ""\nfirewall_config_override/policy   none\nfirewall_config_override/value_authorization   solaris.smf.value.firewall.config'
++ global_get_prop_value firewall_config_default policy
++ target_pg=firewall_config_default
++ prop=policy
++ [ firewall_config_default != firewall_config_override -a firewall_config_default != firewall_config_default ]
++ [ firewall_config_default == firewall_config_default ]
++ extra_pg=firewall_config_override
++ awk $'{\n\t\tfound=0\n\t\tfor (i=1; i<=NF; i++) {\n\t\t\tif (found == 1) {\n\t\t\t\tif (index($i, target_pg) == 1 || index($i, extra_pg) == 1)\n\t\t\t\t\tbreak;\n\n\t\t\t\tprint $i;\n\t\t\t}\n\n\t\t\tif (split($i, values, "/") < 2)\n\t\t\t\tcontinue;\n\n\t\t\tif (values[1] == target_pg && values[2] == prop)\n\t\t\t\tfound=1;\n\t\t}\n\t}' target_pg=firewall_config_default prop=policy extra_pg=firewall_config_override
++ echo firewall_config_default/apply_to '""' firewall_config_default/exceptions '""' firewall_config_default/open_ports '""' firewall_config_default/value_authorization solaris.smf.value.firewall.config firewall_config_default/policy custom firewall_config_default/custom_policy_file /etc/ipf/ipf.conf firewall_config_default/version 1 firewall_config_override/apply_to '""' firewall_config_override/policy none firewall_config_override/value_authorization solaris.smf.value.firewall.config
++ value=custom
++ echo custom
++ GLOBAL_POLICY=custom
++ PATH=/usr/sbin:/usr/bin:/usr/sbin:/usr/lib/ipf:/usr/sbin:/usr/lib/ipf
++ PIDFILE=/var/run/ipmon.pid
++ PFILCHECKED=no
++ smf_zonename
++ echo 2e7096fd-2743-4c3f-b172-d9f511279ee1
++ zone=2e7096fd-2743-4c3f-b172-d9f511279ee1
++ awk '/ipf/ { print $1 } ' -
++ 2> /dev/null
++ /usr/sbin/modinfo
++ 2>& 1
++ ipfid=202
++ [ -f /var/run/ipmon.pid ]
++ cat /var/run/ipmon.pid
++ 2> /dev/null
++ pid=73540
++ [ svc:/network/routing/route:default = svc:/network/ipfilter:default ]
++ service_update svc:/network/routing/route:default
++ svc=svc:/network/routing/route:default
++ ret=0
++ [ custom = custom ]
++ return 0
++ exit 0
++ . /lib/svc/share/smf_include.sh
++ SMF_EXIT_OK=0
++ SMF_EXIT_NODAEMON=94
++ SMF_EXIT_ERR_FATAL=95
++ SMF_EXIT_ERR_CONFIG=96
++ SMF_EXIT_MON_DEGRADE=97
++ SMF_EXIT_MON_OFFLINE=98
++ SMF_EXIT_ERR_NOSMF=99
++ SMF_EXIT_ERR_PERM=100
++ . /lib/svc/share/ipf_include.sh
++ IPFILTER_FMRI=svc:/network/ipfilter:default
++ ETC_IPF_DIR=/etc/ipf
++ /usr/bin/svcprop -p config/ipf6_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IP6FILCONF=/etc/ipf/ipf6.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ipnat_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPNATCONF=/etc/ipf/ipnat.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ippool_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPPOOLCONF=/etc/ipf/ippool.conf
++ [ 0 -eq 1 ]
++ VAR_IPF_DIR=/var/run/ipf
++ IPFILCONF=/var/run/ipf/ipf.conf
++ IPFILOVRCONF=/var/run/ipf/ipf_ovr.conf
++ IPF_LOCK=/var/run/ipflock
++ CONF_FILES=''
++ NAT_FILES=''
++ IPF_SUFFIX=.ipf
++ NAT_SUFFIX=.nat
++ CURRENT_VERSION=1
++ IPF_FMRI=svc:/network/ipfilter:default
++ INETDFMRI=svc:/network/inetd:default
++ RPCBINDFMRI=svc:/network/rpc/bind:default
++ SMF_ONLINE=online
++ SMF_MAINT=maintenance
++ SMF_NONE=none
++ FW_CONTEXT_PG=firewall_context
++ METHOD_PROP=ipf_method
++ FW_CONFIG_PG=firewall_config
++ POLICY_PROP=policy
++ APPLY2_PROP=apply_to
++ EXCEPTIONS_PROP=exceptions
++ FW_CONFIG_DEF_PG=firewall_config_default
++ FW_CONFIG_OVR_PG=firewall_config_override
++ CUSTOM_FILE_PROP=custom_policy_file
++ OPEN_PORTS_PROP=open_ports
++ PREFIX_HOST=host:
++ PREFIX_NET=network:
++ PREFIX_POOL=pool:
++ PREFIX_IF=if:
++ GLOBAL_CONFIG=''
++ GLOBAL_POLICY=''
++ SERVINFO=/usr/lib/servinfo
++ server_port_list=''
++ global_init
++ awk '{$2=" "; print $0}'
++ svcprop -p firewall_config_override -p firewall_config_default svc:/network/ipfilter:default
++ 2> /dev/null
++ GLOBAL_CONFIG=$'firewall_config_default/apply_to   ""\nfirewall_config_default/exceptions   ""\nfirewall_config_default/open_ports   ""\nfirewall_config_default/value_authorization   solaris.smf.value.firewall.config\nfirewall_config_default/policy   custom\nfirewall_config_default/custom_policy_file   /etc/ipf/ipf.conf\nfirewall_config_default/version   1\nfirewall_config_override/apply_to   ""\nfirewall_config_override/policy   none\nfirewall_config_override/value_authorization   solaris.smf.value.firewall.config'
++ global_get_prop_value firewall_config_default policy
++ target_pg=firewall_config_default
++ prop=policy
++ [ firewall_config_default != firewall_config_override -a firewall_config_default != firewall_config_default ]
++ [ firewall_config_default == firewall_config_default ]
++ extra_pg=firewall_config_override
++ awk $'{\n\t\tfound=0\n\t\tfor (i=1; i<=NF; i++) {\n\t\t\tif (found == 1) {\n\t\t\t\tif (index($i, target_pg) == 1 || index($i, extra_pg) == 1)\n\t\t\t\t\tbreak;\n\n\t\t\t\tprint $i;\n\t\t\t}\n\n\t\t\tif (split($i, values, "/") < 2)\n\t\t\t\tcontinue;\n\n\t\t\tif (values[1] == target_pg && values[2] == prop)\n\t\t\t\tfound=1;\n\t\t}\n\t}' target_pg=firewall_config_default prop=policy extra_pg=firewall_config_override
++ echo firewall_config_default/apply_to '""' firewall_config_default/exceptions '""' firewall_config_default/open_ports '""' firewall_config_default/value_authorization solaris.smf.value.firewall.config firewall_config_default/policy custom firewall_config_default/custom_policy_file /etc/ipf/ipf.conf firewall_config_default/version 1 firewall_config_override/apply_to '""' firewall_config_override/policy none firewall_config_override/value_authorization solaris.smf.value.firewall.config
++ value=custom
++ echo custom
++ GLOBAL_POLICY=custom
++ PATH=/usr/sbin:/usr/bin:/usr/sbin:/usr/lib/ipf:/usr/sbin:/usr/lib/ipf
++ PIDFILE=/var/run/ipmon.pid
++ PFILCHECKED=no
++ smf_zonename
++ echo 2e7096fd-2743-4c3f-b172-d9f511279ee1
++ zone=2e7096fd-2743-4c3f-b172-d9f511279ee1
++ awk '/ipf/ { print $1 } ' -
++ 2> /dev/null
++ /usr/sbin/modinfo
++ 2>& 1
++ ipfid=202
++ [ -f /var/run/ipmon.pid ]
++ cat /var/run/ipmon.pid
++ 2> /dev/null
++ pid=73540
++ [ svc:/network/routing/route:default = svc:/network/ipfilter:default ]
++ service_update svc:/network/routing/route:default
++ svc=svc:/network/routing/route:default
++ ret=0
++ [ custom = custom ]
++ return 0
++ exit 0
++ . /lib/svc/share/smf_include.sh
++ SMF_EXIT_OK=0
++ SMF_EXIT_NODAEMON=94
++ SMF_EXIT_ERR_FATAL=95
++ SMF_EXIT_ERR_CONFIG=96
++ SMF_EXIT_MON_DEGRADE=97
++ SMF_EXIT_MON_OFFLINE=98
++ SMF_EXIT_ERR_NOSMF=99
++ SMF_EXIT_ERR_PERM=100
++ . /lib/svc/share/ipf_include.sh
++ IPFILTER_FMRI=svc:/network/ipfilter:default
++ ETC_IPF_DIR=/etc/ipf
++ /usr/bin/svcprop -p config/ipf6_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IP6FILCONF=/etc/ipf/ipf6.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ipnat_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPNATCONF=/etc/ipf/ipnat.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ippool_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPPOOLCONF=/etc/ipf/ippool.conf
++ [ 0 -eq 1 ]
++ VAR_IPF_DIR=/var/run/ipf
++ IPFILCONF=/var/run/ipf/ipf.conf
++ IPFILOVRCONF=/var/run/ipf/ipf_ovr.conf
++ IPF_LOCK=/var/run/ipflock
++ CONF_FILES=''
++ NAT_FILES=''
++ IPF_SUFFIX=.ipf
++ NAT_SUFFIX=.nat
++ CURRENT_VERSION=1
++ IPF_FMRI=svc:/network/ipfilter:default
++ INETDFMRI=svc:/network/inetd:default
++ RPCBINDFMRI=svc:/network/rpc/bind:default
++ SMF_ONLINE=online
++ SMF_MAINT=maintenance
++ SMF_NONE=none
++ FW_CONTEXT_PG=firewall_context
++ METHOD_PROP=ipf_method
++ FW_CONFIG_PG=firewall_config
++ POLICY_PROP=policy
++ APPLY2_PROP=apply_to
++ EXCEPTIONS_PROP=exceptions
++ FW_CONFIG_DEF_PG=firewall_config_default
++ FW_CONFIG_OVR_PG=firewall_config_override
++ CUSTOM_FILE_PROP=custom_policy_file
++ OPEN_PORTS_PROP=open_ports
++ PREFIX_HOST=host:
++ PREFIX_NET=network:
++ PREFIX_POOL=pool:
++ PREFIX_IF=if:
++ GLOBAL_CONFIG=''
++ GLOBAL_POLICY=''
++ SERVINFO=/usr/lib/servinfo
++ server_port_list=''
++ global_init
++ awk '{$2=" "; print $0}'
++ svcprop -p firewall_config_override -p firewall_config_default svc:/network/ipfilter:default
++ 2> /dev/null
++ GLOBAL_CONFIG=$'firewall_config_default/apply_to   ""\nfirewall_config_default/exceptions   ""\nfirewall_config_default/open_ports   ""\nfirewall_config_default/value_authorization   solaris.smf.value.firewall.config\nfirewall_config_default/policy   custom\nfirewall_config_default/custom_policy_file   /etc/ipf/ipf.conf\nfirewall_config_default/version   1\nfirewall_config_override/apply_to   ""\nfirewall_config_override/policy   none\nfirewall_config_override/value_authorization   solaris.smf.value.firewall.config'
++ global_get_prop_value firewall_config_default policy
++ target_pg=firewall_config_default
++ prop=policy
++ [ firewall_config_default != firewall_config_override -a firewall_config_default != firewall_config_default ]
++ [ firewall_config_default == firewall_config_default ]
++ extra_pg=firewall_config_override
++ awk $'{\n\t\tfound=0\n\t\tfor (i=1; i<=NF; i++) {\n\t\t\tif (found == 1) {\n\t\t\t\tif (index($i, target_pg) == 1 || index($i, extra_pg) == 1)\n\t\t\t\t\tbreak;\n\n\t\t\t\tprint $i;\n\t\t\t}\n\n\t\t\tif (split($i, values, "/") < 2)\n\t\t\t\tcontinue;\n\n\t\t\tif (values[1] == target_pg && values[2] == prop)\n\t\t\t\tfound=1;\n\t\t}\n\t}' target_pg=firewall_config_default prop=policy extra_pg=firewall_config_override
++ echo firewall_config_default/apply_to '""' firewall_config_default/exceptions '""' firewall_config_default/open_ports '""' firewall_config_default/value_authorization solaris.smf.value.firewall.config firewall_config_default/policy custom firewall_config_default/custom_policy_file /etc/ipf/ipf.conf firewall_config_default/version 1 firewall_config_override/apply_to '""' firewall_config_override/policy none firewall_config_override/value_authorization solaris.smf.value.firewall.config
++ value=custom
++ echo custom
++ GLOBAL_POLICY=custom
++ PATH=/usr/sbin:/usr/bin:/usr/sbin:/usr/lib/ipf:/usr/sbin:/usr/lib/ipf
++ PIDFILE=/var/run/ipmon.pid
++ PFILCHECKED=no
++ smf_zonename
++ echo 2e7096fd-2743-4c3f-b172-d9f511279ee1
++ zone=2e7096fd-2743-4c3f-b172-d9f511279ee1
++ awk '/ipf/ { print $1 } ' -
++ 2> /dev/null
++ /usr/sbin/modinfo
++ 2>& 1
++ ipfid=202
++ [ -f /var/run/ipmon.pid ]
++ cat /var/run/ipmon.pid
++ 2> /dev/null
++ pid=73540
++ [ svc:/network/routing/rdisc:default = svc:/network/ipfilter:default ]
++ service_update svc:/network/routing/rdisc:default
++ svc=svc:/network/routing/rdisc:default
++ ret=0
++ [ custom = custom ]
++ return 0
++ exit 0
+[ Aug 23 13:59:31 Stopping because service restarting. ]
+[ Aug 23 13:59:31 Executing stop method ("/lib/svc/method/ipfilter stop"). ]
++ . /lib/svc/share/smf_include.sh
++ SMF_EXIT_OK=0
++ SMF_EXIT_NODAEMON=94
++ SMF_EXIT_ERR_FATAL=95
++ SMF_EXIT_ERR_CONFIG=96
++ SMF_EXIT_MON_DEGRADE=97
++ SMF_EXIT_MON_OFFLINE=98
++ SMF_EXIT_ERR_NOSMF=99
++ SMF_EXIT_ERR_PERM=100
++ . /lib/svc/share/ipf_include.sh
++ IPFILTER_FMRI=svc:/network/ipfilter:default
++ ETC_IPF_DIR=/etc/ipf
++ /usr/bin/svcprop -p config/ipf6_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IP6FILCONF=/etc/ipf/ipf6.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ipnat_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPNATCONF=/etc/ipf/ipnat.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ippool_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPPOOLCONF=/etc/ipf/ippool.conf
++ [ 0 -eq 1 ]
++ VAR_IPF_DIR=/var/run/ipf
++ IPFILCONF=/var/run/ipf/ipf.conf
++ IPFILOVRCONF=/var/run/ipf/ipf_ovr.conf
++ IPF_LOCK=/var/run/ipflock
++ CONF_FILES=''
++ NAT_FILES=''
++ IPF_SUFFIX=.ipf
++ NAT_SUFFIX=.nat
++ CURRENT_VERSION=1
++ IPF_FMRI=svc:/network/ipfilter:default
++ INETDFMRI=svc:/network/inetd:default
++ RPCBINDFMRI=svc:/network/rpc/bind:default
++ SMF_ONLINE=online
++ SMF_MAINT=maintenance
++ SMF_NONE=none
++ FW_CONTEXT_PG=firewall_context
++ METHOD_PROP=ipf_method
++ FW_CONFIG_PG=firewall_config
++ POLICY_PROP=policy
++ APPLY2_PROP=apply_to
++ EXCEPTIONS_PROP=exceptions
++ FW_CONFIG_DEF_PG=firewall_config_default
++ FW_CONFIG_OVR_PG=firewall_config_override
++ CUSTOM_FILE_PROP=custom_policy_file
++ OPEN_PORTS_PROP=open_ports
++ PREFIX_HOST=host:
++ PREFIX_NET=network:
++ PREFIX_POOL=pool:
++ PREFIX_IF=if:
++ GLOBAL_CONFIG=''
++ GLOBAL_POLICY=''
++ SERVINFO=/usr/lib/servinfo
++ server_port_list=''
++ global_init
++ awk '{$2=" "; print $0}'
++ svcprop -p firewall_config_override -p firewall_config_default svc:/network/ipfilter:default
++ 2> /dev/null
++ GLOBAL_CONFIG=$'firewall_config_default/apply_to   ""\nfirewall_config_default/exceptions   ""\nfirewall_config_default/open_ports   ""\nfirewall_config_default/value_authorization   solaris.smf.value.firewall.config\nfirewall_config_default/policy   custom\nfirewall_config_default/custom_policy_file   /etc/ipf/ipf.conf\nfirewall_config_default/version   1\nfirewall_config_override/apply_to   ""\nfirewall_config_override/policy   none\nfirewall_config_override/value_authorization   solaris.smf.value.firewall.config'
++ global_get_prop_value firewall_config_default policy
++ target_pg=firewall_config_default
++ prop=policy
++ [ firewall_config_default != firewall_config_override -a firewall_config_default != firewall_config_default ]
++ [ firewall_config_default == firewall_config_default ]
++ extra_pg=firewall_config_override
++ awk $'{\n\t\tfound=0\n\t\tfor (i=1; i<=NF; i++) {\n\t\t\tif (found == 1) {\n\t\t\t\tif (index($i, target_pg) == 1 || index($i, extra_pg) == 1)\n\t\t\t\t\tbreak;\n\n\t\t\t\tprint $i;\n\t\t\t}\n\n\t\t\tif (split($i, values, "/") < 2)\n\t\t\t\tcontinue;\n\n\t\t\tif (values[1] == target_pg && values[2] == prop)\n\t\t\t\tfound=1;\n\t\t}\n\t}' target_pg=firewall_config_default prop=policy extra_pg=firewall_config_override
++ echo firewall_config_default/apply_to '""' firewall_config_default/exceptions '""' firewall_config_default/open_ports '""' firewall_config_default/value_authorization solaris.smf.value.firewall.config firewall_config_default/policy custom firewall_config_default/custom_policy_file /etc/ipf/ipf.conf firewall_config_default/version 1 firewall_config_override/apply_to '""' firewall_config_override/policy none firewall_config_override/value_authorization solaris.smf.value.firewall.config
++ value=custom
++ echo custom
++ GLOBAL_POLICY=custom
++ PATH=/usr/sbin:/usr/bin:/usr/sbin:/usr/lib/ipf
++ PIDFILE=/var/run/ipmon.pid
++ PFILCHECKED=no
++ smf_zonename
++ echo 2e7096fd-2743-4c3f-b172-d9f511279ee1
++ zone=2e7096fd-2743-4c3f-b172-d9f511279ee1
++ awk '/ipf/ { print $1 } ' -
++ 2> /dev/null
++ /usr/sbin/modinfo
++ 2>& 1
++ ipfid=202
++ [ -f /var/run/ipmon.pid ]
++ cat /var/run/ipmon.pid
++ 2> /dev/null
++ pid=73540
++ svcprop -p restarter/contract svc:/network/ipfilter:default
++ ctid=2335
++ [ -n 2335 ]
++ smf_kill_contract 2335 TERM 1
++ time_waited=0
++ time_to_wait=''
++ [ -z '' ]
++ time_to_wait=0
++ /usr/bin/expr 0 '*' 10
++ time_to_wait=0
++ /usr/bin/pgrep -c 2335
++ 1> /dev/null 2>& 1
++ ret=0
++ [ 0 -gt 1 ]
++ [ 0 -eq 1 ]
++ /usr/bin/pkill -TERM -c 2335
++ [ 0 -gt 1 ]
++ [ -z 1 ]
++ [ 1 -eq 0 ]
++ /usr/bin/pgrep -c 2335
++ 1> /dev/null 2>& 1
++ [ 1 -eq 0 ]
++ return 0
++ ipf -D
++ [ -n 202 ]
++ modunload -i 202
+modunload can only be run from the global zone
++ exit 0
+[ Aug 23 13:59:31 Method "stop" exited with status 0. ]
+[ Aug 23 13:59:31 Executing start method ("/lib/svc/method/ipfilter start"). ]
++ . /lib/svc/share/smf_include.sh
++ SMF_EXIT_OK=0
++ SMF_EXIT_NODAEMON=94
++ SMF_EXIT_ERR_FATAL=95
++ SMF_EXIT_ERR_CONFIG=96
++ SMF_EXIT_MON_DEGRADE=97
++ SMF_EXIT_MON_OFFLINE=98
++ SMF_EXIT_ERR_NOSMF=99
++ SMF_EXIT_ERR_PERM=100
++ . /lib/svc/share/ipf_include.sh
++ IPFILTER_FMRI=svc:/network/ipfilter:default
++ ETC_IPF_DIR=/etc/ipf
++ /usr/bin/svcprop -p config/ipf6_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IP6FILCONF=/etc/ipf/ipf6.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ipnat_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPNATCONF=/etc/ipf/ipnat.conf
++ [ 0 -eq 1 ]
++ /usr/bin/svcprop -p config/ippool_config_file svc:/network/ipfilter:default
++ 2> /dev/null
++ IPPOOLCONF=/etc/ipf/ippool.conf
++ [ 0 -eq 1 ]
++ VAR_IPF_DIR=/var/run/ipf
++ IPFILCONF=/var/run/ipf/ipf.conf
++ IPFILOVRCONF=/var/run/ipf/ipf_ovr.conf
++ IPF_LOCK=/var/run/ipflock
++ CONF_FILES=''
++ NAT_FILES=''
++ IPF_SUFFIX=.ipf
++ NAT_SUFFIX=.nat
++ CURRENT_VERSION=1
++ IPF_FMRI=svc:/network/ipfilter:default
++ INETDFMRI=svc:/network/inetd:default
++ RPCBINDFMRI=svc:/network/rpc/bind:default
++ SMF_ONLINE=online
++ SMF_MAINT=maintenance
++ SMF_NONE=none
++ FW_CONTEXT_PG=firewall_context
++ METHOD_PROP=ipf_method
++ FW_CONFIG_PG=firewall_config
++ POLICY_PROP=policy
++ APPLY2_PROP=apply_to
++ EXCEPTIONS_PROP=exceptions
++ FW_CONFIG_DEF_PG=firewall_config_default
++ FW_CONFIG_OVR_PG=firewall_config_override
++ CUSTOM_FILE_PROP=custom_policy_file
++ OPEN_PORTS_PROP=open_ports
++ PREFIX_HOST=host:
++ PREFIX_NET=network:
++ PREFIX_POOL=pool:
++ PREFIX_IF=if:
++ GLOBAL_CONFIG=''
++ GLOBAL_POLICY=''
++ SERVINFO=/usr/lib/servinfo
++ server_port_list=''
++ global_init
++ awk '{$2=" "; print $0}'
++ svcprop -p firewall_config_override -p firewall_config_default svc:/network/ipfilter:default
++ 2> /dev/null
++ GLOBAL_CONFIG=$'firewall_config_default/apply_to   ""\nfirewall_config_default/exceptions   ""\nfirewall_config_default/open_ports   ""\nfirewall_config_default/value_authorization   solaris.smf.value.firewall.config\nfirewall_config_default/policy   custom\nfirewall_config_default/custom_policy_file   /etc/ipf/ipf.conf\nfirewall_config_default/version   1\nfirewall_config_override/apply_to   ""\nfirewall_config_override/policy   none\nfirewall_config_override/value_authorization   solaris.smf.value.firewall.config'
++ global_get_prop_value firewall_config_default policy
++ target_pg=firewall_config_default
++ prop=policy
++ [ firewall_config_default != firewall_config_override -a firewall_config_default != firewall_config_default ]
++ [ firewall_config_default == firewall_config_default ]
++ extra_pg=firewall_config_override
++ awk $'{\n\t\tfound=0\n\t\tfor (i=1; i<=NF; i++) {\n\t\t\tif (found == 1) {\n\t\t\t\tif (index($i, target_pg) == 1 || index($i, extra_pg) == 1)\n\t\t\t\t\tbreak;\n\n\t\t\t\tprint $i;\n\t\t\t}\n\n\t\t\tif (split($i, values, "/") < 2)\n\t\t\t\tcontinue;\n\n\t\t\tif (values[1] == target_pg && values[2] == prop)\n\t\t\t\tfound=1;\n\t\t}\n\t}' target_pg=firewall_config_default prop=policy extra_pg=firewall_config_override
++ echo firewall_config_default/apply_to '""' firewall_config_default/exceptions '""' firewall_config_default/open_ports '""' firewall_config_default/value_authorization solaris.smf.value.firewall.config firewall_config_default/policy custom firewall_config_default/custom_policy_file /etc/ipf/ipf.conf firewall_config_default/version 1 firewall_config_override/apply_to '""' firewall_config_override/policy none firewall_config_override/value_authorization solaris.smf.value.firewall.config
++ value=custom
++ echo custom
++ GLOBAL_POLICY=custom
++ PATH=/usr/sbin:/usr/bin:/usr/sbin:/usr/lib/ipf
++ PIDFILE=/var/run/ipmon.pid
++ PFILCHECKED=no
++ smf_zonename
++ echo 2e7096fd-2743-4c3f-b172-d9f511279ee1
++ zone=2e7096fd-2743-4c3f-b172-d9f511279ee1
++ awk '/ipf/ { print $1 } ' -
++ 2> /dev/null
++ /usr/sbin/modinfo
++ 2>& 1
++ ipfid=202
++ [ -f /var/run/ipmon.pid ]
++ cat /var/run/ipmon.pid
++ 2> /dev/null
++ pid=73540
++ config_get_version
++ svcprop -p firewall_config_default/version svc:/network/ipfilter:default
++ 2> /dev/null
++ ver=1
++ [ 0 -ne 0 -o -z 1 ]
++ echo 1
++ ver=1
++ [ 0 -eq 1 ]
++ [ 1 -ne 1 ]
++ configure_firewall
++ symlink_persistent_file ipnat.conf
++ persist_file=/var/fw/ipnat.conf
++ etc_file=/etc/ipf/ipnat.conf
++ [ ! -e /var/fw/ipnat.conf ]
++ return 0
++ symlink_persistent_file ipf.conf
++ persist_file=/var/fw/ipf.conf
++ etc_file=/etc/ipf/ipf.conf
++ [ ! -e /var/fw/ipf.conf ]
++ return 0
++ create_global_rules
++ [ custom = custom ]
++ global_get_prop_value firewall_config_default custom_policy_file
++ target_pg=firewall_config_default
++ prop=custom_policy_file
++ [ firewall_config_default != firewall_config_override -a firewall_config_default != firewall_config_default ]
++ [ firewall_config_default == firewall_config_default ]
++ extra_pg=firewall_config_override
++ awk $'{\n\t\tfound=0\n\t\tfor (i=1; i<=NF; i++) {\n\t\t\tif (found == 1) {\n\t\t\t\tif (index($i, target_pg) == 1 || index($i, extra_pg) == 1)\n\t\t\t\t\tbreak;\n\n\t\t\t\tprint $i;\n\t\t\t}\n\n\t\t\tif (split($i, values, "/") < 2)\n\t\t\t\tcontinue;\n\n\t\t\tif (values[1] == target_pg && values[2] == prop)\n\t\t\t\tfound=1;\n\t\t}\n\t}' target_pg=firewall_config_default prop=custom_policy_file extra_pg=firewall_config_override
++ echo firewall_config_default/apply_to '""' firewall_config_default/exceptions '""' firewall_config_default/open_ports '""' firewall_config_default/value_authorization solaris.smf.value.firewall.config firewall_config_default/policy custom firewall_config_default/custom_policy_file /etc/ipf/ipf.conf firewall_config_default/version 1 firewall_config_override/apply_to '""' firewall_config_override/policy none firewall_config_override/value_authorization solaris.smf.value.firewall.config
++ value=/etc/ipf/ipf.conf
++ echo /etc/ipf/ipf.conf
++ file=/etc/ipf/ipf.conf
++ [ -n /etc/ipf/ipf.conf ]
++ custom_set_symlink /etc/ipf/ipf.conf
++ [ ! -f /etc/ipf/ipf.conf ]
++ check_ipf_dir
++ [ -d /var/run/ipf ]
++ return 0
++ rm /var/run/ipf/ipf.conf
++ 1> /dev/null 2>& 1
++ ln -s /etc/ipf/ipf.conf /var/run/ipf/ipf.conf
++ 1> /dev/null 2>& 1
++ return 0
++ create_global_ovr_rules
++ [ custom = custom ]
++ echo $'# \'custom\' global policy'
++ 1> /var/run/ipf/ipf_ovr.conf
++ return 0
++ create_services_rules
++ [ custom = custom ]
++ return 0
++ [ ! -f /var/run/ipf/ipf.conf -a ! -f /etc/ipf/ipnat.conf ]
++ ipf -E
++ load_ippool
++ [ -r /etc/ipf/ippool.conf ]
++ return 0
++ load_ipf
++ bad=0
++ ipf -IFa
++ [ -r /var/run/ipf/ipf_ovr.conf ]
++ ipf -I -f /var/run/ipf/ipf_ovr.conf
++ [ 0 != 0 ]
++ [ -r /var/run/ipf/ipf.conf ]
++ ipf -I -f /var/run/ipf/ipf.conf
+syntax error error at "ssh", line 2
++ [ 1 != 0 ]
++ echo '/lib/svc/method/ipfilter: load of /var/run/ipf/ipf.conf into alternate' 'set failed'
+/lib/svc/method/ipfilter: load of /var/run/ipf/ipf.conf into alternate set failed
++ bad=1
++ [ -r /etc/ipf/ipf6.conf ]
++ [ 1 -eq 0 ]
++ echo 'Not switching config due to load error.'
+Not switching config due to load error.
++ return 1
++ exit 96
+[ Aug 23 13:59:31 Method "start" exited with status 96. ]
+[ Aug 23 14:00:44 Rereading configuration. ]
+[ Aug 23 14:03:58 Rereading configuration. ]
