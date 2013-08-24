@@ -23,6 +23,10 @@ p4p:default	(optional)
             <service_fmri value='svc:/system/filesystem/local'/>
         </dependency>
 		
+        <dependency name='multi-user-server' grouping='require_all' restart_on='error' type='service'>
+            <service_fmri value='svc:/milestone/multi-user-server:default'/>
+        </dependency>
+
         <method_context>
             <method_credential user='perforce' group='p4admin' privileges='basic'/>
         </method_context>
@@ -114,6 +118,10 @@ p4p:default	(optional)
 
         <dependency name='filesystem' grouping='require_all' restart_on='error' type='service'>
             <service_fmri value='svc:/system/filesystem/local'/>
+        </dependency>
+
+        <dependency name='multi-user-server' grouping='require_all' restart_on='error' type='service'>
+            <service_fmri value='svc:/milestone/multi-user-server:default'/>
         </dependency>
 
         <method_context>
@@ -229,6 +237,10 @@ p4p:default	(optional)
             <service_fmri value='svc:/system/filesystem/local'/>
         </dependency>
 
+        <dependency name='multi-user-server' grouping='require_all' restart_on='error' type='service'>
+            <service_fmri value='svc:/milestone/multi-user-server:default'/>
+        </dependency>
+		
         <method_context>
             <method_credential user='perforce' group='p4admin' privileges='basic'/>
         </method_context>
@@ -305,6 +317,10 @@ p4p:default	(optional)
 
         <dependency name='filesystem' grouping='require_all' restart_on='error' type='service'>
             <service_fmri value='svc:/system/filesystem/local'/>
+        </dependency>
+
+        <dependency name='multi-user-server' grouping='require_all' restart_on='error' type='service'>
+            <service_fmri value='svc:/milestone/multi-user-server:default'/>
         </dependency>
 
 		<!-- p4web should not start without p4broker:sideload_p4web having started first -->
