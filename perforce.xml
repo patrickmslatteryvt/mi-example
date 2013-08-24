@@ -107,8 +107,6 @@ p4p:default	(optional)
 <!-- ============================== p4d ============================== -->
     <service name='application/perforce/p4d' type='service' version='1'>
 
-        <create_default_instance enabled='false'/>
-
         <dependency name='network' grouping='require_all' restart_on='error' type='service'>
             <service_fmri value='svc:/milestone/network:default'/>
         </dependency>
