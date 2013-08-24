@@ -6,6 +6,7 @@ p4d:depots
 	p4d:sideload_p4web
 		p4broker:sideload_p4web
 			p4web:default
+				nginx:default
 	p4broker:depots
 p4p:default	(optional)
 -->
