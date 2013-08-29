@@ -1,0 +1,479 @@
+Perforce_zone.txt
+
+10.254.250.66
+
+imgadm avail | grep base64
+0084dad6-05c1-11e3-9476-8f8320925eea  base64         13.2.0   smartos  2013-08-15T15:30:00Z
+
+imgadm import 0084dad6-05c1-11e3-9476-8f8320925eea
+
+[root@08-00-27-a3-a2-ed ~]# /usr/sbin/dladm show-vnic
+LINK         OVER       SPEED MACADDRESS        MACADDRTYPE VID  ZONE
+net0         e1000g0    0     82:e5:51:6d:b8:d5 fixed       0    8d94247c-3dd5-40f0-a1af-df374970271a
+net0         e1000g0    0     82:3d:eb:c:e1:bf  fixed       0    9e36df12-501e-403f-a062-762235fcfbad
+net0         e1000g0    0     c2:b7:5c:63:16:31 fixed       0    ba5ed2fa-536a-48f2-a0d8-1b5f4b395677
+net0         e1000g0    0     d2:90:5c:70:5e:c6 fixed       0    1387eb05-c545-4a92-9a99-99d5006cec16
+net0         e1000g0    0     a2:88:3e:91:d2:63 fixed       0    ae1d958e-4eee-4c6e-9717-4f9f530cae92
+net0         e1000g0    0     c2:d7:ea:d0:b8:4a fixed       0    2e7096fd-2743-4c3f-b172-d9f511279ee1		perforce
+
+[root@08-00-27-a3-a2-ed ~]# vmadm list
+UUID                                  TYPE  RAM      STATE             ALIAS
+1387eb05-c545-4a92-9a99-99d5006cec16  OS    1024     running           prd_percona
+2e7096fd-2743-4c3f-b172-d9f511279ee1  OS    1024     running           perforce
+8d94247c-3dd5-40f0-a1af-df374970271a  OS    1024     running           chef
+9e36df12-501e-403f-a062-762235fcfbad  OS    1024     running           base64
+ae1d958e-4eee-4c6e-9717-4f9f530cae92  OS    1024     running           prd_jira
+ba5ed2fa-536a-48f2-a0d8-1b5f4b395677  OS    1024     running           prd_java
+
+[perforce@perforce ~]$ /usr/sbin/dladm show-vnic
+LINK         OVER       SPEED MACADDRESS        MACADDRTYPE VID  ZONE
+net0         ?          1000  c2:d7:ea:d0:b8:4a fixed       0    --
+
+# https://github.com/joyent/smartos-live/blob/master/src/vm/man/vmadm.1m.md
+
+touch ~/perforce2.json
+nano ~/perforce2.json
+
+{
+  "alias" : "perforce2",
+  "autoboot": "true",
+  "brand": "joyent",
+  "dns_domain" : "eng.mywebgrocer.com",
+  "resolvers" : [ "8.8.8.8" ],
+  "image_uuid" : "0084dad6-05c1-11e3-9476-8f8320925eea",
+  "hostname" : "perforce2",
+  "max_physical_memory": 1024,
+  "quota": 20,
+  "firewall_enabled": "true",
+  "cpu_shares": 250,  
+  "nics": [
+    {
+      "nic_tag": "admin",
+      "ip": "10.254.250.68",
+      "netmask": "255.255.254.0",
+      "gateway": "10.254.250.1"
+    }
+  ]
+}
+
+vmadm create -f ~/perforce2.json
+	Successfully created VM 4bf4ed56-e2bc-4b68-ba8f-5e6fd7be5bd4
+
+# ssh setup
+
+zlogin 4bf4ed56-e2bc-4b68-ba8f-5e6fd7be5bd4
+
+# Create a user to run Perforce under
+groupadd -g 500 p4admin
+useradd -g 500 -s /usr/bin/bash -d /home/perforce -m perforce
+passwd perforce
+	MyWebGrocer2013#
+
+# Update package library	
+pkgin -y up
+# Install nano
+pkgin -y install nano
+	
+# Add Perforce to sudoers file:
+echo 'perforce ALL=(ALL) ALL'>>/opt/local/etc/sudoers
+exit
+
+# Configure firewall...
+sudo svcadm disable ipfilter
+
+# Using IPFilter Rules
+# http://wiki.joyent.com/wiki/display/jpc2/Using+IPFilter+Rules
+
+# pass out from src.ip.addr to any keep state
+# pass in quick proto tcp from any to dest.ip.addr port=443
+# pass in quick proto tcp from any to dest.ip.addr port=80
+# block in from any to dest.ip.addr
+
+# pass out from any to any keep state
+# pass in quick proto tcp from any to 10.254.250.66 port=22
+# pass in quick proto tcp from any to 10.254.250.66 port=80
+# pass in quick proto tcp from any to 10.254.250.66 port=443
+# pass in quick proto tcp from any to 10.254.250.66 port=1666
+# pass in quick proto icmp from 10.0.40.57 to 10.254.250.66 keep state
+# block in from any to 10.254.250.66
+
+echo 'echo "pass out from any to any keep state" > /etc/ipf/ipf.conf' | sudo -s
+echo 'echo "pass in quick proto tcp from any to 10.254.250.66 port=22" >> /etc/ipf/ipf.conf' | sudo -s
+echo 'echo "pass in quick proto tcp from any to 10.254.250.66 port=80" >> /etc/ipf/ipf.conf' | sudo -s
+echo 'echo "pass in quick proto tcp from any to 10.254.250.66 port=443" >> /etc/ipf/ipf.conf' | sudo -s
+echo 'echo "pass in quick proto tcp from any to 10.254.250.66 port=1666" >> /etc/ipf/ipf.conf' | sudo -s
+echo 'echo "pass in quick proto icmp from 10.0.40.57 to 10.254.250.66 keep state" >> /etc/ipf/ipf.conf' | sudo -s
+echo 'echo "block in from any to 10.254.250.66" >> /etc/ipf/ipf.conf' | sudo -s
+# cat /etc/ipf/ipf.conf
+
+# list the active rules
+ipfstat -io
+
+sudo svcadm enable ipfilter && sudo svcadm restart ipfilter
+
+# ssh in now
+
+================================================
+
+# Define the version we are going to use and where we'll get it from.
+# P4BIN_DOWNLOAD=http://perforce.mywebgrocer.com/3rdparty/Perforce
+# P4BIN_VERSION=2013.2
+P4BIN_DOWNLOAD=ftp://ftp.perforce.com/perforce
+P4BIN_VERSION=r13.2
+P4BIN_PLATFORM=bin.solaris10x86_64
+P4SCRIPTS_DOWNLOAD=https://raw.github.com/patrickmslatteryvt/mi-perforce/master
+WGETGLOBALS="--no-check-certificate --no-directories --no-cache"
+
+sudo mkdir -p /metadata
+sudo mkdir -p /depotdata
+sudo mkdir -p /depotdata/p4/common/bin
+sudo mkdir -p /p4logs
+sudo mkdir -p /home/perforce/p4-broker
+sudo mkdir -p /home/perforce/depot
+sudo wget --no-directories --no-cache $P4BIN_DOWNLOAD/$P4BIN_VERSION/$P4BIN_PLATFORM/SHA256SUMS --output-document=/depotdata/p4/common/bin/SHA256SUMS
+sudo wget --no-directories --no-cache $P4BIN_DOWNLOAD/$P4BIN_VERSION/$P4BIN_PLATFORM/p4 --output-document=/depotdata/p4/common/bin/p4
+sudo wget --no-directories --no-cache $P4BIN_DOWNLOAD/$P4BIN_VERSION/$P4BIN_PLATFORM/p4broker --output-document=/depotdata/p4/common/bin/p4broker
+sudo wget --no-directories --no-cache $P4BIN_DOWNLOAD/$P4BIN_VERSION/$P4BIN_PLATFORM/p4d --output-document=/depotdata/p4/common/bin/p4d
+sudo wget --no-directories --no-cache $P4BIN_DOWNLOAD/r12.1/$P4BIN_PLATFORM/p4web --output-document=/depotdata/p4/common/bin/p4web
+sudo wget --no-directories --no-cache $P4BIN_DOWNLOAD/$P4BIN_VERSION/$P4BIN_PLATFORM/p4api.tgz --output-document=/depotdata/p4/common/bin/p4api.tgz
+sudo wget --no-directories --no-cache $P4BIN_DOWNLOAD/$P4BIN_VERSION/$P4BIN_PLATFORM/p4p --output-document=/depotdata/p4/common/bin/p4p
+
+# validate the downloaded files
+
+sudo chmod -c +x /depotdata/p4/common/bin/p4*
+sudo ln -s /depotdata/p4/common/bin/p4d /metadata/p4d
+sudo ln -s /depotdata/p4/common/bin/p4broker /metadata/p4broker
+sudo ln -s /depotdata/p4/common/bin/p4web /metadata/p4web
+sudo ln -s /depotdata/p4/common/bin/p4 /metadata/p4
+
+sudo touch /p4logs/p4d.log
+sudo touch /p4logs/p4d_audit.log
+sudo touch /p4logs/p4broker.log
+sudo touch /p4logs/p4web.log
+sudo touch /home/perforce/.p4tickets
+# sudo echo localhost:1666=p4builduser:C2CB31A82FC0B52F49E867A117532AC1>/home/perforce/.p4tickets
+sudo chown -Rc perforce:p4admin /depotdata
+sudo chown -Rc perforce:p4admin /metadata
+sudo chown -Rc perforce:p4admin /p4logs
+sudo chown -Rc perforce:p4admin /home/perforce
+
+# Generate default p4broker.conf file
+# /depotdata/p4/common/bin/p4broker -C>/metadata/p4broker.conf.default
+# Download the customised p4broker conf files
+sudo wget $WGETGLOBALS $P4SCRIPTS_DOWNLOAD/p4broker.conf --output-document=/metadata/p4broker.conf
+sudo wget $WGETGLOBALS $P4SCRIPTS_DOWNLOAD/p4broker.conf.downtime --output-document=/metadata/p4broker.conf.downtime
+sudo wget $WGETGLOBALS $P4SCRIPTS_DOWNLOAD/p4broker_sideload_p4web.conf --output-document=/metadata/p4broker_sideload_p4web.conf
+sudo wget $WGETGLOBALS $P4SCRIPTS_DOWNLOAD/p4broker_sideload_p4web.conf.downtime --output-document=/metadata/p4broker_sideload_p4web.conf.downtime
+sudo wget $WGETGLOBALS $P4SCRIPTS_DOWNLOAD/P4WEBMIMEFILE --output-document=/metadata/P4WEBMIMEFILE
+# Custom SMF file for Perforce daemons
+sudo wget $WGETGLOBALS $P4SCRIPTS_DOWNLOAD/perforce.xml --output-document=/var/svc/manifest/application/perforce.xml
+# for testing purposes
+# sudo cp /home/perforce/perforce.xml /var/svc/manifest/application/perforce.xml
+
+# Should always validate the SMF before importing it, the file uploaded to GitHub has been pre-validated
+svccfg validate /var/svc/manifest/application/perforce.xml
+# Import the SMF file for Perforce
+sudo svccfg import /var/svc/manifest/application/perforce.xml
+
+sudo svcadm restart manifest-import
+
+[perforce@perforce2 ~]$ svcs -a|grep perforce
+disabled       18:18:42 svc:/application/perforce/p4d:default
+disabled       18:18:42 svc:/application/perforce/p4p:default
+online         18:18:43 svc:/application/perforce/p4broker:sideload_p4web
+online         18:18:43 svc:/application/perforce/p4broker:depots
+online         18:18:43 svc:/application/perforce/p4d:sideload_p4web
+online         18:18:43 svc:/application/perforce/p4d:depots
+online         18:18:43 svc:/application/perforce/p4web:default
+
+=============================================
+
+sudo svcadm disable svc:/application/perforce/p4broker:depots
+sudo svcadm disable svc:/application/perforce/p4broker:sideload_p4web
+sudo svcadm disable svc:/application/perforce/p4web:default
+sudo svcadm disable svc:/application/perforce/p4d:sideload_p4web
+sudo svcadm disable svc:/application/perforce/p4d:depots
+
+ps -fu perforce
+
+sudo svccfg delete svc:/application/perforce/p4broker:depots
+sudo svccfg delete svc:/application/perforce/p4broker:sideload_p4web
+sudo svccfg delete svc:/application/perforce/p4web:default
+sudo svccfg delete svc:/application/perforce/p4d:sideload_p4web
+sudo svccfg delete svc:/application/perforce/p4d:depots
+
+svcs -d svc:/network/nfs/server:default
+
+svcs -d svc:/application/perforce/p4broker:depots
+svcs -d svc:/application/perforce/p4broker:sideload_p4web
+svcs -d svc:/application/perforce/p4web:default
+svcs -d svc:/application/perforce/p4d:sideload_p4web
+svcs -d svc:/application/perforce/p4d:depots
+
+sudo svccfg delete svc:/application/perforce/p4d:default
+sudo svccfg delete svc:/application/perforce/p4p:default
+
+svcs -xv
+svcs|grep application
+ps -fu perforce
+
+sudo cp /home/perforce/perforce.xml /var/svc/manifest/application/perforce.xml
+svccfg validate /var/svc/manifest/application/perforce.xml
+sudo svcadm restart manifest-import
+
+sudo svccfg import /var/svc/manifest/application/perforce.xml
+
+sudo svcadm enable svc:/application/perforce/p4broker:default
+sudo svcadm enable svc:/application/perforce/p4web:default
+sudo svcadm enable svc:/application/perforce/p4d:sideload_p4web
+sudo svcadm enable svc:/application/perforce/p4d:depots
+
+
+sudo rm /var/svc/log/application-perforce-p4broker:default.log
+sudo rm /var/svc/log/application-perforce-p4d:AUTH.log
+sudo rm /var/svc/log/application-perforce-p4d:default.log
+
+sudo rm /var/svc/log/application-perforce-p4broker:depots.log
+sudo rm /var/svc/log/application-perforce-p4broker:sideload_p4web.log
+sudo rm /var/svc/log/application-perforce-p4d:depots.log
+sudo rm /var/svc/log/application-perforce-p4d:sideload_p4web.log
+sudo rm /var/svc/log/application-perforce-p4web:default.log
+sudo rm /var/svc/log/application-perforce-p4p:default.log
+
+================
+
+export P4EDITOR=/opt/local/bin/nano
+
+# Users must use ticket-based authentication
+/metadata/p4 -p 1666 -u superuser configure set security=3
+
+# Must set password for user superuser to continue
+/metadata/p4 -p 1666 -u superuser login
+
+# use new integration engine with p4 integrate
+/metadata/p4 -p 1666 -u superuser configure set dm.integ.engine=3
+
+# If set to 1, p4 keys requires admin access.
+/metadata/p4 -p 1666 -u superuser configure set dm.keys.hide=1
+
+# Minimum diskspace required on server root filesystem before server rejects commands.
+/metadata/p4 -p 1666 -u superuser configure set filesys.P4ROOT.min=100M
+
+# Minimum diskspace required on server journal filesystem before server rejects commands.
+/metadata/p4 -p 1666 -u superuser configure set filesys.P4JOURNAL.min=100M
+
+# Minimum diskspace required on server log filesystem before server rejects commands.
+/metadata/p4 -p 1666 -u superuser configure set filesys.P4LOG.min=100M
+
+# Minimum diskspace required for temporary operations before server rejects commands.
+/metadata/p4 -p 1666 -u superuser configure set filesys.TEMP.min=100M
+
+# Minimum diskspace required for any depot before server rejects commands. (If there is less than filesys.depot.min diskspace available for any one depot, commands are rejected for transactions involving all depots.)
+/metadata/p4 -p 1666 -u superuser configure set filesys.depot.min=100M
+
+# Proxy - 2: File paths are case-insensitive if server is case-insensitive
+/metadata/p4 -p 1666 -u superuser configure set lbr.proxy.case=2
+
+# If set, changes default behavior of p4 sync such that if a client workspace begins with this prefix, all sync operations to affected workspaces assume p4 sync -k, and do not alter contents of the workspace.
+/metadata/p4 -p 1666 -u superuser configure set zerosyncPrefix=zerosync
+
+# Preventing automatic creation of users - new users may only be created by superusers running p4 user
+/metadata/p4 -p 1666 -u superuser configure set dm.user.noautocreate=2
+
+# Requiring minimum revisions of client software
+/metadata/p4 -p 1666 -u superuser configure set minClient=2012.1
+/metadata/p4 -p 1666 -u superuser configure set minClientMessage="Your Perforce client is too old. Please upgrade to Perforce client version r2012.1 or higher"
+
+# If monitoring is enabled, and if this configurable is set to a nonzero value, the service refuses to accept more than this many simultaneous command requests.
+# /metadata/p4 -p 1666 -u superuser configure set server.maxcommands=10
+
+# Ignore all nonlocal connection requests
+# P4PORT=localhost:port
+
+# Enabling process monitoring (including idle processes)
+/metadata/p4 -p 1666 -u superuser configure set monitor=2
+
+# Command tracing flags (log everything)
+# server=3 - In addition to data logged at level 2, adds usage information for compute phases of p4 sync and p4 flush (p4 sync -k) commands.
+# http://www.perforce.com/perforce/doc.current/manuals/p4sag/03_superuser.html
+/metadata/p4 -p 1666 -u superuser configure set server=3
+
+# Centralized management of P4V settings
+# http://www.perforce.com/perforce/doc.current/manuals/p4sag/03_superuser.html#1101165
+# If Off, the labels tab does not appear.
+# /metadata/p4 -p 1666 -u superuser property -a -n P4V.Features.Labeling -v Off
+
+# If Off, P4V does not attempt to use the New Connection Wizard.
+/metadata/p4 -p 1666 -u superuser property -a -n P4V.Features.ConnectionWizard -v Off
+
+# If Off, streams-related icons, menus, and the Stream Graph do not appear.
+# /metadata/p4 -p 1666 -u superuser property -a -n P4V.Features.Streams -v Off
+
+# Require passwords to be at least 16 characters in length
+/metadata/p4 -p 1666 -u superuser configure set dm.password.minlength=16
+
+# Delete the default depot named "depot"
+/metadata/p4 -p 1666 -u superuser depot -d depot
+
+# Create spec depot
+echo 'Depot:  		p4-spec'>/tmp/p4tmp
+echo 'Type:   		spec'>>/tmp/p4tmp
+echo 'Address:      local'>>/tmp/p4tmp
+echo 'Map:    		p4-spec/...'>>/tmp/p4tmp
+echo 'Suffix:  		.p4s'>>/tmp/p4tmp
+echo 'SpecMap: 		//p4-spec/...'>>/tmp/p4tmp
+/metadata/p4 -p 1666 -u superuser depot -i</tmp/p4tmp
+/metadata/p4 -p 1666 -u superuser admin updatespecdepot -a
+
+# Create unload depot
+echo 'Depot:  		p4-unload'>/tmp/p4tmp
+echo 'Type:   		unload'>>/tmp/p4tmp
+echo 'Address:      local'>>/tmp/p4tmp
+echo 'Map:    		p4-unload/...'>>/tmp/p4tmp
+/metadata/p4 -p 1666 -u superuser depot -i</tmp/p4tmp
+
+# Create a new depot named "MWG"
+echo 'Depot:  		MWG'>/tmp/p4tmp
+echo 'Description: 	Created by superuser.'>>/tmp/p4tmp
+echo 'Type:   		local'>>/tmp/p4tmp
+echo 'Address:      local'>>/tmp/p4tmp
+echo 'Map:    		MWG/...'>>/tmp/p4tmp
+/metadata/p4 -p 1666 -u superuser depot -i</tmp/p4tmp
+
+# Create the base typemap (need more definitions)
+echo 'TypeMap:'>/tmp/p4tmp
+echo '		text //....asp'>>/tmp/p4tmp
+echo '		binary+F //....avi'>>/tmp/p4tmp
+echo '		binary //....bmp'>>/tmp/p4tmp
+echo '		binary //....btr'>>/tmp/p4tmp
+echo '		text //....cnf'>>/tmp/p4tmp
+echo '		text //....css'>>/tmp/p4tmp
+echo '		binary //....doc'>>/tmp/p4tmp
+echo '		binary //....dot'>>/tmp/p4tmp
+echo '		binary+w //....exp'>>/tmp/p4tmp
+echo '		binary+F //....gif'>>/tmp/p4tmp
+echo '		binary+F //....gz'>>/tmp/p4tmp
+echo '		text //....htm'>>/tmp/p4tmp
+echo '		text //....html'>>/tmp/p4tmp
+echo '		binary //....ico'>>/tmp/p4tmp
+echo '		text //....inc'>>/tmp/p4tmp
+echo '		text+w //....ini'>>/tmp/p4tmp
+echo '		binary //....jpg'>>/tmp/p4tmp
+echo '		text //....js'>>/tmp/p4tmp
+echo '		binary+w //....lib'>>/tmp/p4tmp
+echo '		text+w //....log'>>/tmp/p4tmp
+echo '		binary+F //....mpg'>>/tmp/p4tmp
+echo '		binary //....pdf'>>/tmp/p4tmp
+echo '		text+w //....pdm'>>/tmp/p4tmp
+echo '		binary //....ppt'>>/tmp/p4tmp
+echo '		binary //....xls'>>/tmp/p4tmp
+/metadata/p4 -p 1666 -u superuser typemap -i</tmp/p4tmp
+
+# Enable structured logging
+/metadata/p4 -p 1666 -u superuser configure set serverlog.file.1=/p4logs/all.csv
+/metadata/p4 -p 1666 -u superuser configure set serverlog.file.2=/p4logs/commands.csv
+/metadata/p4 -p 1666 -u superuser configure set serverlog.file.3=/p4logs/errors.csv
+/metadata/p4 -p 1666 -u superuser configure set serverlog.file.4=/p4logs/audit.csv
+/metadata/p4 -p 1666 -u superuser configure set serverlog.file.5=/p4logs/track.csv
+/metadata/p4 -p 1666 -u superuser configure set serverlog.file.6=/p4logs/user.csv
+/metadata/p4 -p 1666 -u superuser configure set serverlog.file.7=/p4logs/events.csv
+
+# Populate P4WEBMIMEFILE
+echo '.h text/plain'>/metadata/P4WEBMIMEFILE
+echo '.c text/plain'>>/metadata/P4WEBMIMEFILE
+echo '.C text/plain'>>/metadata/P4WEBMIMEFILE
+echo '.cc text/plain'>>/metadata/P4WEBMIMEFILE
+echo '.cpp text/plain'>>/metadata/P4WEBMIMEFILE
+echo '.java text/plain'>>/metadata/P4WEBMIMEFILE
+echo '.pl text/plain'>>/metadata/P4WEBMIMEFILE
+echo '.py text/plain'>>/metadata/P4WEBMIMEFILE
+
+/metadata/p4 -p 1666 -u www login
+
+
+p4 serverid
+
+
+cat /var/svc/log/application-perforce-p4web:default.log
+
+
+cat /var/svc/log/application-perforce-p4broker:default.log
+cat /var/svc/log/application-perforce-p4d:default.log
+cat /var/svc/log/application-perforce-p4p:default.log
+cat /var/svc/log/application-perforce-p4web:default.log
+
+
+sudo wget --no-check-certificate --no-directories --no-cache https://raw.github.com/patrickmslatteryvt/mi-perforce/master/perforce.xml --output-document=/var/svc/manifest/application/p4d.xml
+svccfg validate /var/svc/manifest/application/perforce.xml
+sudo svccfg import /var/svc/manifest/application/perforce.xml
+
+sudo svcadm enable p4web
+
+sudo touch /var/svc/manifest/application/p4d.xml
+sudo nano -w /var/svc/manifest/application/p4d.xml
+svccfg validate /var/svc/manifest/application/p4d.xml
+sudo svccfg import /var/svc/manifest/application/p4d.xml
+svcs p4d
+	STATE          STIME    FMRI
+	offline*       15:19:33 svc:/application/perforce/p4d:default
+sudo svcadm enable p4web
+svcs p4d
+	STATE          STIME    FMRI
+	offline*       15:19:33 svc:/application/perforce/p4d:default
+ps auxw | grep p4web
+	perforce  7813  0.0  0.1 8392 3740 ?        S 15:21:35  0:00 /depotdata/p4/common/bin/p4d -L /p4logs/p4d.log -A /p4logs/p4d_audit.l
+
+export VISUAL=/opt/local/bin/nano
+export EDITOR=/opt/local/bin/nano
+
+svccfg extract -a > my-custom-profile.xml
+
+# Enable mail daemon
+sudo svcadm enable svc:/pkgsrc/postfix:default
+
+
+ http://wiki.joyent.com/display/smart/About+the+Service+Management+Facility
+ 
+=============================================
+Nginx reverse proxy
+# Note that nginx-1.5 is listed as unstable at this time (is also missing it's SMF)
+sudo pkgin -y in nginx-1.4
+
+sudo svcadm enable svc:/pkgsrc/nginx:default
+
+/opt/local/etc/nginx/nginx.conf
+
+# Consider adding something like following lines to /etc/newsyslog.conf:
+# /var/log/nginx/access.log www:www 640 7 * 24 Z  /var/db/nginx/nginx.pid SIGUSR1
+# /var/log/nginx/error.log  www:www 640 7 * 24 Z  /var/db/nginx/nginx.pid SIGUSR1
+
+
+
+# Create self signed SSL Cert for HTTPS
+# http://lukasz.cepowski.com/devlog/40,create-self-signed-ssl-cert-for-https
+
+# Create private key
+openssl genrsa -des3 -out perforce.mywebgrocer.com.key 2048
+	MyWebGrocer2013#
+
+# Create CSR
+openssl req -new -key perforce.mywebgrocer.com.key -out perforce.mywebgrocer.com.csr
+	Country Name (2 letter code) [AU]:US
+	State or Province Name (full name) [Some-State]:Vermont
+	Locality Name (eg, city) []:Winooski
+	Organization Name (eg, company) [Internet Widgits Pty Ltd]:MyWebGrocer
+	Organizational Unit Name (eg, section) []:Storefront
+	Common Name (e.g. server FQDN or YOUR name) []:perforce.mywebgrocer.com
+	Email Address []:perforce-admins@mywebgrocer.com
+	Please enter the following 'extra' attributes
+	to be sent with your certificate request
+	A challenge password []:MyWebGrocer2013#
+	An optional company name []:MyWebGrocer
+
+
+# Remove password
+mv perforce.mywebgrocer.com.key perforce.mywebgrocer.com.key.orig
+openssl rsa -in perforce.mywebgrocer.com.key.orig -out perforce.mywebgrocer.com.key
+
+# Create self signed SSL cert
+openssl x509 -req -days 365 -in perforce.mywebgrocer.com.csr -signkey perforce.mywebgrocer.com.key -out perforce.mywebgrocer.com.crt
