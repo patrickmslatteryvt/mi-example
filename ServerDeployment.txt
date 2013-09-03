@@ -1,0 +1,48 @@
+http://www.perforce.com/sites/default/files/Tyler-ServerDeploymentBestPractices-paper.pdf
+
+SDP Structure: Physical
+/depotdata/p4/1/checkpoints
+/depotdata/p4/1/depots
+/depotdata/p4/1/bin
+/depotdata/p4/1/etc
+/depotdata/p4/common/bin
+/depotdata
+/metadata/p4/1/root
+/metadata/p4/1/offline_db
+/logs/p4/1/logs
+/p4
+
+SDP Structure: Logical
+
+/p4/common			-->		/depotdata/p4/common/bin
+
+/p4/1
+	/checkpoints	-->		/depotdata/p4/1/bin/checkpoints
+	/depots			-->		/depotdata/p4/1/depots
+	/bin			-->		/depotdata/p4/1/bin
+	/etc			-->		/depotdata/p4/1/etc
+	/tmp			-->		/depotdata/p4/1/tmp
+	/root			-->		/metadata/p4/1/root
+	/offline_db		-->		/metadata/p4/1/offline_db
+	/logs			-->		/logs/p4/1/logs
+/p4/2/
+	/checkpoints	-->		/depotdata/p4/2/bin/checkpoints
+	/depots			-->		/depotdata/p4/2/depots
+	/bin			-->		/depotdata/p4/2/bin
+	/etc			-->		/depotdata/p4/2/etc
+	/tmp			-->		/depotdata/p4/2/tmp
+	/root			-->		/metadata/p4/2/root
+	/offline_db		-->		/metadata/p4/2/offline_db
+	/logs			-->		/logs/p4/2/logs
+/p4/3/
+	...
+
+Common Paths 
+P4ROOT 				/p4/1/root
+					/p4/1/root/license 
+					
+P4LOG				/p4/1/logs/log
+					/p4/1/logs/checkpoint.log
+					/p4/1/logs/verify.log
+					
+P4JOURNAL			/p4/1/logs/journal
