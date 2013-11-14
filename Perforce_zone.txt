@@ -44,7 +44,7 @@ nano ~/perforce2.json
   "hostname" : "perforce2",
   "max_physical_memory": 1024,
   "quota": 20,
-  "firewall_enabled": "true",
+  "firewall_enabled": "false",
   "cpu_shares": 250,  
   "nics": [
     {
@@ -119,7 +119,7 @@ sudo svcadm enable ipfilter && sudo svcadm restart ipfilter
 # P4BIN_DOWNLOAD=http://perforce.mywebgrocer.com/3rdparty/Perforce
 # P4BIN_VERSION=2013.2
 P4BIN_DOWNLOAD=ftp://ftp.perforce.com/perforce
-P4BIN_VERSION=r13.2
+P4BIN_VERSION=r13.3
 P4BIN_PLATFORM=bin.solaris10x86_64
 P4SCRIPTS_DOWNLOAD=https://raw.github.com/patrickmslatteryvt/mi-perforce/master
 WGETGLOBALS="--no-check-certificate --no-directories --no-cache"
@@ -139,6 +139,18 @@ sudo wget --no-directories --no-cache $P4BIN_DOWNLOAD/$P4BIN_VERSION/$P4BIN_PLAT
 sudo wget --no-directories --no-cache $P4BIN_DOWNLOAD/$P4BIN_VERSION/$P4BIN_PLATFORM/p4p --output-document=/depotdata/p4/common/bin/p4p
 
 # validate the downloaded files
+cd /depotdata/p4/common/bin
+sha256sum -c /depotdata/p4/common/bin/SHA256SUMS
+exit_status=$?
+if test $exit_status -eq 0
+then
+    echo "${SCRIPTNAME}: File(s) match precomputed SHA256 hash(es)"
+else
+    echo "${SCRIPTNAME}: Files DO NOT match precomputed SHA256 hash(es). Exiting."
+    exit 1
+    # FUTURE FIX: Should go back and retry the download again, if after 3 tries it's still bad then give up and exit.
+fi
+cd ->nul
 
 sudo chmod -c +x /depotdata/p4/common/bin/p4*
 sudo ln -s /depotdata/p4/common/bin/p4d /metadata/p4d
