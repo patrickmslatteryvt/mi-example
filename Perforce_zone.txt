@@ -1,82 +1,130 @@
-Perforce_zone.txt
+#!/bin/bash
+# Perforce setup in a SmartOS zone
+# Author: Patrick M. Slattery <pslattery@mywebgrocer.com>
+#
 
-10.254.250.66
+# This set of notes is the basis of an install script
 
-imgadm avail | grep base64
-0084dad6-05c1-11e3-9476-8f8320925eea  base64         13.2.0   smartos  2013-08-15T15:30:00Z
-
-imgadm import 0084dad6-05c1-11e3-9476-8f8320925eea
-
-[root@08-00-27-a3-a2-ed ~]# /usr/sbin/dladm show-vnic
-LINK         OVER       SPEED MACADDRESS        MACADDRTYPE VID  ZONE
-net0         e1000g0    0     82:e5:51:6d:b8:d5 fixed       0    8d94247c-3dd5-40f0-a1af-df374970271a
-net0         e1000g0    0     82:3d:eb:c:e1:bf  fixed       0    9e36df12-501e-403f-a062-762235fcfbad
-net0         e1000g0    0     c2:b7:5c:63:16:31 fixed       0    ba5ed2fa-536a-48f2-a0d8-1b5f4b395677
-net0         e1000g0    0     d2:90:5c:70:5e:c6 fixed       0    1387eb05-c545-4a92-9a99-99d5006cec16
-net0         e1000g0    0     a2:88:3e:91:d2:63 fixed       0    ae1d958e-4eee-4c6e-9717-4f9f530cae92
-net0         e1000g0    0     c2:d7:ea:d0:b8:4a fixed       0    2e7096fd-2743-4c3f-b172-d9f511279ee1		perforce
-
-[root@08-00-27-a3-a2-ed ~]# vmadm list
-UUID                                  TYPE  RAM      STATE             ALIAS
-1387eb05-c545-4a92-9a99-99d5006cec16  OS    1024     running           prd_percona
-2e7096fd-2743-4c3f-b172-d9f511279ee1  OS    1024     running           perforce
-8d94247c-3dd5-40f0-a1af-df374970271a  OS    1024     running           chef
-9e36df12-501e-403f-a062-762235fcfbad  OS    1024     running           base64
-ae1d958e-4eee-4c6e-9717-4f9f530cae92  OS    1024     running           prd_jira
-ba5ed2fa-536a-48f2-a0d8-1b5f4b395677  OS    1024     running           prd_java
-
-[perforce@perforce ~]$ /usr/sbin/dladm show-vnic
-LINK         OVER       SPEED MACADDRESS        MACADDRTYPE VID  ZONE
-net0         ?          1000  c2:d7:ea:d0:b8:4a fixed       0    --
-
-# https://github.com/joyent/smartos-live/blob/master/src/vm/man/vmadm.1m.md
-
-touch ~/perforce2.json
-nano ~/perforce2.json
-
-{
-  "alias" : "perforce2",
-  "autoboot": "true",
-  "brand": "joyent",
-  "dns_domain" : "eng.mywebgrocer.com",
-  "resolvers" : [ "8.8.8.8" ],
-  "image_uuid" : "0084dad6-05c1-11e3-9476-8f8320925eea",
-  "hostname" : "perforce2",
-  "max_physical_memory": 1024,
-  "quota": 20,
-  "firewall_enabled": "false",
-  "cpu_shares": 250,  
-  "nics": [
-    {
-      "nic_tag": "admin",
-      "ip": "10.254.250.68",
-      "netmask": "255.255.254.0",
-      "gateway": "10.254.250.1"
-    }
-  ]
+function pause(){
+   read -p "$*"
 }
 
-vmadm create -f ~/perforce2.json
-	Successfully created VM 4bf4ed56-e2bc-4b68-ba8f-5e6fd7be5bd4
+# ================================================================================
+
+10.254.250.66
+name = perforce.devdmz.mywebgrocer.com.
+
+imgadm avail | grep base64
+17c98640-1fdb-11e3-bf51-3708ce78e75a  base64         13.2.1   smartos  2013-09-20T15:02:46Z
+
+imgadm import 17c98640-1fdb-11e3-bf51-3708ce78e75a
+
+echo '{'>~/perforce.json
+echo '  "alias" : "perforce",'>>~/perforce.json
+echo '  "autoboot": "true",'>>~/perforce.json
+echo '  "brand": "joyent",'>>~/perforce.json
+echo '  "dns_domain" : "devdmz.mywebgrocer.com",'>>~/perforce.json
+echo '  "resolvers": ["10.0.33.50", "10.0.32.160"],'>>~/perforce.json
+echo '  "image_uuid" : "17c98640-1fdb-11e3-bf51-3708ce78e75a",'>>~/perforce.json
+echo '  "hostname" : "perforce.devdmz.mywebgrocer.com",'>>~/perforce.json
+echo '  "max_physical_memory": 2048,'>>~/perforce.json
+echo '  "quota": 10,'>>~/perforce.json
+echo '  "firewall_enabled": "false",'>>~/perforce.json
+echo '  "cpu_shares": 250,'>>~/perforce.json
+echo '  "nics": ['>>~/perforce.json
+echo '    {'>>~/perforce.json
+echo '      "nic_tag": "admin",'>>~/perforce.json
+echo '      "ip": "10.254.250.66",'>>~/perforce.json
+echo '      "netmask": "255.255.254.0",'>>~/perforce.json
+echo '      "gateway": "10.254.250.1",'>>~/perforce.json
+echo '      "primary": true'>>~/perforce.json
+echo '    }'>>~/perforce.json
+echo '  ]'>>~/perforce.json
+echo '}'>>~/perforce.json
+
+# Need to add multiple vols to our zone
+# These vols are used for metadata, depotdata and p4logs
+# metadata should be a local SSD or low latency SSD accelerated volume
+# depotdata would ideally be an NFS share
+# p4logs could be either local disk or an NFS share
+
+# Validate our JSON first
+vmadm validate create -f ~/perforce.json
+#	VALID 'create' payload for joyent brand VMs.
+exit_status=$?
+if test $exit_status -eq 0
+then
+    echo 'JSON was valid, now creating the VM...'
+    vmadm create -f ~/perforce.json
+else
+    echo 'JSON file did not pass validation, please edit and try again.'
+    exit 1
+fi
 
 # ssh setup
+zlogin 8341bd58-7497-4176-bbf9-690d0a55670f
 
-zlogin 4bf4ed56-e2bc-4b68-ba8f-5e6fd7be5bd4
+# ================================================================================
 
-# Create a user to run Perforce under
-groupadd -g 500 p4admin
-useradd -g 500 -s /usr/bin/bash -d /home/perforce -m perforce
-passwd perforce
-	MyWebGrocer2013#
+echo 'Perforce - Export all the environment variables we will use later on in the script...'
 
-# Update package library	
-pkgin -y up
-# Install nano
-pkgin -y install nano
-	
-# Add Perforce to sudoers file:
-echo 'perforce ALL=(ALL) ALL'>>/opt/local/etc/sudoers
-exit
+USERNAME="admin"
+PASSWORD="MyWebGrocer2013#"
+
+# Define the version we are going to use and where we'll get it from.
+# P4BIN_DOWNLOAD=http://perforce.mywebgrocer.com/3rdparty/Perforce
+# P4BIN_VERSION=2013.2
+P4BIN_DOWNLOAD=ftp://ftp.perforce.com/perforce
+P4BIN_VERSION=r13.3
+P4BIN_PLATFORM=bin.solaris10x86_64
+P4SCRIPTS_DOWNLOAD=https://raw.github.com/patrickmslatteryvt/mi-perforce/master
+WGETGLOBALS="--no-check-certificate --no-directories --no-cache"
+
+# P4WEB_SERVER=10.254.250.66
+
+pause 'Press [Enter] key to continue...'
+echo ' '
+# ================================================================================
+
+echo 'Perforce - Installing base packages...'
+# Update package library and install the necessary packages
+pkgin -y up && pkgin -y install nano nginx-1.4 dtracetools htop net-snmp
+# Note that nginx-1.5 is listed as unstable at this time (is also missing it's SMF)
+
+# svcadm enable snmp:default
+
+pause 'Press [Enter] key to continue...'
+echo ' '
+# ================================================================================
+
+echo 'Perforce - Change the default password of the builtin admin user...'
+echo "${USERNAME}:${PASSWORD}" | changepass
+
+echo 'Perforce - Create the users to run Perforce under...'
+# NOTE: 8 char max for user and group names
+# SmartOS has a changepass command
+# https://github.com/joyent/zoneinit/blob/master/includes/91-passwords.sh
+
+# <username>,<password>,<GID>,<groupname>,<User detail>
+echo 'up4dev,MyWebGrocer2013#_dev,500,gp4dev,Account for running the Perforce dev instance under'>~/users.txt
+echo 'up4stg,MyWebGrocer2013#_stg,501,gp4stg,Account for running the Perforce staging instance under'>>~/users.txt
+echo 'up4prd,MyWebGrocer2013#_prd,502,gp4prd,Account for running the Perforce production instance under'>>~/users.txt
+
+curl "https://raw.github.com/patrickmslatteryvt/shell/master/bash/create_users.sh?login=patrickmslatteryvt&token=4ee5e6b2fb3b37b5b60ead21f9f67629" -o ~/create_users.sh
+echo
+chmod -c +x ~/create_users.sh
+echo
+~/create_users.sh<~/users.txt
+
+# Add users to sudoers file:
+# echo 'admin ALL=(ALL) ALL'>>/opt/local/etc/sudoers
+# echo 'uperforcedev ALL=(ALL) ALL'>>/opt/local/etc/sudoers
+# echo 'uperforcestg ALL=(ALL) ALL'>>/opt/local/etc/sudoers
+# echo 'uperforceprd ALL=(ALL) ALL'>>/opt/local/etc/sudoers
+
+pause 'Press [Enter] key to continue...'
+echo ' '
+# ================================================================================
 
 # Configure firewall...
 sudo svcadm disable ipfilter
@@ -111,18 +159,7 @@ ipfstat -io
 
 sudo svcadm enable ipfilter && sudo svcadm restart ipfilter
 
-# ssh in now
-
-================================================
-
-# Define the version we are going to use and where we'll get it from.
-# P4BIN_DOWNLOAD=http://perforce.mywebgrocer.com/3rdparty/Perforce
-# P4BIN_VERSION=2013.2
-P4BIN_DOWNLOAD=ftp://ftp.perforce.com/perforce
-P4BIN_VERSION=r13.3
-P4BIN_PLATFORM=bin.solaris10x86_64
-P4SCRIPTS_DOWNLOAD=https://raw.github.com/patrickmslatteryvt/mi-perforce/master
-WGETGLOBALS="--no-check-certificate --no-directories --no-cache"
+# ================================================================================
 
 sudo mkdir -p /metadata
 sudo mkdir -p /depotdata
@@ -130,13 +167,13 @@ sudo mkdir -p /depotdata/p4/common/bin
 sudo mkdir -p /p4logs
 sudo mkdir -p /home/perforce/p4-broker
 sudo mkdir -p /home/perforce/depot
-sudo wget --no-directories --no-cache $P4BIN_DOWNLOAD/$P4BIN_VERSION/$P4BIN_PLATFORM/SHA256SUMS --output-document=/depotdata/p4/common/bin/SHA256SUMS
-sudo wget --no-directories --no-cache $P4BIN_DOWNLOAD/$P4BIN_VERSION/$P4BIN_PLATFORM/p4 --output-document=/depotdata/p4/common/bin/p4
-sudo wget --no-directories --no-cache $P4BIN_DOWNLOAD/$P4BIN_VERSION/$P4BIN_PLATFORM/p4broker --output-document=/depotdata/p4/common/bin/p4broker
-sudo wget --no-directories --no-cache $P4BIN_DOWNLOAD/$P4BIN_VERSION/$P4BIN_PLATFORM/p4d --output-document=/depotdata/p4/common/bin/p4d
-sudo wget --no-directories --no-cache $P4BIN_DOWNLOAD/r12.1/$P4BIN_PLATFORM/p4web --output-document=/depotdata/p4/common/bin/p4web
-sudo wget --no-directories --no-cache $P4BIN_DOWNLOAD/$P4BIN_VERSION/$P4BIN_PLATFORM/p4api.tgz --output-document=/depotdata/p4/common/bin/p4api.tgz
-sudo wget --no-directories --no-cache $P4BIN_DOWNLOAD/$P4BIN_VERSION/$P4BIN_PLATFORM/p4p --output-document=/depotdata/p4/common/bin/p4p
+sudo wget ${WGETGLOBALS} ${P4BIN_DOWNLOAD}/${P4BIN_VERSION}/${P4BIN_PLATFORM}/SHA256SUMS --output-document=/depotdata/p4/common/bin/SHA256SUMS
+sudo wget ${WGETGLOBALS} ${P4BIN_DOWNLOAD}/${P4BIN_VERSION}/${P4BIN_PLATFORM}/p4 --output-document=/depotdata/p4/common/bin/p4
+sudo wget ${WGETGLOBALS} ${P4BIN_DOWNLOAD}/${P4BIN_VERSION}/${P4BIN_PLATFORM}/p4broker --output-document=/depotdata/p4/common/bin/p4broker
+sudo wget ${WGETGLOBALS} ${P4BIN_DOWNLOAD}/${P4BIN_VERSION}/${P4BIN_PLATFORM}/p4d --output-document=/depotdata/p4/common/bin/p4d
+sudo wget ${WGETGLOBALS} ${P4BIN_DOWNLOAD}/r12.1/${P4BIN_PLATFORM}/p4web --output-document=/depotdata/p4/common/bin/p4web
+sudo wget ${WGETGLOBALS} ${P4BIN_DOWNLOAD}/${P4BIN_VERSION}/${P4BIN_PLATFORM}/p4api.tgz --output-document=/depotdata/p4/common/bin/p4api.tgz
+sudo wget ${WGETGLOBALS} ${P4BIN_DOWNLOAD}/${P4BIN_VERSION}/${P4BIN_PLATFORM}/p4p --output-document=/depotdata/p4/common/bin/p4p
 
 # validate the downloaded files
 cd /depotdata/p4/common/bin
@@ -198,7 +235,7 @@ online         18:18:43 svc:/application/perforce/p4d:sideload_p4web
 online         18:18:43 svc:/application/perforce/p4d:depots
 online         18:18:43 svc:/application/perforce/p4web:default
 
-=============================================
+# ================================================================================
 
 sudo svcadm disable svc:/application/perforce/p4broker:depots
 sudo svcadm disable svc:/application/perforce/p4broker:sideload_p4web
@@ -252,7 +289,7 @@ sudo rm /var/svc/log/application-perforce-p4d:sideload_p4web.log
 sudo rm /var/svc/log/application-perforce-p4web:default.log
 sudo rm /var/svc/log/application-perforce-p4p:default.log
 
-================
+# ================================================================================
 
 export P4EDITOR=/opt/local/bin/nano
 
@@ -415,7 +452,7 @@ cat /var/svc/log/application-perforce-p4p:default.log
 cat /var/svc/log/application-perforce-p4web:default.log
 
 
-sudo wget --no-check-certificate --no-directories --no-cache https://raw.github.com/patrickmslatteryvt/mi-perforce/master/perforce.xml --output-document=/var/svc/manifest/application/p4d.xml
+sudo wget ${WGETGLOBALS} https://raw.github.com/patrickmslatteryvt/mi-perforce/master/perforce.xml --output-document=/var/svc/manifest/application/p4d.xml
 svccfg validate /var/svc/manifest/application/perforce.xml
 sudo svccfg import /var/svc/manifest/application/perforce.xml
 
@@ -446,7 +483,8 @@ sudo svcadm enable svc:/pkgsrc/postfix:default
 
  http://wiki.joyent.com/display/smart/About+the+Service+Management+Facility
  
-=============================================
+# ================================================================================
+
 Nginx reverse proxy
 # Note that nginx-1.5 is listed as unstable at this time (is also missing it's SMF)
 sudo pkgin -y in nginx-1.4
@@ -489,3 +527,45 @@ openssl rsa -in perforce.mywebgrocer.com.key.orig -out perforce.mywebgrocer.com.
 
 # Create self signed SSL cert
 openssl x509 -req -days 365 -in perforce.mywebgrocer.com.csr -signkey perforce.mywebgrocer.com.key -out perforce.mywebgrocer.com.crt
+
+# ================================================================================
+
+echo 'Perforce - Configure Nginx reverse proxy...'
+# The nginx service is disabled by default, it needs a valid conf file setup for it first before we enable it
+curl "https://raw.github.com/patrickmslatteryvt/mi-perforce/master/nginx.conf" -o /opt/local/etc/nginx/nginx.conf
+# Replace the hostname stub with the actual hostname
+sed -i "s/HOSTNAME/${HOSTNAME}/g" /opt/local/etc/nginx/nginx.conf
+cat /opt/local/etc/nginx/nginx.conf|grep -i --color ${HOSTNAME}
+# Replace the external facing IP address stub with the actual IP address of interface net0
+# Note that net0 is the Joyent-SDC-Private interface when running on JoyentCloud, in such a case listen on net1 instead.
+# This is used to make sure that nginx only listens on the external interface.
+IP_ADDRESS=$(ifconfig net0 | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p')
+sed -i "s/IP_ADDRESS/${IP_ADDRESS}/g" /opt/local/etc/nginx/nginx.conf
+cat /opt/local/etc/nginx/nginx.conf|grep -i --color ${IP_ADDRESS}
+
+# Create a directory for nginx status and error pages.
+mkdir -p /srv/www/images
+cp /opt/local/share/examples/nginx/html/* /srv/www/
+# 404 background image
+# FIX
+# FIX
+# FIX
+# GET/MAKE A PERFORCE SPECIFIC IMAGE
+curl "https://raw.github.com/patrickmslatteryvt/joyent/master/mi-jira/images/maint_background.gif?login=patrickmslatteryvt&token=3c4c4a98efde5914b29621f543c75072" -o /srv/www/images/maint_background.gif
+# FIX
+# FIX
+# FIX
+
+# Create self signed SSL Cert for HTTPS
+curl "https://raw.github.com/patrickmslatteryvt/shell/master/bash/generateSSLSelfSignCert.sh?login=patrickmslatteryvt&token=2303aeb70fe59c5caf20f7e83e183907" -o ~/generateSSLSelfSignCert.sh
+chmod -c +x ~/generateSSLSelfSignCert.sh
+~/generateSSLSelfSignCert.sh
+
+# Enable nginx
+svcadm enable svc:/pkgsrc/nginx:default
+svcs -xv nginx
+# tail -n 20 /var/svc/log/pkgsrc-nginx:default.log
+
+pause 'Press [Enter] key to continue...'
+echo ' '
+# ================================================================================
