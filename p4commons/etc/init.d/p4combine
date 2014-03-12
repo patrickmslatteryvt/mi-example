@@ -1,0 +1,68 @@
+# start/stop/restart the jetty service with the p4combine configuration
+set -e
+. /lib/lsb/init-functions
+
+NAME=p4combine
+JETTY_HOME=/opt/jetty
+JETTY_PID=/var/run/$NAME.pid
+JAVA=$(which java)
+JETTY_PORT=9003
+TIMEOUT=30
+
+running()
+{
+  local PID=$(cat "$1" 2>/dev/null) || return 1
+  kill -0 "$PID" 2>/dev/null
+}
+
+case "$1" in
+  start)
+        echo -n "Starting $NAME webserver: "
+        if start-stop-daemon -S -p$JETTY_PID -d$JETTY_HOME --chuid jetty -b -m -a  $JAVA -- -Djetty.logs=/var/log/$NAME -Djetty.home=$JETTY_HOME -Djava.io.tmpdir=/tmp -jar $JETTY_HOME/start.jar -Djetty.port=$JETTY_PORT --ini= OPTIONS=Server,jsp,jmx,resources,websocket,ext etc/jetty-$NAME.xml --daemon
+        then
+          sleep 1
+          if running "$JETTY_PID"
+          then
+            RETVAL=0
+            echo "OK"
+          else
+            RETVAL=1
+            echo "FAILED"
+          fi
+        fi
+        ;;
+  stop)
+        echo -n "Stopping $NAME webserver: "
+        start-stop-daemon -K -p"$JETTY_PID" -d"$JETTY_HOME" -a "$JAVA" -s HUP
+        while running "$JETTY_PID"; do
+          TIMEOUT=$(($TIMEOUT-1));
+          if [ $TIMEOUT -eq 0 ]; then
+            start-stop-daemon -K -p"$JETTY_PID" -d"$JETTY_HOME" -a "$JAVA" -s KILL
+          fi
+           sleep 1
+        done
+
+        if running "$JETTY_PID"; then
+          echo FAILED
+        else
+          echo OK
+        fi
+        rm -f "$JETTY_PID"
+        RETVAL=$?
+        ;;
+  status)
+        status_of_proc $JAVA $NAME -p $JETTY_PID
+        RETVAL=$?
+        ;;
+  restart)
+        $0 stop
+    	$0 start
+        RETVAL=$?
+        ;;
+  *)
+        echo "Usage: $NAME {start|stop|status|restart}"
+        exit 1
+esac
+
+exit $RETVAL
+

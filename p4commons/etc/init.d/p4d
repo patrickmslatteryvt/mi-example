@@ -1,0 +1,84 @@
+#! /bin/sh
+#
+# p4d           Start the p4d daemon 
+
+. /lib/lsb/init-functions
+. /etc/p4d.conf
+
+running_check() 
+{
+    status_p4d=`ps axu | grep 'perforce' | grep 'p4d -d'`
+    if test -n "$status_p4d" ; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+running()
+{
+    running_check
+    if [ $? -eq "0" ]; then
+        echo "OK"
+        return 0
+    else
+        echo "FAILED"
+        return 1
+    fi
+}
+
+stop_running_loop() 
+{
+# wait for up to 1 minute
+    for i in $(seq 1 60)
+    do
+        running_check
+        if [ $? -eq "1" ]; then
+            echo "OK"
+            return 0
+        fi
+        sleep 1
+    done
+    
+    echo "FAILED"
+    return 1
+}
+
+RETVAL=0
+
+# See how we were called.
+case "$1" in
+  start)
+    echo -n "Starting Perforce server: "
+    su - perforce -c ". /etc/p4d.conf; p4d -d" > /dev/null
+    sleep 1
+    running
+    RETVAL=$?
+    ;;
+  stop)
+    echo -n "Stopping Perforce server: "
+    su - perforce -c ". /etc/p4d.conf; echo $COMMONSSUPERPASS | p4 -Zapp=Commons -u $COMMONSSUPER login; p4 -Zapp=Commons -u $COMMONSSUPER admin stop" >/dev/null
+    stop_running_loop
+    RETVAL=$?
+    ;;
+  status)
+    running_check
+    RETVAL=$?
+    if [ $RETVAL -eq "0" ]; then
+        echo "running"
+    else
+        echo "stopped"
+    fi
+    ;;
+  restart)
+    $0 stop
+    $0 start
+    RETVAL=$?
+    ;;
+  *)
+    echo "Usage: p4d {start|stop|status|restart}"
+    exit 1
+esac
+
+exit $RETVAL
+

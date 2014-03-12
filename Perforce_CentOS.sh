@@ -67,7 +67,7 @@ install_base() {
   # these may already be installed via kickstart but we'll call them
   # again here just in case as the script will fail without them
   echo ''
-  echo 'JIRA - Installing base packages...'
+  echo 'Perforce - Installing base packages...'
   yum update -y && yum install -y nano wget lsof patch
   # jq is a lightweight and flexible command-line JSON processor.
   curl http://stedolan.github.io/jq/download/linux64/jq -o /usr/local/sbin/jq
@@ -78,7 +78,7 @@ install_base() {
 
 install_nginx() {
   echo ''
-  echo 'JIRA - Installing nginx...'
+  echo 'Perforce - Installing nginx...'
   # http://nginx.org/packages/keys/nginx_signing.key
   echo "[nginx]">/etc/yum.repos.d/nginx.repo
   echo "name=nginx repo">>/etc/yum.repos.d/nginx.repo
@@ -97,7 +97,7 @@ install_nginx() {
 
 install_htop() {
   echo ''
-  echo 'JIRA - Installing htop...'
+  echo 'Perforce - Installing htop...'
   rpm -Uhv http://pkgs.repoforge.org/htop/htop-1.0.2-1.el6.rf.x86_64.rpm
 }
 
@@ -128,16 +128,16 @@ create_users() {
   # Add the admin user to the sudoers list
   # echo 'admin ALL=(ALL) ALL'>>/etc/sudoers
   echo ''
-  echo 'JIRA - Create the users to run JIRA under...'
+  echo 'Perforce - Create the users to run Perforce under...'
   # NOTE: 8 char max for user and group names
   # <username>,<password>,<GID>,<groupname>,<User detail>,<shell>
-  echo 'ujiraeap,MyWebGrocer2013#_eap,500,gjiraeap,Account for running the JIRA EAP instance under,/sbin/nologin'>~/users.txt
-  echo 'ujiradev,MyWebGrocer2013#_dev,501,gjiradev,Account for running the JIRA dev instance under,/sbin/nologin'>>~/users.txt
-  echo 'ujirastg,MyWebGrocer2013#_stg,502,gjirastg,Account for running the JIRA staging instance under,/sbin/nologin'>>~/users.txt
-  echo 'ujiraprd,MyWebGrocer2013#_prd,503,gjiraprd,Account for running the JIRA production instance under,/sbin/nologin'>>~/users.txt
-  echo 'ujiramig,MyWebGrocer2013#_mig,504,gjiramig,Account for running the JIRA migration processes under,/sbin/nologin'>>~/users.txt
+  echo 'up4broker,MyWebGrocer2013#_p4broker,500,gp4admin,Account for running the Perforce Broker under,/sbin/nologin'>~/users.txt
+  echo 'up4d,MyWebGrocer2013#_p4d,500,gp4admin,Account for running the Perforce depots under,/sbin/nologin'>>~/users.txt
+  echo 'up4web,MyWebGrocer2013#_p4web,500,gp4admin,Account for running the Perforce web server under,/sbin/nologin'>>~/users.txt
+  echo 'up4git,MyWebGrocer2013#_p4git,500,gp4admin,Account for running the Perforce GitFusion instance under,/sbin/nologin'>>~/users.txt
+  echo 'up4commons,MyWebGrocer2013#_p4commons,500,gp4admin,Account for running the Perforce Commons processes under,/sbin/nologin'>>~/users.txt
 
-  curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic https://raw.github.com/patrickmslatteryvt/shell/master/bash/create_users.sh -o ~/create_users.sh
+  curl -L -u ${GITHUB_PRIV_OAUTH_KEY}:x-oauth-basic https://raw.github.com/patrickmslatteryvt/shell/master/bash/create_users.sh -o ~/create_users.sh
   echo
   chmod -c +x ~/create_users.sh
   echo
@@ -178,7 +178,7 @@ install_java() {
   mkdir -p /opt/java
 
   echo ''
-  echo 'JIRA - Extracting Java binaries...'
+  echo 'Perforce - Extracting Java binaries...'
   # Extract the Java binaries from the gz file to the installation directory
   # Will extract as owned by uucp:143 if --no-same-owner is not used by the root user
   tar --no-same-owner -xvzf /tmp/server-${JAVA_VERSION}-linux-x64.tar.gz -C /opt/java 1>/dev/null
@@ -193,7 +193,7 @@ config_nginx() {
   echo ''
   echo 'Perforce - Configure Nginx reverse proxy...'
   # The nginx service is disabled by default, it needs a valid conf file setup for it first before we enable it
-  curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic https://raw.github.com/patrickmslatteryvt/joyent/master/mi-jira/nginx/nginx.conf -o /etc/nginx/nginx.conf
+  curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic https://raw.github.com/patrickmslatteryvt/mi-perforce/master/nginx/nginx.conf -o /etc/nginx/nginx.conf
   grep -i --color "Hello future GitHubber" /etc/nginx/nginx.conf
 
   # Replace the hostname stub with the CNAME that we are using (This could be the hostname, either way define the CNAME variable)
@@ -204,27 +204,27 @@ config_nginx() {
   sed -i "s/IP_ADDRESS/${IP_ADDRESS}/g" /etc/nginx/nginx.conf
   grep -i --color ${IP_ADDRESS} /etc/nginx/nginx.conf
   # Fix the /etc locations in the conf file (the conf file was written for SmartOS), log locations are the same in Linux and CentOS 6.x
-  sed -i "s@/opt/local/etc@/etc@g" /etc/nginx/nginx.conf
+#  sed -i "s@/opt/local/etc@/etc@g" /etc/nginx/nginx.conf
   # Fix the user name in the conf file (www in SmartOS, nginx in CentOS 6.x)
   sed -i "s@www www;@nginx nginx;@g" /etc/nginx/nginx.conf
   # Download the IP blocking conf file
-  curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic https://raw.github.com/patrickmslatteryvt/joyent/master/mi-jira/nginx/blockips.conf -o /etc/nginx/blockips.conf
+  curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic https://raw.github.com/patrickmslatteryvt/mi-perforce/master/nginx/blockips.conf -o /etc/nginx/blockips.conf
 
   # Create a directory for nginx status and error pages.
   mkdir -p /srv/www/MWG_images
   cp /usr/share/nginx/html/* /srv/www/
   # 404 background image
-  curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic https://raw.github.com/patrickmslatteryvt/joyent/master/mi-jira/images/maint_background.gif -o /srv/www/MWG_images/maint_background.gif
+  curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic https://raw.github.com/patrickmslatteryvt/mi-perforce/master/images/maint_background.gif -o /srv/www/MWG_images/maint_background.gif
 
   # download the static error pages
   mkdir -p /srv/www/error
   mv /srv/www/50x.html /srv/www/error/50x.html
-  curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic https://raw.github.com/patrickmslatteryvt/joyent/master/mi-jira/nginx/403.html -o /srv/www/error/403.html
-  curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic https://raw.github.com/patrickmslatteryvt/joyent/master/mi-jira/nginx/502.html -o /srv/www/error/502.html
-  curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic https://raw.github.com/patrickmslatteryvt/joyent/master/mi-jira/nginx/503.html -o /srv/www/error/503.html
+  curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic https://raw.github.com/patrickmslatteryvt/mi-perforce/master/nginx/403.html -o /srv/www/error/403.html
+  curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic https://raw.github.com/patrickmslatteryvt/mi-perforce/master/nginx/502.html -o /srv/www/error/502.html
+  curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic https://raw.github.com/patrickmslatteryvt/mi-perforce/master/nginx/503.html -o /srv/www/error/503.html
 
   # Create self signed SSL Cert for HTTPS
-  curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic https://raw.github.com/patrickmslatteryvt/shell/master/bash/generateSSLSelfSignCert.sh -o ~/generateSSLSelfSignCert.sh
+  curl -L -u ${GITHUB_PRIV_OAUTH_KEY}:x-oauth-basic https://raw.github.com/patrickmslatteryvt/shell/master/bash/generateSSLSelfSignCert.sh -o ~/generateSSLSelfSignCert.sh
   chmod -c +x ~/generateSSLSelfSignCert.sh
   ~/generateSSLSelfSignCert.sh
   # If the CNAME is not the same as the hostname then rename the self signed keys or else nginx won't start
@@ -319,14 +319,14 @@ config_firewall() {
   echo -e "\tAllow ping from inside to outside"
   iptables -A OUTPUT -o eth0 -p icmp --icmp-type echo-request -j ACCEPT
   iptables -A INPUT -i eth0 -p icmp --icmp-type echo-reply -j ACCEPT
-  # Testcase ping mwgwinvtdc01.internal.mywebgrocer.com
+  # Testcase ping wvt2012r2stdco.devdmz.mywebgrocer.com
   echo -e "\tAllow local loopback access"
   iptables -A INPUT -i lo -j ACCEPT
   iptables -A OUTPUT -o lo -j ACCEPT
   echo -e "\tAllow outbound DNS"
   iptables -A OUTPUT -p udp -o eth0 --dport 53 -j ACCEPT
   iptables -A INPUT -p udp -i eth0 --sport 53 -j ACCEPT
-  # Testcase ping mwgwinvtdc01.internal.mywebgrocer.com
+  # Testcase ping wvt2012r2stdco.devdmz.mywebgrocer.com
   echo -e "\tAllow Sendmail or Postfix Traffic"
   # iptables -A INPUT -i eth0 -p tcp --dport 25 -m state --state NEW,ESTABLISHED -j ACCEPT
   iptables -A INPUT -i eth0 -p tcp --dport 25 -m state --state ESTABLISHED -j ACCEPT
@@ -425,40 +425,30 @@ sudo wget $WGETGLOBALS $P4SCRIPTS_DOWNLOAD/P4WEBMIMEFILE --output-document=/meta
 config_p4_initd() {
   echo ''
   echo 'Perforce - Setup service instances for Perforce...'
-  # Linux is 10 years behind Solaris in this respect
+  # RH based Linux distros are 10 years behind SMF in Solaris in this respect
 
   # Download the Perforce init scripts from Github
-  curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic https://raw.github.com/patrickmslatteryvt/joyent/master/mi-jira/init.d/p4broker -o /etc/init.d/p4broker
-  curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic https://raw.github.com/patrickmslatteryvt/joyent/master/mi-jira/init.d/p4d -o /etc/init.d/p4d
-  curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic https://raw.github.com/patrickmslatteryvt/joyent/master/mi-jira/init.d/p4d_sideload -o /etc/init.d/p4d_sideload
-  curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic https://raw.github.com/patrickmslatteryvt/joyent/master/mi-jira/init.d/p4web -o /etc/init.d/p4web
+  curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic https://raw.github.com/patrickmslatteryvt/mi-perforce/master/init.d/p4broker -o /etc/init.d/p4broker
+  curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic https://raw.github.com/patrickmslatteryvt/mi-perforce/master/init.d/p4d -o /etc/init.d/p4d
+  curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic https://raw.github.com/patrickmslatteryvt/mi-perforce/master/init.d/p4d_sideload -o /etc/init.d/p4d_sideload
+  curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic https://raw.github.com/patrickmslatteryvt/mi-perforce/master/init.d/p4web -o /etc/init.d/p4web
 
-  # Replace the _CNAME_ stub with the CNAME that we are using
-  for ENVIRONMENT in eap dev stg prd
-  do
-    sed -i "s/_CNAME_/${CNAME}/g" /etc/init.d/jira_${ENVIRONMENT}
-    grep -i --color ${CNAME} /etc/init.d/jira_${ENVIRONMENT}
-  done
-
-  # Make the JIRA init scripts executable
-  chmod -c +x /etc/init.d/jira_*
+  # Make the Perforce init scripts executable
+  chmod -c +x /etc/init.d/p4*
 
   # Create the RHEL services
-  /sbin/chkconfig --add jira_eap
-  /sbin/chkconfig --add jira_dev
-  /sbin/chkconfig --add jira_stg
-  /sbin/chkconfig --add jira_prd
+  /sbin/chkconfig --add p4broker
+  /sbin/chkconfig --add p4d
+  /sbin/chkconfig --add p4d_sideload
+  /sbin/chkconfig --add p4web
 
   # Set the services to autostart in the necessary runlevels
-  /sbin/chkconfig --level 345 jira_eap on
-  /sbin/chkconfig --level 345 jira_dev on
-  /sbin/chkconfig --level 345 jira_stg on
-  /sbin/chkconfig --level 345 jira_prd on
+  /sbin/chkconfig --level 345 p4broker on
+  /sbin/chkconfig --level 345 p4d on
+  /sbin/chkconfig --level 345 p4d_sideload on
+  /sbin/chkconfig --level 345 p4web on
 
   # Do not start services at this time, they must be properly setup first
-  # service jira_dev start
-  # service jira_stg start
-  # service jira_prd start
 }
 
 # ================================================================================
@@ -489,17 +479,17 @@ config_sshd_banner() {
 
 config_ntp() {
   echo ''
-  echo 'Configure NTP settings...'
+  echo 'Perforce - Configure NTP settings...'
   cp /etc/ntp.conf /etc/ntp.conf.default
   echo '#' company NTP servers>/etc/ntp.conf
-  echo server mwgwinvtdc01.internal.mywebgrocer.com iburst>>/etc/ntp.conf
+  echo server wvt2012r2stdco.devdmz.mywebgrocer.com iburst>>/etc/ntp.conf
   echo '#' restrict everything>>/etc/ntp.conf
   echo restrict default ignore>>/etc/ntp.conf
   echo '#' allow access via the loopback network>>/etc/ntp.conf
   echo restrict 127.0.0.1>>/etc/ntp.conf
   echo '#' allow access to the company NTP servers>>/etc/ntp.conf
   echo '#' you must use numeric addresses here>>/etc/ntp.conf
-  echo restrict mwgwinvtdc01.internal.mywebgrocer.com>>/etc/ntp.conf
+  echo restrict wvt2012r2stdco.devdmz.mywebgrocer.com>>/etc/ntp.conf
   echo '#' if you wanted to serve time to other systems on on the 10.17.0.0/16 network, you would add a line like the one below>>/etc/ntp.conf
   echo '#' restrict 10.17.0.0 netmask 255.255.0.0 nomodify>>/etc/ntp.conf
   echo '#' use the local clock fudged down to stratum 10 as a last resort if the company NTP servers are not reachable>>/etc/ntp.conf
@@ -508,19 +498,19 @@ config_ntp() {
   echo '#' specify the location of the drift file>>/etc/ntp.conf
   echo '#' this contains the systemic frequency correction for your hardware. >>/etc/ntp.conf
   echo driftfile /var/lib/ntp/drift>>/etc/ntp.conf
-  echo mwgwinvtdc01.internal.mywebgrocer.com>/etc/ntp/step-tickers
+  echo wvt2012r2stdco.devdmz.mywebgrocer.com>/etc/ntp/step-tickers
   # Enable the NTPD service
   chkconfig --level 345 ntpd on
   service ntpd start
   # Check our drift
-  ntpdate -q mwgwinvtdc01.internal.mywebgrocer.com
+  ntpdate -q wvt2012r2stdco.devdmz.mywebgrocer.com
 }
 
 # ================================================================================
 
 config_crontab() {
   echo ''
-  echo 'Setup contab jobs for Perforce...'
+  echo 'Perforce - Setup contab jobs'
   echo  "# MAILTO=${PERFORCE_ADMINS}">/root/crontab.input.perforce
   echo  '# Example of job definition'>>/root/crontab.input.perforce
   echo  '# .---------------- minute (0 - 59)'>>/root/crontab.input.perforce
@@ -531,7 +521,7 @@ config_crontab() {
   echo  '# |  |  |  |  |'>>/root/crontab.input.perforce
   echo  '# *  *  *  *  * user-name command to be executed'>>/root/crontab.input.perforce
   echo  '#':>>/root/crontab.input.perforce
-  crontab -u uperforce /root/crontab.input.perforce
+  crontab -u up4d /root/crontab.input.perforce
   rm -f /root/crontab.input.perforce
   done
 }
@@ -540,7 +530,7 @@ config_crontab() {
 
 config_env() {
   echo ''
-  echo 'Configure shell environment...'
+  echo 'Perforce - Configure shell environment...'
   touch /etc/profile.d/environ.sh
   echo export EDITOR=/bin/nano>/etc/profile.d/environ.sh
   echo export VISUAL=/bin/nano>>/etc/profile.d/environ.sh
@@ -581,8 +571,8 @@ config_postfix() {
   # Send the Perforce admin root's email.
   sed -i 's/#root/root/g' /etc/aliases
   sed -i "s/marc/${PERFORCE_ADMINS}/g" /etc/aliases
-  # Since cron runs the proxy sync jobs as user uperforce, that user will get any mail if there are sync errors etc.
-  echo "uperforce:       ${PERFORCE_ADMINS}">>/etc/aliases
+  # Since cron runs the proxy sync jobs as user up4d, that user will get any mail if there are sync errors etc.
+  echo "up4d:       ${PERFORCE_ADMINS}">>/etc/aliases
   # recompile the alias file
   newaliases
 }
