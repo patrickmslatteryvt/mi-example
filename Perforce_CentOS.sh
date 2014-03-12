@@ -110,7 +110,7 @@ install_vmtools() {
   rpm --import http://packages.vmware.com/tools/keys/VMWARE-PACKAGING-GPG-RSA-KEY.pub
   echo "[vmware-tools]">/etc/yum.repos.d/vmware-tools.repo
   echo "name=VMware Tools">>/etc/yum.repos.d/vmware-tools.repo
-  echo "baseurl=http://packages.vmware.com/tools/esx/5.5p01/rhel6/x86_64/repodata/repomd.xml">>/etc/yum.repos.d/vmware-tools.repo
+  echo "baseurl=http://packages.vmware.com/tools/esx/latest/rhel6/x86_64">>/etc/yum.repos.d/vmware-tools.repo
   echo "enabled=1">>/etc/yum.repos.d/vmware-tools.repo
   echo "gpgcheck=1">>/etc/yum.repos.d/vmware-tools.repo
   # Install VMware Tools
@@ -350,17 +350,27 @@ sed -i "s@netview-aix-8   1668/tcp                # netview-aix-8@p4d-sideload  
 # ================================================================================
 
 create_p4_dirs() {
+# REQUIRES USERS TO EXIST FIRST
+
 # Don't create the directories if they already exist
 [[ -d /metadata ]] || mkdir -p /metadata
 [[ -d $P4BIN_DIR ]] || mkdir -p $P4BIN_DIR
 [[ -d /p4logs ]] || mkdir -p /p4logs
 # mkdir -p /home/perforce/p4-broker     # Create the users before we create these folders
 # mkdir -p /home/perforce/depot
+
+chown -Rc uperforce:gp4admin /depotdata
+chown -Rc uperforce:gp4admin /metadata
+chown -Rc uperforce:gp4admin /p4logs
+chown -Rc uperforce:gp4admin /home/perforce
+
 }
 
 # ================================================================================
 
 install_p4() {
+# REQUIRES USERS TO EXIST FIRST
+
 # Don't download if the files already exist
 [[ -f $P4BIN_DIR/SHA256SUMS ]] || wget $WGETGLOBALS $P4BIN_DOWNLOAD/$P4BIN_VERSION/$P4BIN_PLATFORM/SHA256SUMS --output-document=$P4BIN_DIR/SHA256SUMS
 [[ -f $P4BIN_DIR/p4ftpd ]] || wget $WGETGLOBALS $P4BIN_DOWNLOAD/$P4BIN_VERSION/$P4BIN_PLATFORM/p4ftpd --output-document=$P4BIN_DIR/p4ftpd
@@ -404,10 +414,7 @@ touch /p4logs/p4broker.log
 touch /p4logs/p4web.log
 touch /home/perforce/.p4tickets
 # echo localhost:1666=p4builduser:C2CB31A82FC0B52F49E867A117532AC1>/home/perforce/.p4tickets
-chown -Rc perforce:p4admin /depotdata
-chown -Rc perforce:p4admin /metadata
-chown -Rc perforce:p4admin /p4logs
-chown -Rc perforce:p4admin /home/perforce
+
 
 # Generate default p4broker.conf file
 # $P4BIN_DIR/p4broker -C>/metadata/p4broker.conf.default
@@ -509,6 +516,7 @@ config_ntp() {
 # ================================================================================
 
 config_crontab() {
+# REQUIRES USERS TO EXIST FIRST
   echo ''
   echo 'Perforce - Setup contab jobs'
   echo  "# MAILTO=${PERFORCE_ADMINS}">/root/crontab.input.perforce
