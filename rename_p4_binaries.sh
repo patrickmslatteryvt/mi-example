@@ -8,6 +8,5 @@ do
     mv --verbose $f $f.$VERSION
   else
     echo "File '$f' is not executable"
-  done
   fi
 done
