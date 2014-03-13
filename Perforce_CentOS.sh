@@ -37,7 +37,7 @@ export_vars() {
 
   # Who will email be sent to? If not defined send to the default
   if [ -z ${PERFORCE_ADMINS} ]; then
-    PERFORCE_ADMINS=pslattery@mywebgrocer.com
+    PERFORCE_ADMINS=pslattery+perforce@mywebgrocer.com
   fi
 
   # CNAME=sourcecode.mywebgrocer.com
@@ -600,9 +600,9 @@ config_nginx
 config_network
 config_firewall
 config_etc-services
-create_p4_dirs
-install_p4
-config_p4_initd
+#create_p4_dirs
+#install_p4
+#config_p4_initd
 config_sshd_banner
 config_ntp
 config_crontab
