@@ -1,0 +1,186 @@
+#!/bin/bash
+### BEGIN INIT INFO
+# chkconfig: 2345 92 05
+# Provides:          jira_stg
+# Required-Start:    $local_fs $network 
+# Required-Stop:     $local_fs $network
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# X-Interactive:     false
+# Short-Description: Start/stop p4broker
+# Description:       Start/stop Perforce Broker
+### END INIT INFO
+
+umask u=rwx,g=rx,o=rx   # = 0022
+# The default umask 002 used for normal user. With this mask default directory permissions are 775 and default file permissions are 664.
+# The default umask for the root user is 022 result into default directory permissions are 755 and default file permissions are 644.
+# For directories, the base permissions are (rwxrwxrwx) 0777 and for files they are 0666 (rw-rw-rw)
+
+# Console text colors
+RED='\e[1;31m' # red console text
+NC='\e[0m' # Switch console text back to regular (no color)
+
+# Use LSB init script functions for printing messages
+LSB_FUNCTIONS="/lib/lsb/init-functions"
+if test -f ${LSB_FUNCTIONS} ; then
+  . ${LSB_FUNCTIONS}
+else
+  log_success_msg()
+  {
+    echo -e " SUCCESS! $@"
+  }
+  log_failure_msg()
+  {
+    echo -e "${RED} ERROR! $@ ${NC}"
+  }
+fi
+
+# Handle SELinux variances
+if [ -x "/sbin/runuser" ]; then
+  SU="/sbin/runuser -s /bin/bash"
+else
+  SU="/bin/su -s /bin/bash"
+fi
+
+# Name of app
+APP_NAME=`basename $0`
+APP_DESC="Perforce Broker (${APP_NAME})"
+
+# Read in the conf file for this daemon instance
+. /p4/1/etc/p4d.conf
+
+# Check startup binaries exist
+test -x ${P4D_DAEMON} || { log_failure_msg "${P4D_DAEMON} not found";
+if [ "$1" = "stop" ]; then exit 0;
+else exit 5; fi; }
+
+# Get the system uptime in seconds (as an integer)
+UPTIME=$(cat /proc/uptime|awk '{print $1}'| cut -d "." -f 1)
+
+case "$1" in
+  # Start command
+  start)
+    if [ ! -f ${P4D_METADATA}/configured ]; then
+      echo "This Perforce instance has not been configured yet."
+      echo "The instance will not be started until it has been configured."
+      exit 1
+    fi
+    STATUS=$( ps aux | grep "[c]atalina.base=$CATALINA_HOME" | wc -l )
+      if [ ${STATUS} -gt 0 ]; then
+        log_failure_msg "$APP_DESC is already running."
+      else
+        # Wait for the jira_prd instance to start before we start the jira_stg instance, if this takes longer than 180 seconds then just go ahead and start jira_stg
+        # If we don't do this on Linux then all the services try to start at the same time during system startup and we end up with four locked JIRA instances as they take too long to init and run into the JIRA startup timeout
+        # This wait time can be ignored if the uptime of the system is greater than 10 minutes (600 seconds) as in this case it should be just a regular service restart
+        # The new Upstart init daemon _should_ be able solve this problem but it does not seem to be correctly accounting for slow starting services such as JIRA under RHEL/CentOS v6.x
+        # SMF is _so_ much better...
+        if [ ${UPTIME} -lt 600 ]; then
+          JIRA_PRD_STATUS=0
+          WAIT_FOR=180 # seconds
+          START=${SECONDS}
+          END=$((SECONDS+${WAIT_FOR}))
+          echo -n "Service jira_prd is not started, waiting ${WAIT_FOR} seconds for service jira_prd to start: "
+          while [ ${SECONDS} -lt ${END} ]
+          do
+            JIRA_PRD_STATUS=$( curl --max-time 10 --silent -k https://_CNAME_/rest/api/2/serverInfo?doHealthCheck=true | grep "baseUrl" | wc -l )
+            if [ ${JIRA_PRD_STATUS} -gt 0 ]
+            then
+              log_success_msg "JIRA PRD has started."
+              echo "Elapsed wait time:" ${SECONDS} "seconds"
+              break
+            else
+              sleep 3
+              echo -n "."
+            fi
+          done
+        fi
+        echo "Starting $APP_DESC"
+        ${SU} -m ${USER} -c "cd ${CATALINA_HOME}/logs && ${CATALINA_HOME}/bin/startup.sh &> /dev/null"
+      fi
+  ;;
+  # Stop command
+  stop)
+    STATUS=$( ps aux | grep "[c]atalina.base=$CATALINA_HOME" | wc -l )
+      if [ ${STATUS} -gt 0 ]; then
+        echo "Stopping ${APP_DESC}"
+        ${SU} -m ${USER} -c "${CATALINA_HOME}/bin/shutdown.sh &> /dev/null"
+        log_success_msg "${APP_DESC} stopped successfully"
+      else
+        log_failure_msg "${APP_DESC} is not running."
+      fi
+  ;;
+  # Restart command
+  restart)
+    $0 stop
+    sleep 5
+    $0 start
+  ;;
+  # Status command
+  status)
+    if [ ! -f ${METADATA}/configured ]; then
+      echo "This Perforce instance (${APP_NAME}) has not been configured yet."
+      exit 1
+    fi
+    STATUS=$( ps aux | grep "[c]atalina.base=$CATALINA_HOME" | wc -l )
+      if [ ${STATUS} -gt 0 ]; then
+        log_success_msg "${APP_NAME} - ($APP_DESC) is running."
+        JIRA_STATUS=$(curl --max-time 10 --silent -k https://_CNAME_/${APP_INSTANCE}/rest/api/2/serverInfo?doHealthCheck=true | grep "baseUrl" | wc -l )
+        if [ ${JIRA_STATUS} -gt 0 ]
+        then
+          log_success_msg "${APP_NAME} - ($APP_DESC) is responding to REST queries."
+          JIRA_STATUS=$(curl --max-time 10 --silent -k https://_CNAME_/${APP_INSTANCE}/rest/api/2/serverInfo?doHealthCheck=true | grep ":false" | wc -l )
+          if [ ${JIRA_STATUS} -gt 0 ]
+          then
+            log_failure_msg "${APP_NAME} - ($APP_DESC) is _NOT_ responding to database queries."
+          else
+            log_success_msg "${APP_NAME} - ($APP_DESC) is responding to database queries."
+          fi
+        else
+          log_failure_msg "${APP_NAME} - ($APP_DESC) is _NOT_ responding to REST queries."
+        fi        
+        JIRA_SERVERTITLE=$( curl --max-time 10 --silent -k https://_CNAME_/${APP_INSTANCE}/rest/api/2/serverInfo?doHealthCheck=true | /usr/local/sbin/jq --monochrome-output --raw-output --ascii-output '.serverTitle')
+        JIRA_VERSION=$( curl --max-time 10 --silent -k https://_CNAME_/${APP_INSTANCE}/rest/api/2/serverInfo?doHealthCheck=true | /usr/local/sbin/jq --monochrome-output --raw-output --ascii-output '.version')
+        JIRA_BASEURL=$( curl --max-time 10 --silent -k https://_CNAME_/${APP_INSTANCE}/rest/api/2/serverInfo?doHealthCheck=true | /usr/local/sbin/jq --monochrome-output --raw-output --ascii-output '.baseUrl')
+        echo " JIRA title   : " ${JIRA_SERVERTITLE}
+        echo " JIRA version : " ${JIRA_VERSION}
+        echo " JIRA baseURL : " ${JIRA_BASEURL}
+      else
+        log_failure_msg "${APP_NAME} - ($APP_DESC) is not running."
+      fi
+    ;;
+  # maint command - Put system in/out of maintenance mode (via broker redirection)
+  maint)
+    if [ ${MAINT_MODE} = 0 ]; then
+      ln -s ${METADATA}/p4broker.conf.down ${METADATA}/p4broker.conf
+      MAINT_MODE=1
+    else
+      ln -s ${METADATA}/p4broker.conf.up ${METADATA}/p4broker.conf
+      MAINT_MODE=0
+    fi
+  ;;
+  # logtail command
+  logtail)
+    STATUS=$( ps aux | grep "${P4LOG}" | grep -v grep | wc -l )
+      if [ ${STATUS} -gt 0 ]; then
+        PID=$( ps aux | grep "${P4LOG}" | grep -v grep | awk '{print $2}' )
+        tail -n 40 -f ${P4LOG} --pid=${PID}
+      else
+        tail -n 40 ${P4LOG}
+        # /p4logs/${P4D_INSTANCE}/p4broker.log
+      fi
+  ;;
+  *)
+    echo "Usage: /etc/init.d/${APP_NAME} {start|restart|stop|status|logtail}"
+    exit 1
+  ;;
+esac
+
+exit 0
+
+./p4d.2013.3.784164 -d -A auditlog -J journal -L log -p port -r root
+/depotdata/p4/common/bin/p4d.2013.3.784164 -d -A /p4logs/1/audit.log -J /p4logs/1/p4d.journal -L /p4logs/1/p4d.log -p 1667 -r /metadata/1
+ps aux|grep "p4"
+/depotdata/p4/common/bin/p4d.2013.3.784164 -d -A /p4logs/1/audit.log -J /p4logs/1/journal -L /p4logs/1/p4d.log -p 1667 -r /metadata/1
+
+
+${P4LOG}

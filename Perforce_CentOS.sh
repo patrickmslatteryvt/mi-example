@@ -356,14 +356,49 @@ sed -i "s@netview-aix-8   1668/tcp                # netview-aix-8@p4d-sideload  
 create_p4_dirs() {
 # REQUIRES USERS TO EXIST FIRST
 
-# Don't create the directories if they already exist
-[[ -d /metadata ]] || mkdir -p /metadata
+mkdir -p /depotdata/p4/{1,2}/{checkpoints,depots,bin,etc,tmp}
+mkdir -p /metadata/p4/{1,2}/{root,offline_db}
+mkdir -p /p4logs/p4/{1,2}/logs
+mkdir -p /p4/{1,2}
 [[ -d $P4BIN_DIR ]] || mkdir -p $P4BIN_DIR
-[[ -d /p4logs ]] || mkdir -p /p4logs
 # If the home directory does not exist then exit
 [[ -d /home/uperforce ]] || exit 3
-mkdir -p /home/uperforce/p4-broker
-mkdir -p /home/uperforce/depot
+mkdir -p /home/uperforce/{p4-broker,depot}
+
+# Create our symlink tree
+# /p4/common          -->        /depotdata/p4/common/bin
+# /p4/1
+#     /checkpoints    -->        /depotdata/p4/1/checkpoints
+#     /depots         -->        /depotdata/p4/1/depots
+#     /bin            -->        /depotdata/p4/1/bin
+#     /etc            -->        /depotdata/p4/1/etc
+#     /tmp            -->        /depotdata/p4/1/tmp
+#     /root           -->        /metadata/p4/1/root
+#     /offline_db     -->        /metadata/p4/1/offline_db
+#     /logs           -->        /p4logs/p4/1/logs
+
+ln -s /depotdata/p4/common/bin /p4/common
+# THIS ISN'T WORKING!!!
+for INSTANCE in 1 2
+do
+  for DIR in checkpoints depots bin etc tmp
+  do
+    ln -s /depotdata/p4/${INSTANCE}/${DIR} /p4/${INSTANCE}/${DIR}
+  done
+done
+
+for INSTANCE in 1 2
+do
+  for DIR in root offline_db
+  do
+    ln -s /metadata/p4/${INSTANCE}/${DIR} /p4/${INSTANCE}/${DIR}
+  done
+done
+
+for INSTANCE in 1 2
+do
+  ln -s /p4logs/p4/${INSTANCE}/logs /p4/${INSTANCE}/logs
+done
 
 chown -Rc uperforce:gp4admin /depotdata
 chown -Rc uperforce:gp4admin /metadata
@@ -430,16 +465,24 @@ curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic https://raw.github.com/patrickmslat
 chmod -c +x ~/rename_p4_binaries.sh
 ~/rename_p4_binaries.sh
 
-ln -s $P4BIN_DIR/p4d.????.?.?????? /metadata/p4d
-ln -s $P4BIN_DIR/p4broker.????.?.?????? /metadata/p4broker
-ln -s $P4BIN_DIR/p4web.????.?.?????? /metadata/p4web
-ln -s $P4BIN_DIR/p4.????.?.?????? /metadata/p4
+ln -s $P4BIN_DIR/p4d.????.?.?????? /p4/1/bin/p4d
+ln -s $P4BIN_DIR/p4broker.????.?.?????? /p4/1/bin/p4broker
+ln -s $P4BIN_DIR/p4web.????.?.?????? /p4/1/bin/p4web
+ln -s $P4BIN_DIR/p4.????.?.?????? /p4/1/bin/p4
 
 touch /p4logs/p4d.log
 touch /p4logs/p4d_audit.log
 touch /p4logs/p4broker.log
 touch /p4logs/p4web.log
 touch /home/uperforce/.p4tickets
+
+for INSTANCE in 1 2
+do
+  for LOGFILE in p4d.log p4d_audit.log p4broker.log p4web.log
+  do
+    touch /p4logs/p4/${INSTANCE}/${DIR}
+  done
+done
 
 # Download the customised p4broker conf files
 for FILENAME in p4broker.conf.up p4broker.conf.down p4broker_sideload_p4web.conf.up p4broker_sideload_p4web.conf.down P4WEBMIMEFILE

@@ -11,6 +11,11 @@
 # Description:       Start/stop Perforce Broker
 ### END INIT INFO
 
+umask u=rwx,g=rx,o=rx   # = 0022
+# The default umask 002 used for normal user. With this mask default directory permissions are 775 and default file permissions are 664.
+# The default umask for the root user is 022 result into default directory permissions are 755 and default file permissions are 644.
+# For directories, the base permissions are (rwxrwxrwx) 0777 and for files they are 0666 (rw-rw-rw)
+
 # Console text colors
 RED='\e[1;31m' # red console text
 NC='\e[0m' # Switch console text back to regular (no color)
@@ -39,71 +44,41 @@ fi
 
 # Name of app
 APP_NAME=`basename $0`
-APP_INSTANCE=$(echo `basename $0` | cut -d "_" -f 2)
-APP_DESC="Perforce Broker"
-# Name of the user to run as
-USER=uperforce
-# Location of application's instance specific bin directory
-METADATA=/????
-DEPOTDATA
-P4LOGS
+APP_DESC="Perforce Broker (${APP_NAME})"
+PIDFILE=/var/run/${APP_NAME}.pid
+
+# Read in the conf file for this daemon instance
+. /p4/1/etc/p4d.conf
 
 # Check startup binaries exist
-P4_STARTUP=${CATALINA_HOME}/bin/startup.sh
-test -x ${JIRA_STARTUP} || { log_failure_msg "${JIRA_STARTUP} not found";
+test -x ${P4BROKER_DAEMON} || { log_failure_msg "${P4BROKER_DAEMON} not found";
 if [ "$1" = "stop" ]; then exit 0;
 else exit 5; fi; }
-
-# Get the system uptime in seconds (as an integer)
-UPTIME=$(cat /proc/uptime|awk '{print $1}'| cut -d "." -f 1)
+# Should also check for daemon conf file as well
 
 case "$1" in
   # Start command
   start)
-    if [ ! -f /jira/${APP_INSTANCE}/configured ]; then
-      echo "This Perforce instance (${APP_NAME}) has not been configured yet."
+    if [ ! -f ${P4D_METADATA}/configured ]; then
+      echo "This Perforce instance has not been configured yet."
       echo "The instance will not be started until it has been configured."
       exit 1
     fi
-    STATUS=$( ps aux | grep "[c]atalina.base=$CATALINA_HOME" | wc -l )
+    STATUS=$( ps aux | grep "${P4LOG}" | grep -v grep | wc -l )
       if [ ${STATUS} -gt 0 ]; then
         log_failure_msg "$APP_DESC is already running."
       else
-        # Wait for the jira_prd instance to start before we start the jira_stg instance, if this takes longer than 180 seconds then just go ahead and start jira_stg
-        # If we don't do this on Linux then all the services try to start at the same time during system startup and we end up with four locked JIRA instances as they take too long to init and run into the JIRA startup timeout
-        # This wait time can be ignored if the uptime of the system is greater than 10 minutes (600 seconds) as in this case it should be just a regular service restart
-        # The new Upstart init daemon _should_ be able solve this problem but it does not seem to be correctly accounting for slow starting services such as JIRA under RHEL/CentOS v6.x
-        # SMF is _so_ much better...
-        if [ ${UPTIME} -lt 600 ]; then
-          JIRA_PRD_STATUS=0
-          WAIT_FOR=180 # seconds
-          START=${SECONDS}
-          END=$((SECONDS+${WAIT_FOR}))
-          echo -n "Service jira_prd is not started, waiting ${WAIT_FOR} seconds for service jira_prd to start: "
-          while [ ${SECONDS} -lt ${END} ]
-          do
-            JIRA_PRD_STATUS=$( curl --max-time 10 --silent -k https://_CNAME_/rest/api/2/serverInfo?doHealthCheck=true | grep "baseUrl" | wc -l )
-            if [ ${JIRA_PRD_STATUS} -gt 0 ]
-            then
-              log_success_msg "JIRA PRD has started."
-              echo "Elapsed wait time:" ${SECONDS} "seconds"
-              break
-            else
-              sleep 3
-              echo -n "."
-            fi
-          done
-        fi
         echo "Starting $APP_DESC"
-        ${SU} -m ${USER} -c "cd ${CATALINA_HOME}/logs && ${CATALINA_HOME}/bin/startup.sh &> /dev/null"
+        ${SU} -m ${P4D_USER} -c "${P4BROKER_DAEMON} -c ${P4D_ROOT}/${APP_NAME}.conf -d"
+        # /depotdata/p4/common/bin/p4d.2013.3.784164 -d -A /p4logs/1/audit.log -J /p4logs/1/journal -L /p4logs/1/p4d.log -p 1667 -r /metadata/1      
       fi
   ;;
   # Stop command
   stop)
-    STATUS=$( ps aux | grep "[c]atalina.base=$CATALINA_HOME" | wc -l )
+    STATUS=$( ps aux | grep "${P4LOG}" | grep -v grep | wc -l )
       if [ ${STATUS} -gt 0 ]; then
         echo "Stopping ${APP_DESC}"
-        ${SU} -m ${USER} -c "${CATALINA_HOME}/bin/shutdown.sh &> /dev/null"
+        ${SU} -m ${P4D_USER} -c "kill -s TERM p4broker-parent-pid"       
         log_success_msg "${APP_DESC} stopped successfully"
       else
         log_failure_msg "${APP_DESC} is not running."
@@ -117,45 +92,42 @@ case "$1" in
   ;;
   # Status command
   status)
-    if [ ! -f /jira/${APP_INSTANCE}/configured ]; then
-      echo "This JIRA instance (${APP_NAME}) has not been configured yet."
+    if [ ! -f ${METADATA}/${P4D_INSTANCE}/configured ]; then
+      echo "This Perforce instance (${APP_NAME}) has not been configured yet."
       exit 1
     fi
-    STATUS=$( ps aux | grep "[c]atalina.base=$CATALINA_HOME" | wc -l )
+    STATUS=$( ps aux | grep "${P4LOG}" | grep -v grep | wc -l )
       if [ ${STATUS} -gt 0 ]; then
         log_success_msg "${APP_NAME} - ($APP_DESC) is running."
-        JIRA_STATUS=$(curl --max-time 10 --silent -k https://_CNAME_/${APP_INSTANCE}/rest/api/2/serverInfo?doHealthCheck=true | grep "baseUrl" | wc -l )
-        if [ ${JIRA_STATUS} -gt 0 ]
-        then
-          log_success_msg "${APP_NAME} - ($APP_DESC) is responding to REST queries."
-          JIRA_STATUS=$(curl --max-time 10 --silent -k https://_CNAME_/${APP_INSTANCE}/rest/api/2/serverInfo?doHealthCheck=true | grep ":false" | wc -l )
-          if [ ${JIRA_STATUS} -gt 0 ]
-          then
-            log_failure_msg "${APP_NAME} - ($APP_DESC) is _NOT_ responding to database queries."
-          else
-            log_success_msg "${APP_NAME} - ($APP_DESC) is responding to database queries."
-          fi
-        else
-          log_failure_msg "${APP_NAME} - ($APP_DESC) is _NOT_ responding to REST queries."
-        fi        
-        JIRA_SERVERTITLE=$( curl --max-time 10 --silent -k https://_CNAME_/${APP_INSTANCE}/rest/api/2/serverInfo?doHealthCheck=true | /usr/local/sbin/jq --monochrome-output --raw-output --ascii-output '.serverTitle')
-        JIRA_VERSION=$( curl --max-time 10 --silent -k https://_CNAME_/${APP_INSTANCE}/rest/api/2/serverInfo?doHealthCheck=true | /usr/local/sbin/jq --monochrome-output --raw-output --ascii-output '.version')
-        JIRA_BASEURL=$( curl --max-time 10 --silent -k https://_CNAME_/${APP_INSTANCE}/rest/api/2/serverInfo?doHealthCheck=true | /usr/local/sbin/jq --monochrome-output --raw-output --ascii-output '.baseUrl')
-        echo " JIRA title   : " ${JIRA_SERVERTITLE}
-        echo " JIRA version : " ${JIRA_VERSION}
-        echo " JIRA baseURL : " ${JIRA_BASEURL}
       else
         log_failure_msg "${APP_NAME} - ($APP_DESC) is not running."
       fi
     ;;
+  # maint command - Put system in/out of maintenance mode (via broker redirection)
+  maint)
+    if [ ${MAINT_MODE} = 0 ]; then
+      echo "Do you want to put the Perforce Broker into maintenance mode?"
+      select yn in "Yes" "No"; do
+          case $yn in
+              Yes ) ln -s ${METADATA}/${P4D_INSTANCE}/p4broker.conf.down ${METADATA}/p4broker.conf;
+                    MAINT_MODE=1
+                    break;;
+              No ) exit;;
+          esac
+      done
+    else
+      ln -s ${METADATA}/${P4D_INSTANCE}/p4broker.conf.up ${METADATA}/${P4D_INSTANCE}/p4broker.conf
+      MAINT_MODE=0
+    fi
+  ;;
   # logtail command
-  logtail)  
-    STATUS=$( ps aux | grep "[c]atalina.base=$CATALINA_HOME" | wc -l )
+  logtail)
+    STATUS=$( ps aux | grep "${P4LOG}" | grep -v grep | wc -l )
       if [ ${STATUS} -gt 0 ]; then
-        PID=$(ps aux | grep "[c]atalina.base=$CATALINA_HOME"| grep -v grep | awk '{print $2}')
-        tail -n 20 -f /jira/${APP_INSTANCE}/logs/catalina/catalina.out --pid=${PID}
+        PID=$( ps aux | grep "${P4LOG}" | grep -v grep | awk '{print $2}' )
+        tail -n 40 -f /p4logs/${P4D_INSTANCE}/p4broker.log --pid=${PID}
       else
-        tail -n 20 /jira/${APP_INSTANCE}/logs/catalina/catalina.out
+        tail -n 40 /p4logs/${P4D_INSTANCE}/p4broker.log
       fi
   ;;
   *)
@@ -165,3 +137,11 @@ case "$1" in
 esac
 
 exit 0
+
+./p4d.2013.3.784164 -d -A auditlog -J journal -L log -p port -r root
+/depotdata/p4/common/bin/p4d.2013.3.784164 -d -A /p4logs/1/audit.log -J /p4logs/1/p4d.journal -L /p4logs/1/p4d.log -p 1667 -r /metadata/1
+ps aux|grep "p4"
+/depotdata/p4/common/bin/p4d.2013.3.784164 -d -A /p4logs/1/audit.log -J /p4logs/1/journal -L /p4logs/1/p4d.log -p 1667 -r /metadata/1
+
+
+${P4LOG}
