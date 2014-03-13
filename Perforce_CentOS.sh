@@ -29,7 +29,7 @@ export_vars() {
   P4BIN_DOWNLOAD=ftp://ftp.perforce.com/perforce
   P4BIN_VERSION=r13.3
   P4BIN_PLATFORM=bin.linux26x86_64
-  #P4SCRIPTS_DOWNLOAD=https://raw.github.com/patrickmslatteryvt/mi-perforce/master
+  P4SCRIPTS_DOWNLOAD=https://raw.github.com/patrickmslatteryvt/mi-perforce/master
   WGETGLOBALS="--no-check-certificate --no-directories --no-cache"
   P4BIN_DIR=/depotdata/p4/common/bin
 
@@ -132,11 +132,13 @@ create_users() {
   echo 'Perforce - Create the users to run Perforce under...'
   # NOTE: 8 char max for user and group names
   # <username>,<password>,<GID>,<groupname>,<User detail>,<shell>
-  echo 'up4broker,MyWebGrocer2013#_p4broker,500,gp4admin,Account for running the Perforce Broker under,/sbin/nologin'>~/users.txt
-  echo 'up4d,MyWebGrocer2013#_p4d,500,gp4admin,Account for running the Perforce depots under,/sbin/nologin'>>~/users.txt
-  echo 'up4web,MyWebGrocer2013#_p4web,500,gp4admin,Account for running the Perforce web server under,/sbin/nologin'>>~/users.txt
-  echo 'up4git,MyWebGrocer2013#_p4git,500,gp4admin,Account for running the Perforce GitFusion instance under,/sbin/nologin'>>~/users.txt
-  echo 'up4commons,MyWebGrocer2013#_p4commons,500,gp4admin,Account for running the Perforce Commons processes under,/sbin/nologin'>>~/users.txt
+  echo 'uperforce,MyWebGrocer2013#_perforce,500,gp4admin,Account for running the Perforce services under,/sbin/nologin'>~/users.txt
+  # Would be be better security to run each service under its own user? Getting access to a edge access user such as the broker should not lead to access on the main p4d user in such a case. Worth looking into...
+  #echo 'up4broker,MyWebGrocer2013#_p4broker,500,gp4admin,Account for running the Perforce Broker under,/sbin/nologin'>~/users.txt
+  #echo 'up4d,MyWebGrocer2013#_p4d,500,gp4admin,Account for running the Perforce depots under,/sbin/nologin'>>~/users.txt
+  #echo 'up4web,MyWebGrocer2013#_p4web,500,gp4admin,Account for running the Perforce web server under,/sbin/nologin'>>~/users.txt
+  #echo 'up4git,MyWebGrocer2013#_p4git,500,gp4admin,Account for running the Perforce GitFusion instance under,/sbin/nologin'>>~/users.txt
+  #echo 'up4commons,MyWebGrocer2013#_p4commons,500,gp4admin,Account for running the Perforce Commons processes under,/sbin/nologin'>>~/users.txt
 
   curl -L -u ${GITHUB_PRIV_OAUTH_KEY}:x-oauth-basic https://raw.github.com/patrickmslatteryvt/shell/master/bash/create_users.sh -o ~/create_users.sh
   echo
@@ -262,6 +264,7 @@ config_network() {
 }
 
 # ================================================================================
+
 config_firewall() {
   # Initial firewall
   # Chain INPUT (policy ACCEPT 0 packets, 0 bytes)
@@ -357,13 +360,15 @@ create_p4_dirs() {
 [[ -d /metadata ]] || mkdir -p /metadata
 [[ -d $P4BIN_DIR ]] || mkdir -p $P4BIN_DIR
 [[ -d /p4logs ]] || mkdir -p /p4logs
-# mkdir -p /home/perforce/p4-broker     # Create the users before we create these folders
-# mkdir -p /home/perforce/depot
+# If the home directory does not exist then exit
+[[ -d /home/uperforce ]] || exit 3
+mkdir -p /home/uperforce/p4-broker
+mkdir -p /home/uperforce/depot
 
 chown -Rc uperforce:gp4admin /depotdata
 chown -Rc uperforce:gp4admin /metadata
 chown -Rc uperforce:gp4admin /p4logs
-chown -Rc uperforce:gp4admin /home/perforce
+chown -Rc uperforce:gp4admin /home/uperforce
 
 }
 
@@ -372,18 +377,22 @@ chown -Rc uperforce:gp4admin /home/perforce
 install_p4() {
 # REQUIRES USERS TO EXIST FIRST
 
-# Don't download if the files already exist
-[[ -f $P4BIN_DIR/SHA256SUMS ]] || wget $WGETGLOBALS $P4BIN_DOWNLOAD/$P4BIN_VERSION/$P4BIN_PLATFORM/SHA256SUMS --output-document=$P4BIN_DIR/SHA256SUMS
-[[ -f $P4BIN_DIR/p4ftpd ]] || wget $WGETGLOBALS $P4BIN_DOWNLOAD/$P4BIN_VERSION/$P4BIN_PLATFORM/p4ftpd --output-document=$P4BIN_DIR/p4ftpd
-[[ -f $P4BIN_DIR/p4d ]] || wget $WGETGLOBALS $P4BIN_DOWNLOAD/$P4BIN_VERSION/$P4BIN_PLATFORM/p4d --output-document=$P4BIN_DIR/p4d
-[[ -f $P4BIN_DIR/p4broker ]] || wget $WGETGLOBALS $P4BIN_DOWNLOAD/$P4BIN_VERSION/$P4BIN_PLATFORM/p4broker --output-document=$P4BIN_DIR/p4broker
-[[ -f $P4BIN_DIR/p4 ]] || wget $WGETGLOBALS $P4BIN_DOWNLOAD/$P4BIN_VERSION/$P4BIN_PLATFORM/p4 --output-document=$P4BIN_DIR/p4
-[[ -f $P4BIN_DIR/p4p ]] || wget $WGETGLOBALS $P4BIN_DOWNLOAD/$P4BIN_VERSION/$P4BIN_PLATFORM/p4p --output-document=$P4BIN_DIR/p4p
-[[ -f $P4BIN_DIR/p4v.tgz ]] || wget $WGETGLOBALS $P4BIN_DOWNLOAD/$P4BIN_VERSION/$P4BIN_PLATFORM/p4v.tgz --output-document=$P4BIN_DIR/p4v.tgz
-[[ -f $P4BIN_DIR/perfmerge ]] || wget $WGETGLOBALS $P4BIN_DOWNLOAD/$P4BIN_VERSION/$P4BIN_PLATFORM/perfmerge --output-document=$P4BIN_DIR/perfmerge
-[[ -f $P4BIN_DIR/p4api.tgz ]] || wget $WGETGLOBALS $P4BIN_DOWNLOAD/$P4BIN_VERSION/$P4BIN_PLATFORM/p4api.tgz --output-document=$P4BIN_DIR/p4api.tgz
+for FILENAME in SHA256SUMS p4d p4broker p4 p4p p4api.tgz # p4ftpd p4v.tgz perfmerge
+do
+  # Don't download if the files already exist
+  [[ -f $P4BIN_DIR/${FILENAME} ]] || wget $WGETGLOBALS $P4BIN_DOWNLOAD/$P4BIN_VERSION/$P4BIN_PLATFORM/${FILENAME} --output-document=$P4BIN_DIR/${FILENAME} 
+done
 
+# p4web is not at the same release version as everything else
+[[ -f $P4BIN_DIR/SHA256SUMS.r12.1 ]] || wget $WGETGLOBALS $P4BIN_DOWNLOAD/r12.1/$P4BIN_PLATFORM/SHA256SUMS --output-document=$P4BIN_DIR/SHA256SUMS.r12.1
 [[ -f $P4BIN_DIR/p4web ]] || wget $WGETGLOBALS $P4BIN_DOWNLOAD/r12.1/$P4BIN_PLATFORM/p4web --output-document=$P4BIN_DIR/p4web
+
+# Comment out the files we don't need/want from the hash manifest, if we don't do this and haven't downloaded the files the hash test in the following step will fail
+sed -i '/p4v.tgz/s/^/# /g' $P4BIN_DIR/SHA256SUMS
+sed -i '/perfmerge/s/^/# /g' $P4BIN_DIR/SHA256SUMS
+sed -i '/p4ftpd/s/^/# /g' $P4BIN_DIR/SHA256SUMS
+# Do the same for the p4web binary
+sed -i '/p4web/!s/^/# /g' $P4BIN_DIR/SHA256SUMS.r12.1
 
 # Verify the downloaded files
 cd $P4BIN_DIR/
@@ -398,11 +407,28 @@ else
 fi
 cd ->nul
 
-chmod -c +x $P4BIN_DIR/p4*
-chmod -c -x $P4BIN_DIR/p4*.tgz
+# And again for p4web
+cd $P4BIN_DIR/
+sha256sum -c $P4BIN_DIR/SHA256SUMS.r12.1
+exit_status=$?
+if test $exit_status -eq 0
+then
+  echo "Files match precomputed SHA256 hashes"
+else
+  echo "Files DO NOT match precomputed SHA256 hashes. Exiting."
+  exit 1
+fi
+cd ->nul
 
-# Rename the binaries so that they have the version string in their name
-rename_p4_binaries.sh
+# Make the binaries executable
+chmod -c u+x $P4BIN_DIR/p4*
+# but not the tgz files
+chmod -c u-x $P4BIN_DIR/p4*.tgz
+
+# Rename the binaries so that they have the version string in their name (
+curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic https://raw.github.com/patrickmslatteryvt/mi-perforce/master/rename_p4_binaries.sh -o ~/rename_p4_binaries.sh
+chmod -c +x ~/rename_p4_binaries.sh
+~/rename_p4_binaries.sh
 
 ln -s $P4BIN_DIR/p4d.?????? /metadata/p4d
 ln -s $P4BIN_DIR/p4broker.?????? /metadata/p4broker
@@ -413,18 +439,17 @@ touch /p4logs/p4d.log
 touch /p4logs/p4d_audit.log
 touch /p4logs/p4broker.log
 touch /p4logs/p4web.log
-touch /home/perforce/.p4tickets
-# echo localhost:1666=p4builduser:C2CB31A82FC0B52F49E867A117532AC1>/home/perforce/.p4tickets
+touch /home/uperforce/.p4tickets
 
-
-# Generate default p4broker.conf file
-# $P4BIN_DIR/p4broker -C>/metadata/p4broker.conf.default
 # Download the customised p4broker conf files
-sudo wget $WGETGLOBALS $P4SCRIPTS_DOWNLOAD/p4broker.conf --output-document=/metadata/p4broker.conf
-sudo wget $WGETGLOBALS $P4SCRIPTS_DOWNLOAD/p4broker.conf.downtime --output-document=/metadata/p4broker.conf.downtime
-sudo wget $WGETGLOBALS $P4SCRIPTS_DOWNLOAD/p4broker_sideload_p4web.conf --output-document=/metadata/p4broker_sideload_p4web.conf
-sudo wget $WGETGLOBALS $P4SCRIPTS_DOWNLOAD/p4broker_sideload_p4web.conf.downtime --output-document=/metadata/p4broker_sideload_p4web.conf.downtime
-sudo wget $WGETGLOBALS $P4SCRIPTS_DOWNLOAD/P4WEBMIMEFILE --output-document=/metadata/P4WEBMIMEFILE
+for FILENAME in p4broker.conf p4broker.conf.downtime p4broker_sideload_p4web.conf p4broker_sideload_p4web.conf.downtime P4WEBMIMEFILE
+do
+  # Don't download if the files already exist
+  [[ -f /metadata/${FILENAME} ]] || wget $WGETGLOBALS $P4SCRIPTS_DOWNLOAD/${FILENAME} --output-document=/metadata/${FILENAME}
+done
+
+chown -Rc uperforce:gp4admin /depotdata
+chown -Rc uperforce:gp4admin /metadata
 
 }
 
@@ -594,14 +619,14 @@ export_vars
 install_base
 install_nginx
 install_htop
-install_vmtools   # broken on VMware's side?
+install_vmtools
 create_users
 install_java
 config_nginx
 config_network
 config_firewall
 config_etc-services
-#create_p4_dirs
+create_p4_dirs
 #install_p4
 #config_p4_initd
 config_sshd_banner
