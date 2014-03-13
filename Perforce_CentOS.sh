@@ -531,7 +531,6 @@ config_crontab() {
   echo  '#':>>/root/crontab.input.perforce
   crontab -u up4d /root/crontab.input.perforce
   rm -f /root/crontab.input.perforce
-  done
 }
 
 # ================================================================================
