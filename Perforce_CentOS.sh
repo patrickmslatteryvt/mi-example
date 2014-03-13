@@ -627,7 +627,7 @@ config_network
 config_firewall
 config_etc-services
 create_p4_dirs
-#install_p4
+install_p4
 #config_p4_initd
 config_sshd_banner
 config_ntp
