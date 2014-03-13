@@ -460,6 +460,12 @@ config_p4_initd() {
   echo 'Perforce - Setup service instances for Perforce...'
   # RH based Linux distros are 10 years behind SMF in Solaris in this respect
 
+for FILENAME in p4broker p4d p4d_sideload p4web
+do
+  # Don't download if the files already exist
+  [[ -f $P4BIN_DIR/${FILENAME} ]] || curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic $P4SCRIPTS_DOWNLOAD/init.d/${FILENAME} -o /etc/init.d/${FILENAME}
+done
+  
   # Download the Perforce init scripts from Github
   curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic https://raw.github.com/patrickmslatteryvt/mi-perforce/master/init.d/p4broker -o /etc/init.d/p4broker
   curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic https://raw.github.com/patrickmslatteryvt/mi-perforce/master/init.d/p4d -o /etc/init.d/p4d
@@ -628,7 +634,7 @@ config_firewall
 config_etc-services
 create_p4_dirs
 install_p4
-#config_p4_initd
+config_p4_initd
 config_sshd_banner
 config_ntp
 config_crontab
