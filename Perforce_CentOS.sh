@@ -430,10 +430,10 @@ curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic https://raw.github.com/patrickmslat
 chmod -c +x ~/rename_p4_binaries.sh
 ~/rename_p4_binaries.sh
 
-ln -s $P4BIN_DIR/p4d.?????? /metadata/p4d
-ln -s $P4BIN_DIR/p4broker.?????? /metadata/p4broker
-ln -s $P4BIN_DIR/p4web.?????? /metadata/p4web
-ln -s $P4BIN_DIR/p4.?????? /metadata/p4
+ln -s $P4BIN_DIR/p4d.????.?.?????? /metadata/p4d
+ln -s $P4BIN_DIR/p4broker.????.?.?????? /metadata/p4broker
+ln -s $P4BIN_DIR/p4web.????.?.?????? /metadata/p4web
+ln -s $P4BIN_DIR/p4.????.?.?????? /metadata/p4
 
 touch /p4logs/p4d.log
 touch /p4logs/p4d_audit.log
@@ -442,7 +442,7 @@ touch /p4logs/p4web.log
 touch /home/uperforce/.p4tickets
 
 # Download the customised p4broker conf files
-for FILENAME in p4broker.conf p4broker.conf.downtime p4broker_sideload_p4web.conf p4broker_sideload_p4web.conf.downtime P4WEBMIMEFILE
+for FILENAME in p4broker.conf.up p4broker.conf.down p4broker_sideload_p4web.conf.up p4broker_sideload_p4web.conf.down P4WEBMIMEFILE
 do
   # Don't download if the files already exist
   [[ -f /metadata/${FILENAME} ]] || wget $WGETGLOBALS $P4SCRIPTS_DOWNLOAD/${FILENAME} --output-document=/metadata/${FILENAME}
@@ -450,6 +450,7 @@ done
 
 chown -Rc uperforce:gp4admin /depotdata
 chown -Rc uperforce:gp4admin /metadata
+chown -Rc uperforce:gp4admin /p4logs
 
 }
 
@@ -457,36 +458,21 @@ chown -Rc uperforce:gp4admin /metadata
 
 config_p4_initd() {
   echo ''
-  echo 'Perforce - Setup service instances for Perforce...'
+  echo 'Perforce - Install service instances...'
   # RH based Linux distros are 10 years behind SMF in Solaris in this respect
 
-for FILENAME in p4broker p4d p4d_sideload p4web
+for SERVICE in p4broker p4d p4d_sideload p4web
 do
-  # Don't download if the files already exist
-  [[ -f $P4BIN_DIR/${FILENAME} ]] || curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic $P4SCRIPTS_DOWNLOAD/init.d/${FILENAME} -o /etc/init.d/${FILENAME}
-done
-  
-  # Download the Perforce init scripts from Github
-  curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic https://raw.github.com/patrickmslatteryvt/mi-perforce/master/init.d/p4broker -o /etc/init.d/p4broker
-  curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic https://raw.github.com/patrickmslatteryvt/mi-perforce/master/init.d/p4d -o /etc/init.d/p4d
-  curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic https://raw.github.com/patrickmslatteryvt/mi-perforce/master/init.d/p4d_sideload -o /etc/init.d/p4d_sideload
-  curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic https://raw.github.com/patrickmslatteryvt/mi-perforce/master/init.d/p4web -o /etc/init.d/p4web
-
+  # Don't download if the services already exist
+  # [[ -f $P4BIN_DIR/${SERVICE} ]] || curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic $P4SCRIPTS_DOWNLOAD/init.d/${SERVICE} -o /etc/init.d/${SERVICE}
+  [[ -f $P4BIN_DIR/${SERVICE} ]] || curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic https://raw.github.com/patrickmslatteryvt/mi-perforce/commons/init.d/${SERVICE} -o /etc/init.d/${SERVICE}
   # Make the Perforce init scripts executable
-  chmod -c +x /etc/init.d/p4*
-
+  chmod -c +x /etc/init.d/${SERVICE}
   # Create the RHEL services
-  /sbin/chkconfig --add p4broker
-  /sbin/chkconfig --add p4d
-  /sbin/chkconfig --add p4d_sideload
-  /sbin/chkconfig --add p4web
-
+  /sbin/chkconfig --add ${SERVICE}
   # Set the services to autostart in the necessary runlevels
-  /sbin/chkconfig --level 345 p4broker on
-  /sbin/chkconfig --level 345 p4d on
-  /sbin/chkconfig --level 345 p4d_sideload on
-  /sbin/chkconfig --level 345 p4web on
-
+  /sbin/chkconfig --level 345 ${SERVICE} on
+done
   # Do not start services at this time, they must be properly setup first
 }
 
