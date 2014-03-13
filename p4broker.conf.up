@@ -1,5 +1,7 @@
 #-------------------------------------------------------------------------------
 # p4broker configuration file
+# This is for the main broker instance listening at TCP:1666 and pointed at TCP:1667
+# and is intended for use during normal server operation
 #-------------------------------------------------------------------------------
 
 target      = localhost:1667;
@@ -86,12 +88,3 @@ redirection  = selective;
 # match 'integrate'.  To match an exact string, append the beginning/end of line
 # anchors.  E.g. '^integ$'.
 
-#
-# Uncomment the lines below to block all access to the server during
-# periods of maintenance.
-#
-#command: .*
-#{
-#    action  = reject;
-#    message = "Server down for maintenance. Back soon";
-#}

@@ -1,5 +1,7 @@
 #-------------------------------------------------------------------------------
 # p4broker configuration file
+# This is for the p4web sideload broker instance listening at TCP:2666 and pointed at TCP:2667
+# and is intended for use during maintenance mode
 #-------------------------------------------------------------------------------
 
 target      = localhost:2667;
@@ -87,11 +89,10 @@ redirection  = selective;
 # anchors.  E.g. '^integ$'.
 
 #
-# Uncomment the lines below to block all access to the server during
-# periods of maintenance.
+# Block all access to the server during periods of maintenance.
 #
 command: .*
 {
     action  = reject;
-    message = "Server down for maintenance. Back soon";
+    message = "The Perforce server is currently down for maintenance.";
 }
