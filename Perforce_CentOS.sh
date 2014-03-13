@@ -59,6 +59,7 @@ export_vars() {
       # exit 1
     # fi
   # fi  
+}
 
 # ================================================================================
 
@@ -481,6 +482,7 @@ config_sshd_banner() {
   echo  of use.>>/etc/ssh/ssh-banner
   echo  LOG OFF IMMEDIATELY if you do not agree to the conditions stated in this warning>>/etc/ssh/ssh-banner
   service sshd reload
+}
 
 # ================================================================================
 
