@@ -7,7 +7,7 @@
 target      = localhost:2667;
 listen      = 2666;
 directory   = /metadata;
-logfile     = /p4logs/p4broker.log;
+logfile     = /p4/1/logs/p4broker.log;
 debug-level = server=1;
 admin-name  = "Patrick M. Slattery";
 admin-phone = 802-654-9825;
