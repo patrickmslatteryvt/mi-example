@@ -461,26 +461,26 @@ chmod -c u+x $P4BIN_DIR/p4*
 chmod -c u-x $P4BIN_DIR/p4*.tgz
 
 # Rename the binaries so that they have the version string in their name (
-curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic https://raw.github.com/patrickmslatteryvt/mi-perforce/master/rename_p4_binaries.sh -o ~/rename_p4_binaries.sh
+#curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic https://raw.github.com/patrickmslatteryvt/mi-perforce/master/rename_p4_binaries.sh -o ~/rename_p4_binaries.sh
+curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic https://raw.github.com/patrickmslatteryvt/mi-perforce/commons/rename_p4_binaries.sh -o ~/rename_p4_binaries.sh
 chmod -c +x ~/rename_p4_binaries.sh
 ~/rename_p4_binaries.sh
 
-ln -s $P4BIN_DIR/p4d.????.?.?????? /p4/1/bin/p4d
-ln -s $P4BIN_DIR/p4broker.????.?.?????? /p4/1/bin/p4broker
-ln -s $P4BIN_DIR/p4web.????.?.?????? /p4/1/bin/p4web
-ln -s $P4BIN_DIR/p4.????.?.?????? /p4/1/bin/p4
+for INSTANCE in 1 2
+do
+  for EXECUTABLE in p4d p4broker p4web p4
+  do
+    ln -s $P4BIN_DIR/${EXECUTABLE}.????.?.?????? /p4/${INSTANCE}/bin/${EXECUTABLE}
+  done
+done
 
-touch /p4logs/p4d.log
-touch /p4logs/p4d_audit.log
-touch /p4logs/p4broker.log
-touch /p4logs/p4web.log
 touch /home/uperforce/.p4tickets
 
 for INSTANCE in 1 2
 do
   for LOGFILE in p4d.log p4d_audit.log p4broker.log p4web.log
   do
-    touch /p4logs/p4/${INSTANCE}/${DIR}
+    touch /p4logs/p4/${INSTANCE}/logs/${LOGFILE}
   done
 done
 
@@ -591,7 +591,7 @@ config_crontab() {
   echo  '# |  |  |  |  |'>>/root/crontab.input.perforce
   echo  '# *  *  *  *  * user-name command to be executed'>>/root/crontab.input.perforce
   echo  '#':>>/root/crontab.input.perforce
-  crontab -u up4d /root/crontab.input.perforce
+  crontab -u uperforce /root/crontab.input.perforce
   rm -f /root/crontab.input.perforce
 }
 
