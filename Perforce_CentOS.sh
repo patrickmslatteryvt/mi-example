@@ -461,8 +461,7 @@ chmod -c u+x $P4BIN_DIR/p4*
 chmod -c u-x $P4BIN_DIR/p4*.tgz
 
 # Rename the binaries so that they have the version string in their name (
-#curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic https://raw.github.com/patrickmslatteryvt/mi-perforce/master/rename_p4_binaries.sh -o ~/rename_p4_binaries.sh
-curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic https://raw.github.com/patrickmslatteryvt/mi-perforce/commons/rename_p4_binaries.sh -o ~/rename_p4_binaries.sh
+curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic https://raw.github.com/patrickmslatteryvt/mi-perforce/master/rename_p4_binaries.sh -o ~/rename_p4_binaries.sh
 chmod -c +x ~/rename_p4_binaries.sh
 ~/rename_p4_binaries.sh
 
@@ -508,7 +507,7 @@ for SERVICE in p4broker p4d p4d_sideload p4web
 do
   # Don't download if the services already exist
   # [[ -f $P4BIN_DIR/${SERVICE} ]] || curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic $P4SCRIPTS_DOWNLOAD/init.d/${SERVICE} -o /etc/init.d/${SERVICE}
-  [[ -f $P4BIN_DIR/${SERVICE} ]] || curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic https://raw.github.com/patrickmslatteryvt/mi-perforce/commons/init.d/${SERVICE} -o /etc/init.d/${SERVICE}
+  [[ -f $P4BIN_DIR/${SERVICE} ]] || curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic https://raw.github.com/patrickmslatteryvt/mi-perforce/master/init.d/${SERVICE} -o /etc/init.d/${SERVICE}
   # Make the Perforce init scripts executable
   chmod -c +x /etc/init.d/${SERVICE}
   # Create the RHEL services
