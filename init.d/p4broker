@@ -1,14 +1,14 @@
-#!/bin/bash
+#!/bin/bash -ex
 ### BEGIN INIT INFO
 # chkconfig: 2345 92 05
-# Provides:          jira_stg
-# Required-Start:    $local_fs $network 
-# Required-Stop:     $local_fs $network
+# Provides:          p4broker
+# Required-Start:    $local_fs $network $p4d
+# Required-Stop:     $local_fs $network $p4d
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
 # X-Interactive:     false
 # Short-Description: Start/stop p4broker
-# Description:       Start/stop Perforce Broker
+# Description:       Start/stop Perforce Broker (Application level firewall)
 ### END INIT INFO
 
 umask u=rwx,g=rx,o=rx   # = 0022
@@ -42,13 +42,20 @@ else
   SU="/bin/su -s /bin/bash"
 fi
 
+# Read in the conf file for this daemon instance
+if [ ! -f /p4/1/etc/p4d.conf ]; then
+  exit 1
+else
+  . /p4/1/etc/p4d.conf
+fi
+
 # Name of app
 APP_NAME=`basename $0`
-APP_DESC="Perforce Broker (${APP_NAME})"
+APP_DESC="Perforce Broker"
 PIDFILE=/var/run/${APP_NAME}.pid
-
-# Read in the conf file for this daemon instance
-. /p4/1/etc/p4d.conf
+LOCKFILE=/var/lock/subsys/${APP_NAME}
+P4BROKER_DAEMON=/p4/${P4D_INSTANCE}/bin/${APP_NAME}
+RETVAL=0
 
 # Check startup binaries exist
 test -x ${P4BROKER_DAEMON} || { log_failure_msg "${P4BROKER_DAEMON} not found";
@@ -59,26 +66,30 @@ else exit 5; fi; }
 case "$1" in
   # Start command
   start)
-    if [ ! -f ${P4D_METADATA}/configured ]; then
+    if [ ! -f /p4/${P4D_INSTANCE}/etc/configured ]; then
       echo "This Perforce instance has not been configured yet."
       echo "The instance will not be started until it has been configured."
       exit 1
     fi
-    STATUS=$( ps aux | grep "${P4LOG}" | grep -v grep | wc -l )
+    STATUS=$( ps aux | grep "/p4/${P4D_INSTANCE}/etc/${APP_NAME}.conf" | grep -v grep | wc -l )
       if [ ${STATUS} -gt 0 ]; then
         log_failure_msg "$APP_DESC is already running."
       else
-        echo "Starting $APP_DESC"
-        ${SU} -m ${P4D_USER} -c "${P4BROKER_DAEMON} -c ${P4D_ROOT}/${APP_NAME}.conf -d"
-        # /depotdata/p4/common/bin/p4d.2013.3.784164 -d -A /p4logs/1/audit.log -J /p4logs/1/journal -L /p4logs/1/p4d.log -p 1667 -r /metadata/1      
+        echo -n $"Starting ${APP_NAME}: "
+        daemon --user=${P4D_USER} --pidfile=${PIDFILE} ${P4BROKER_DAEMON} -c /p4/${P4D_INSTANCE}/etc/${APP_NAME}.conf
+        RETVAL=$?
+        echo
+        [ $RETVAL = 0 ] && touch ${LOCKFILE}
+        return $RETVAL
       fi
   ;;
   # Stop command
   stop)
-    STATUS=$( ps aux | grep "${P4LOG}" | grep -v grep | wc -l )
+    STATUS=$( ps aux | grep "/p4/${P4D_INSTANCE}/etc/${APP_NAME}.conf" | grep -v grep | wc -l )
       if [ ${STATUS} -gt 0 ]; then
         echo "Stopping ${APP_DESC}"
-        ${SU} -m ${P4D_USER} -c "kill -s TERM p4broker-parent-pid"       
+        ${SU} -m ${P4D_USER} -c "kill -s TERM p4broker-parent-pid"
+        # Check to make sure we stopped it
         log_success_msg "${APP_DESC} stopped successfully"
       else
         log_failure_msg "${APP_DESC} is not running."
@@ -92,56 +103,62 @@ case "$1" in
   ;;
   # Status command
   status)
-    if [ ! -f ${METADATA}/${P4D_INSTANCE}/configured ]; then
+    if [ ! -f /p4/${P4D_INSTANCE}/etc/configured ]; then
       echo "This Perforce instance (${APP_NAME}) has not been configured yet."
       exit 1
     fi
-    STATUS=$( ps aux | grep "${P4LOG}" | grep -v grep | wc -l )
+    STATUS=$( ps aux | grep "/p4/${P4D_INSTANCE}/etc/${APP_NAME}.conf" | grep -v grep | wc -l )
       if [ ${STATUS} -gt 0 ]; then
-        log_success_msg "${APP_NAME} - ($APP_DESC) is running."
+        log_success_msg "${APP_NAME} - $APP_DESC is running."
       else
-        log_failure_msg "${APP_NAME} - ($APP_DESC) is not running."
+        log_failure_msg "${APP_NAME} - $APP_DESC is not running."
       fi
     ;;
   # maint command - Put system in/out of maintenance mode (via broker redirection)
   maint)
-    if [ ${MAINT_MODE} = 0 ]; then
+    if [ ! -f /p4/${P4D_INSTANCE}/etc/maint_mode ]; then
       echo "Do you want to put the Perforce Broker into maintenance mode?"
       select yn in "Yes" "No"; do
           case $yn in
-              Yes ) ln -s ${METADATA}/${P4D_INSTANCE}/p4broker.conf.down ${METADATA}/p4broker.conf;
-                    MAINT_MODE=1
+              Yes ) ln -sf /p4/${P4D_INSTANCE}/etc/${APP_NAME}.conf.down /p4/${P4D_INSTANCE}/etc/${APP_NAME}.conf;
+                    touch /p4/${P4D_INSTANCE}/etc/maint_mode
                     break;;
               No ) exit;;
           esac
       done
     else
-      ln -s ${METADATA}/${P4D_INSTANCE}/p4broker.conf.up ${METADATA}/${P4D_INSTANCE}/p4broker.conf
-      MAINT_MODE=0
+      echo "Do you want to take the Perforce Broker out of maintenance mode?"
+      select yn in "Yes" "No"; do
+          case $yn in
+              Yes ) ln -sf /p4/${P4D_INSTANCE}/etc/${APP_NAME}.conf.up /p4/${P4D_INSTANCE}/etc/${APP_NAME}.conf;
+                    rm -f /p4/${P4D_INSTANCE}/etc/maint_mode
+                    break;;
+              No ) exit;;
+          esac
+      done
     fi
   ;;
   # logtail command
   logtail)
-    STATUS=$( ps aux | grep "${P4LOG}" | grep -v grep | wc -l )
+    STATUS=$( ps aux | grep "/p4/${P4D_INSTANCE}/etc/${APP_NAME}.conf" | grep -v grep | wc -l )
       if [ ${STATUS} -gt 0 ]; then
-        PID=$( ps aux | grep "${P4LOG}" | grep -v grep | awk '{print $2}' )
-        tail -n 40 -f /p4logs/${P4D_INSTANCE}/p4broker.log --pid=${PID}
+        PID=$( ps aux | grep "/p4/${P4D_INSTANCE}/etc/${APP_NAME}.conf" | grep -v grep | awk '{print $2}' )
+        tail -n 40 -f /p4/${P4D_INSTANCE}/logs/${APP_NAME}.log --pid=${PID}
       else
-        tail -n 40 /p4logs/${P4D_INSTANCE}/p4broker.log
+        tail -n 40 /p4/${P4D_INSTANCE}/logs/${APP_NAME}.log
       fi
   ;;
   *)
-    echo "Usage: /etc/init.d/${APP_NAME} {start|restart|stop|status|logtail}"
+    echo "Usage: /etc/init.d/${APP_NAME} {start|stop|restart|status|maint|logtail}"
     exit 1
   ;;
 esac
 
 exit 0
+#exit $RETVAL
 
-./p4d.2013.3.784164 -d -A auditlog -J journal -L log -p port -r root
-/depotdata/p4/common/bin/p4d.2013.3.784164 -d -A /p4logs/1/audit.log -J /p4logs/1/p4d.journal -L /p4logs/1/p4d.log -p 1667 -r /metadata/1
-ps aux|grep "p4"
-/depotdata/p4/common/bin/p4d.2013.3.784164 -d -A /p4logs/1/audit.log -J /p4logs/1/journal -L /p4logs/1/p4d.log -p 1667 -r /metadata/1
-
-
-${P4LOG}
+# ./p4d.2013.3.784164 -d -A auditlog -J journal -L log -p port -r root
+# /depotdata/p4/common/bin/p4d.2013.3.784164 -d -A /p4logs/1/audit.log -J /p4logs/1/p4d.journal -L /p4logs/1/p4d.log -p 1667 -r /metadata/1
+# ps aux|grep "p4"
+# /depotdata/p4/common/bin/p4d.2013.3.784164 -d -A /p4logs/1/audit.log -J /p4logs/1/journal -L /p4logs/1/p4d.log -p 1667 -r /metadata/1
+# ${P4LOG}
