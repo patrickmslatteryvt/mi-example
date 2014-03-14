@@ -251,7 +251,7 @@ config_nginx() {
 
 config_network() {
   echo ''
-  echo 'JIRA - Configure network settings...'
+  echo 'Perforce - Configure network settings...'
   # Disable applications from using IPv6 without actually disabling IPv6 totally
   # See: How do I disable IPv6? - http://wiki.centos.org/FAQ/CentOS6#head-d47139912868bcb9d754441ecb6a8a10d41781df
   # These commands will disable IPv6 usage on the running system
@@ -487,12 +487,13 @@ done
 for FILENAME in p4broker.conf.up p4broker.conf.down p4broker_sideload_p4web.conf.up p4broker_sideload_p4web.conf.down P4WEBMIMEFILE
 do
   # Don't download if the files already exist
-  [[ -f /metadata/${FILENAME} ]] || wget $WGETGLOBALS $P4SCRIPTS_DOWNLOAD/${FILENAME} --output-document=/metadata/${FILENAME}
+  [[ -f /p4/1/root/${FILENAME} ]] || wget $WGETGLOBALS $P4SCRIPTS_DOWNLOAD/${FILENAME} --output-document=/p4/1/root/${FILENAME}
 done
 
 chown -Rc uperforce:gp4admin /depotdata
 chown -Rc uperforce:gp4admin /metadata
 chown -Rc uperforce:gp4admin /p4logs
+chown -Rc uperforce:gp4admin /p4
 
 }
 
@@ -503,19 +504,37 @@ config_p4_initd() {
   echo 'Perforce - Install service instances...'
   # RH based Linux distros are 10 years behind SMF in Solaris in this respect
 
-for SERVICE in p4broker p4d p4d_sideload p4web
-do
-  # Don't download if the services already exist
-  # [[ -f $P4BIN_DIR/${SERVICE} ]] || curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic $P4SCRIPTS_DOWNLOAD/init.d/${SERVICE} -o /etc/init.d/${SERVICE}
-  [[ -f $P4BIN_DIR/${SERVICE} ]] || curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic https://raw.github.com/patrickmslatteryvt/mi-perforce/master/init.d/${SERVICE} -o /etc/init.d/${SERVICE}
-  # Make the Perforce init scripts executable
-  chmod -c +x /etc/init.d/${SERVICE}
-  # Create the RHEL services
-  /sbin/chkconfig --add ${SERVICE}
-  # Set the services to autostart in the necessary runlevels
-  /sbin/chkconfig --level 345 ${SERVICE} on
-done
+  for SERVICE in p4broker p4d p4d_sideload p4web
+  do
+    # Don't download if the services already exist
+    [[ -f $P4BIN_DIR/${SERVICE} ]] || curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic $P4SCRIPTS_DOWNLOAD/init.d/${SERVICE} -o /etc/init.d/${SERVICE}
+    # Make the Perforce init scripts executable
+    chmod -c +x /etc/init.d/${SERVICE}
+    # Create the RHEL services
+    /sbin/chkconfig --add ${SERVICE}
+    # Set the services to autostart in the necessary runlevels
+    /sbin/chkconfig --level 345 ${SERVICE} on
+  done
   # Do not start services at this time, they must be properly setup first
+  
+# get the conf files for the services
+
+# [root@perforce ~]# service p4broker
+# /etc/init.d/p4broker: line 51: /p4/1/etc/p4d.conf: No such file or directory
+# Usage: /etc/init.d/p4broker {start|restart|stop|status|logtail}
+
+  for INSTANCE in 1 2
+  do
+    for CONF in p4broker.conf.down p4broker.conf.up p4broker_sideload_p4web.conf.down p4broker_sideload_p4web.conf.up
+    do
+      [[ -f /p4/${INSTANCE}/etc/${CONF} ]] || curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic $P4SCRIPTS_DOWNLOAD/init.d/${CONF} -o /p4/${INSTANCE}/etc/${CONF}  
+    done
+  done
+
+  ln -s /p4/1/etc/p4broker.conf.up /p4/1/etc/p4broker.conf
+  ln -s /p4/2/etc/p4broker.conf.up /p4/2/etc/p4broker.conf
+
+  
 }
 
 # ================================================================================
@@ -669,3 +688,8 @@ config_crontab
 config_env
 config_logwatch
 config_postfix
+# Things to do
+# p4_logrotate
+# 
+
+echo "Perforce installation complete, please configure the system before use."
