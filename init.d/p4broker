@@ -35,6 +35,9 @@ else
   }
 fi
 
+# Source the RH init function library.
+. /etc/rc.d/init.d/functions
+
 # Handle SELinux variances
 if [ -x "/sbin/runuser" ]; then
   SU="/sbin/runuser -s /bin/bash"
@@ -42,8 +45,9 @@ else
   SU="/bin/su -s /bin/bash"
 fi
 
-# Read in the conf file for this daemon instance
+# Read in the primary p4d conf file for this p4 instance exists
 if [ ! -f /p4/1/etc/p4d.conf ]; then
+  log_failure_msg "/p4/1/etc/p4d.conf not found, exiting."
   exit 1
 else
   . /p4/1/etc/p4d.conf
@@ -52,23 +56,32 @@ fi
 # Name of app
 APP_NAME=`basename $0`
 APP_DESC="Perforce Broker"
-PIDFILE=/var/run/${APP_NAME}.pid
-LOCKFILE=/var/lock/subsys/${APP_NAME}
+PIDFILE=${PIDFILE-/var/run/${APP_NAME}.pid}
+LOCKFILE=${LOCKFILE-/var/lock/subsys/${APP_NAME}}
 P4BROKER_DAEMON=/p4/${P4D_INSTANCE}/bin/${APP_NAME}
 RETVAL=0
 
-# Check startup binaries exist
+# Check that the startup binary exists
 test -x ${P4BROKER_DAEMON} || { log_failure_msg "${P4BROKER_DAEMON} not found";
 if [ "$1" = "stop" ]; then exit 0;
 else exit 5; fi; }
-# Should also check for daemon conf file as well
+
+# Check that the conf file for this daemon instance exists
+if [ ! -f /p4/${P4D_INSTANCE}/etc/${APP_NAME}.conf ]; then
+  log_failure_msg "/p4/${P4D_INSTANCE}/etc/${APP_NAME}.conf not found, exiting."
+  exit 1
+else
+  echo ""
+fi
+
+# Can we validate that the broker conf file is valid without starting the service?
 
 case "$1" in
   # Start command
   start)
     if [ ! -f /p4/${P4D_INSTANCE}/etc/configured ]; then
       echo "This Perforce instance has not been configured yet."
-      echo "The instance will not be started until it has been configured."
+      echo "The instance will not be started until it has been marked as configured."
       exit 1
     fi
     STATUS=$( ps aux | grep "/p4/${P4D_INSTANCE}/etc/${APP_NAME}.conf" | grep -v grep | wc -l )
@@ -76,7 +89,7 @@ case "$1" in
         log_failure_msg "$APP_DESC is already running."
       else
         echo -n $"Starting ${APP_NAME}: "
-        daemon --user=${P4D_USER} --pidfile=${PIDFILE} ${P4BROKER_DAEMON} -c /p4/${P4D_INSTANCE}/etc/${APP_NAME}.conf
+        daemon --user=${P4D_USER} --pidfile=${PIDFILE} "${P4BROKER_DAEMON} -c /p4/${P4D_INSTANCE}/etc/${APP_NAME}.conf &"
         RETVAL=$?
         echo
         [ $RETVAL = 0 ] && touch ${LOCKFILE}
@@ -88,7 +101,10 @@ case "$1" in
     STATUS=$( ps aux | grep "/p4/${P4D_INSTANCE}/etc/${APP_NAME}.conf" | grep -v grep | wc -l )
       if [ ${STATUS} -gt 0 ]; then
         echo "Stopping ${APP_DESC}"
-        ${SU} -m ${P4D_USER} -c "kill -s TERM p4broker-parent-pid"
+        killproc -p ${PIDFILE} ${APP_NAME}
+        RETVAL=$?
+        echo
+        [ $RETVAL = 0 ] && rm -f ${LOCKFILE} ${PIDFILE}
         # Check to make sure we stopped it
         log_success_msg "${APP_DESC} stopped successfully"
       else
@@ -117,11 +133,12 @@ case "$1" in
   # maint command - Put system in/out of maintenance mode (via broker redirection)
   maint)
     if [ ! -f /p4/${P4D_INSTANCE}/etc/maint_mode ]; then
-      echo "Do you want to put the Perforce Broker into maintenance mode?"
+      echo -e "${RED} Do you want to put the Perforce Broker into maintenance mode?${NC}"
       select yn in "Yes" "No"; do
           case $yn in
               Yes ) ln -sf /p4/${P4D_INSTANCE}/etc/${APP_NAME}.conf.down /p4/${P4D_INSTANCE}/etc/${APP_NAME}.conf;
                     touch /p4/${P4D_INSTANCE}/etc/maint_mode
+                    ls -la /p4/${P4D_INSTANCE}/etc/${APP_NAME}.conf
                     break;;
               No ) exit;;
           esac
@@ -132,6 +149,7 @@ case "$1" in
           case $yn in
               Yes ) ln -sf /p4/${P4D_INSTANCE}/etc/${APP_NAME}.conf.up /p4/${P4D_INSTANCE}/etc/${APP_NAME}.conf;
                     rm -f /p4/${P4D_INSTANCE}/etc/maint_mode
+                    ls -la /p4/${P4D_INSTANCE}/etc/${APP_NAME}.conf
                     break;;
               No ) exit;;
           esac
