@@ -520,7 +520,7 @@ config_p4_initd() {
   do
     for CONF in p4broker.conf.down p4broker.conf.up p4broker_sideload_p4web.conf.down p4broker_sideload_p4web.conf.up P4WEBMIMEFILE
     do
-      [[ -f /p4/${INSTANCE}/etc/${CONF} ]] || curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic $P4SCRIPTS_DOWNLOAD/init.d/${CONF} -o /p4/${INSTANCE}/etc/${CONF}  
+      [[ -f /p4/${INSTANCE}/etc/${CONF} ]] || curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic $P4SCRIPTS_DOWNLOAD/${CONF} -o /p4/${INSTANCE}/etc/${CONF}  
     done
   done
   
