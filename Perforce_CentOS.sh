@@ -483,13 +483,6 @@ do
   done
 done
 
-# Download the customised p4broker conf files
-for FILENAME in p4broker.conf.up p4broker.conf.down p4broker_sideload_p4web.conf.up p4broker_sideload_p4web.conf.down P4WEBMIMEFILE
-do
-  # Don't download if the files already exist
-  [[ -f /p4/1/root/${FILENAME} ]] || wget $WGETGLOBALS $P4SCRIPTS_DOWNLOAD/${FILENAME} --output-document=/p4/1/root/${FILENAME}
-done
-
 chown -Rc uperforce:gp4admin /depotdata
 chown -Rc uperforce:gp4admin /metadata
 chown -Rc uperforce:gp4admin /p4logs
@@ -525,14 +518,15 @@ config_p4_initd() {
 
   for INSTANCE in 1 2
   do
-    for CONF in p4broker.conf.down p4broker.conf.up p4broker_sideload_p4web.conf.down p4broker_sideload_p4web.conf.up
+    for CONF in p4broker.conf.down p4broker.conf.up p4broker_sideload_p4web.conf.down p4broker_sideload_p4web.conf.up P4WEBMIMEFILE
     do
       [[ -f /p4/${INSTANCE}/etc/${CONF} ]] || curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic $P4SCRIPTS_DOWNLOAD/init.d/${CONF} -o /p4/${INSTANCE}/etc/${CONF}  
     done
   done
-
-  ln -s /p4/1/etc/p4broker.conf.up /p4/1/etc/p4broker.conf
-  ln -s /p4/2/etc/p4broker.conf.up /p4/2/etc/p4broker.conf
+  
+  # Set the initial broker conf file
+  ln -sf /p4/1/etc/p4broker.conf.up /p4/1/etc/p4broker.conf
+  ln -sf /p4/2/etc/p4broker.conf.up /p4/2/etc/p4broker.conf
 
   
 }
