@@ -132,8 +132,8 @@ create_users() {
   echo 'Perforce - Create the users to run Perforce under...'
   # NOTE: 8 char max for user and group names
   # <username>,<password>,<GID>,<groupname>,<User detail>,<shell>
-  echo 'uperforce,MyWebGrocer2013#_perforce,500,gp4admin,Account for running the Perforce services under,/sbin/nologin'>~/users.txt
-  # Would be be better security to run each service under its own user? Getting access to a edge access user such as the broker should not lead to access on the main p4d user in such a case. Worth looking into...
+  echo 'uperforce,MyWebGrocer2013#_perforce,500,gp4admin,Account for running the Perforce services under,/bin/bash'>~/users.txt
+  # Would it be better security to run each service under its own user? Getting access to a edge access user such as the broker should not lead to access on the main p4d user in such a case. Worth looking into...
   #echo 'up4broker,MyWebGrocer2013#_p4broker,500,gp4admin,Account for running the Perforce Broker under,/sbin/nologin'>~/users.txt
   #echo 'up4d,MyWebGrocer2013#_p4d,500,gp4admin,Account for running the Perforce depots under,/sbin/nologin'>>~/users.txt
   #echo 'up4web,MyWebGrocer2013#_p4web,500,gp4admin,Account for running the Perforce web server under,/sbin/nologin'>>~/users.txt
