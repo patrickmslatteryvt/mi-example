@@ -135,23 +135,37 @@ case "$1" in
     if [ ! -f /p4/${P4D_INSTANCE}/etc/maint_mode ]; then
       echo -e "${RED} Do you want to put the Perforce Broker into maintenance mode?${NC}"
       select yn in "Yes" "No"; do
-          case $yn in
-              Yes ) ln -sf /p4/${P4D_INSTANCE}/etc/${APP_NAME}.conf.down /p4/${P4D_INSTANCE}/etc/${APP_NAME}.conf;
-                    touch /p4/${P4D_INSTANCE}/etc/maint_mode
-                    ls -la /p4/${P4D_INSTANCE}/etc/${APP_NAME}.conf
-                    break;;
-              No ) exit;;
+        case $yn in
+          Yes ) # Should ask what custom message we want displayed during downtime, then sed it into place.
+            echo "Do you want to display a custom downtime message?"
+            echo "Default message is: The Perforce server is currently down for maintenance."
+            select yn in "Yes" "No"; do
+              case $yn in
+                Yes ) # Get the message from the user then sed it into place.
+                      read -p "Please enter the custom downtime message: " CUSTOM_MESSAGE
+                      cp /p4/${P4D_INSTANCE}/etc/${APP_NAME}.conf.down /p4/${P4D_INSTANCE}/etc/${APP_NAME}.conf.down.custom;
+                      sed -i "s/The Perforce server is currently down for maintenance./${CUSTOM_MESSAGE}/g" /p4/${P4D_INSTANCE}/etc/${APP_NAME}.conf.down.custom;
+                      ln -sf /p4/${P4D_INSTANCE}/etc/${APP_NAME}.conf.down.custom /p4/${P4D_INSTANCE}/etc/${APP_NAME}.conf;
+                      touch /p4/${P4D_INSTANCE}/etc/maint_mode;
+                      ls -la /p4/${P4D_INSTANCE}/etc/${APP_NAME}.conf;
+                      break;;
+                No ) exit;;
+                     ln -sf /p4/${P4D_INSTANCE}/etc/${APP_NAME}.conf.down /p4/${P4D_INSTANCE}/etc/${APP_NAME}.conf;
+                     touch /p4/${P4D_INSTANCE}/etc/maint_mode;
+                     ls -la /p4/${P4D_INSTANCE}/etc/${APP_NAME}.conf;
+                     break;;
+          No ) exit;;
           esac
       done
     else
       echo "Do you want to take the Perforce Broker out of maintenance mode?"
       select yn in "Yes" "No"; do
-          case $yn in
-              Yes ) ln -sf /p4/${P4D_INSTANCE}/etc/${APP_NAME}.conf.up /p4/${P4D_INSTANCE}/etc/${APP_NAME}.conf;
-                    rm -f /p4/${P4D_INSTANCE}/etc/maint_mode
-                    ls -la /p4/${P4D_INSTANCE}/etc/${APP_NAME}.conf
-                    break;;
-              No ) exit;;
+        case $yn in
+          Yes ) ln -sf /p4/${P4D_INSTANCE}/etc/${APP_NAME}.conf.up /p4/${P4D_INSTANCE}/etc/${APP_NAME}.conf;
+                rm -f /p4/${P4D_INSTANCE}/etc/maint_mode
+                ls -la /p4/${P4D_INSTANCE}/etc/${APP_NAME}.conf
+                break;;
+          No ) exit;;
           esac
       done
     fi
