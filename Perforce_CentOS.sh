@@ -613,9 +613,10 @@ config_env() {
   echo ''
   echo 'Perforce - Configure shell environment...'
   touch /etc/profile.d/environ.sh
-  echo export EDITOR=/bin/nano>/etc/profile.d/environ.sh
-  echo export VISUAL=/bin/nano>>/etc/profile.d/environ.sh
-  echo alias vi=/bin/nano>>/etc/profile.d/environ.sh
+  echo "PATH=/p4/1/bin:$PATH">/etc/profile.d/environ.sh
+  echo "export EDITOR=/bin/nano">>/etc/profile.d/environ.sh
+  echo "export VISUAL=/bin/nano">>/etc/profile.d/environ.sh
+  echo "alias vi=/bin/nano">>/etc/profile.d/environ.sh
   chmod -c +x /etc/profile.d/environ.sh
   #. /etc/profile.d/environ.sh
 

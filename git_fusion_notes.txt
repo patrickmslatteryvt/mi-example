@@ -1,0 +1,93 @@
+# p4 -p perforce.devdmz.mywebgrocer.com:1666 -u superuser
+# p4 -p 10.254.250.66:1666 -u superuser
+
+====================================================================================
+Automated install complete! Now a few final bits to do manually.
+====================================================================================
+
+# Add the following export lines to the top of the ugit .bashrc (/home/ugit/.bashrc)
+
+# export PATH=/usr/local/git-fusion/bin:$PATH
+# export P4USER=git-fusion-user
+# export P4PORT=<your Perforce port>
+
+# Run on gitfusion system
+echo 'export PATH=/usr/local/git-fusion/bin:$PATH'>>/home/ugit/.bashrc
+echo 'export P4USER=git-fusion-user'>>/home/ugit/.bashrc
+echo 'export P4PORT=10.254.250.66:1666'>>/home/ugit/.bashrc
+
+# After updating your .bashrc file run:
+
+source /home/ugit/.bashrc
+p4 -u superuser login
+p4gf_super_init.py --user superuser
+# Error
+# Unable to run 'p4 passwd -P xxx -u git-fusion-user'.
+# This operation is not permitted at this server security level.
+
+# Make sure to set a password for git-fusion-user and run p4 login as git-fusion-user to setup a ticket
+
+# Get a ticket for the user "git-fusion-user"
+p4 -p 1666 -u git-fusion-user login
+p4 -p 1666 -u git-fusion-user tickets
+  localhost:1667 (git-fusion-user) 327403845E642DA6F6EE61B8571D64F1
+  
+# Git Fusion requires a trigger to be installed on your Perforce server to properly support atomic checkins in Git. To install the trigger:
+
+# 1) Copy "p4gf_submit_trigger.py" to your Perforce server machine
+# Run on p4d system
+mkdir -p /p4/common/triggers/git-fusion/
+export GITHUB_OAUTH_KEY=03b9d2f35a9c63a00820b1024b1a12f1f54a574d
+curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic https://raw.github.com/patrickmslatteryvt/mi-perforce/master/triggers/git-fusion/p4gf_submit_trigger.py -o /p4/common/triggers/git-fusion/p4gf_submit_trigger.py
+head /p4/common/triggers/git-fusion/p4gf_submit_trigger.py
+chmod -c +x /p4/common/triggers/git-fusion/p4gf_submit_trigger.py
+
+# 2) Run the following to generate the trigger lines needed by Git Fusion
+   # python p4gf_submit_trigger.py --generate-trigger-entries "/absolute/path/to/python" "/absolute/path/to/p4gf_submit_trigger.py"
+python /p4/common/triggers/git-fusion/p4gf_submit_trigger.py --generate-trigger-entries /usr/bin/python /p4/common/triggers/git-fusion/p4gf_submit_trigger.py
+
+    GF-pre-submit         change-submit  //...                       "/usr/bin/python /p4/common/triggers/git-fusion/p4gf_submit_trigger.py change-submit             %changelist% %user% %client% %serverport%"
+    GF-post-submit        change-commit  //...                       "/usr/bin/python /p4/common/triggers/git-fusion/p4gf_submit_trigger.py change-commit             %changelist% %user% %client% %serverport% %oldchangelist%"
+    GF-chg-submit         change-content //...                       "/usr/bin/python /p4/common/triggers/git-fusion/p4gf_submit_trigger.py change-content            %changelist% %user% %client% %serverport%"
+    GF-post-submit-config change-commit  //.git-fusion/repos/*/p4gf_config "/usr/bin/python /p4/common/triggers/git-fusion/p4gf_submit_trigger.py change-commit-p4gf-config %changelist% %user% %client% %serverport% %oldchangelist%"
+
+    
+# 3) As a Perforce super user run "p4 triggers" and add those entries.
+
+# p4 -p 1666 -u superuser triggers -o>/tmp/p4tmp
+# echo '  MWG_AD_Login auth-check auth "/p4/common/triggers/auth/p4auth_ad.pl wvt2012r2stdco.devdmz.mywebgrocer.com 389 DEVDMZ %user%"'>>/tmp/p4tmp
+# tail /tmp/p4tmp
+# p4 -p 1666 -u superuser triggers -i</tmp/p4tmp
+
+
+You will need to add triggers as above for each depot where you want to enable Git Fusion.
+The final step is to setup the version counter by running the following commands from the Perforce server
+
+p4 -p 1666 -u git-fusion-user login
+/usr/bin/python /p4/common/triggers/git-fusion/p4gf_submit_trigger.py --set-version-counter 1666
+
+If your server runs in Unicode mode, you will need to make a slight change to the trigger script:
+For unicode servers uncomment the following line
+#CHARSET = ['-C', 'utf8']
+
+You will need to add a cronjob to check for and install new SSH keys.
+See the Git Fusion Guide section on "Create a cron job" for details.
+
+Now either add user keys and/or run the following to create a repository
+p4gf_init_repo.py
+Switching you to the new user account for Git Fusion...
+
+
+
+
+
+
+
+
+
+cp -r /metadata/p4/1/root/p4-spec /depotdata/p4/1/depots/p4-spec
+diff -r /metadata/p4/1/root/p4-spec /depotdata/p4/1/depots/p4-spec
+Only in /metadata/p4/1/root/p4-spec/depot/42,d/p4-spec.p4s,d: 1.2.gz
+
+mv /metadata/p4/1/root/Perforce /depotdata/p4/1/depots/Perforce
+
