@@ -534,7 +534,7 @@ chown -Rc uperforce:gp4admin /p4
 config_p4_initd() {
   echo ''
   echo 'Perforce - Install service instances...'
-  # RH based Linux distros are 10 years behind SMF in Solaris in this respect
+  # RH6 based Linux distros are 10 years behind SMF in Solaris in this respect
 
   for SERVICE in p4broker p4d p4d_sideload p4web
   do
@@ -546,6 +546,7 @@ config_p4_initd() {
     /sbin/chkconfig --add ${SERVICE}
     # Set the services to autostart in the necessary runlevels
     /sbin/chkconfig --level 345 ${SERVICE} on
+    # NOTE - FIX FIX FIX: service p4web does not support chkconfig
   done
   # Do not start services at this time, they must be properly setup first
   
@@ -559,15 +560,13 @@ config_p4_initd() {
   do
     for CONF in p4broker.conf.down p4broker.conf.up p4broker_sideload_p4web.conf.down p4broker_sideload_p4web.conf.up P4WEBMIMEFILE
     do
-      [[ -f /p4/${INSTANCE}/etc/${CONF} ]] || curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic $P4SCRIPTS_DOWNLOAD/${CONF} -o /p4/${INSTANCE}/etc/${CONF}  
+      [[ -f /p4/${INSTANCE}/etc/${CONF} ]] || curl --header "Authorization: token ${GITHUB_OAUTH_KEY}" --header "Accept: application/vnd.github.v3.raw" --location https://api.github.com/repos/patrickmslatteryvt/mi-perforce/contents/${CONF} -o /p4/${INSTANCE}/etc/${CONF}
     done
   done
-  
+
   # Set the initial broker conf file
   ln -sf /p4/1/etc/p4broker.conf.up /p4/1/etc/p4broker.conf
   ln -sf /p4/2/etc/p4broker.conf.up /p4/2/etc/p4broker.conf
-
-  
 }
 
 # ================================================================================
@@ -593,6 +592,8 @@ config_sshd_banner() {
   echo  of use.>>/etc/ssh/ssh-banner
   echo  LOG OFF IMMEDIATELY if you do not agree to the conditions stated in this warning>>/etc/ssh/ssh-banner
   service sshd reload
+  # CentOS 7
+  # /bin/systemctl reload sshd.service
 }
 
 # ================================================================================
@@ -622,6 +623,7 @@ config_ntp() {
   # Enable the NTPD service
   chkconfig --level 345 ntpd on
   service ntpd start
+  # /bin/systemctl start ntpd.service
   # Check our drift
   ntpdate -q wvt2012r2stdco.devdmz.mywebgrocer.com
 }
