@@ -16,24 +16,26 @@ export_vars() {
   # Define our Java version
   # 7u51-b13
   JAVA_RELEASE=7
-  JAVA_UPDATE=u51
-  JAVA_BUILD=b13
+  JAVA_UPDATE=u60
+  JAVA_BUILD=b19
   JAVA_VERSION="jre-"
   JAVA_VERSION+=$JAVA_RELEASE$JAVA_UPDATE
-  JAVA_DIR="jdk1.7.0_51"
+  JAVA_DIR="jdk1.7.0_60"
   JAVA_x64_URL=http://download.oracle.com/otn-pub/java/jdk/$JAVA_RELEASE$JAVA_UPDATE-$JAVA_BUILD/server-jre-$JAVA_RELEASE$JAVA_UPDATE-linux-x64.tar.gz
-  JAVA_x64_MD5=c5a034f4222bac326101799bcb20509c
+  JAVA_x64_MD5=bc957cf56532c633cbc95708844bd675
   
   # Define the version we are going to use and where we'll get it from.
   # P4BIN_DOWNLOAD=http://perforce.mywebgrocer.com/3rdparty/Perforce
   P4BIN_DOWNLOAD=ftp://ftp.perforce.com/perforce
-  P4BIN_VERSION=r13.3
+  P4BIN_VERSION=r14.1
   P4BIN_PLATFORM=bin.linux26x86_64
   P4SCRIPTS_DOWNLOAD=https://raw.github.com/patrickmslatteryvt/mi-perforce/master
   WGETGLOBALS="--no-check-certificate --no-directories --no-cache"
   P4BIN_DIR=/depotdata/p4/common/bin
 
-  IP_ADDRESS=$(ifconfig eth0 | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p')
+  # IP_ADDRESS=$(ifconfig eth0 | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p')
+  # CentOS 7
+  IP_ADDRESS=$(ip addr | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p')
 
   # Who will email be sent to? If not defined send to the default
   if [ -z ${PERFORCE_ADMINS} ]; then
@@ -69,7 +71,7 @@ install_base() {
   # again here just in case as the script will fail without them
   echo ''
   echo 'Perforce - Installing base packages...'
-  yum update -y && yum install -y nano wget lsof patch
+  yum update -y && yum install -y nano wget lsof patch openssh-clients
   # jq is a lightweight and flexible command-line JSON processor.
   curl http://stedolan.github.io/jq/download/linux64/jq -o /usr/local/sbin/jq
   chmod -c +x /usr/local/sbin/jq
@@ -87,11 +89,25 @@ install_nginx() {
   echo "enabled=1">>/etc/yum.repos.d/nginx.repo
   echo "gpgcheck=0">>/etc/yum.repos.d/nginx.repo
   # Verify we can download from the repo
-  yum list | grep nginx
-    # check we got a return there
-  # Install nginx
-  yum install -y nginx
+  REPO_ACTIVE=$( yum list | grep "nginx" | wc -l )
+  if [ ${REPO_ACTIVE} -gt 0 ]; then
+    log_success_msg "Yum repo [nginx] is available"
+    # Install nginx
+    yum install -y nginx
     # Check the packages were installed
+    PKG_INSTALLED=$( yum list installed|grep "nginx" | wc -l )
+    if [ ${PKG_INSTALLED} -gt 0 ]; then
+      log_success_msg "Package was installed"
+    else
+      log_failure_msg "Package was NOT installed"
+      # We need the packages installed so exiting if the package was not installed
+      exit 1
+    fi
+  else
+    log_failure_msg "Yum repo [nginx] is NOT available"
+    # We need the packages in the repo so exiting if the repo is not available
+    exit 1
+  fi
 }
 
 # ================================================================================
@@ -99,7 +115,30 @@ install_nginx() {
 install_htop() {
   echo ''
   echo 'Perforce - Installing htop...'
-  rpm -Uhv http://pkgs.repoforge.org/htop/htop-1.0.2-1.el6.rf.x86_64.rpm
+  echo "[EPEL]">/etc/yum.repos.d/epel.repo
+  echo "name=EPEL 7 (beta) repo">>/etc/yum.repos.d/epel.repo
+  echo "baseurl=http://dl.fedoraproject.org/pub/epel/beta/7/x86_64/">>/etc/yum.repos.d/epel.repo
+  echo "enabled=1">>/etc/yum.repos.d/epel.repo
+  echo "gpgcheck=0">>/etc/yum.repos.d/epel.repo
+  REPO_ACTIVE=$( yum list | grep "EPEL" | wc -l )
+  if [ ${REPO_ACTIVE} -gt 0 ]; then
+    log_success_msg "Yum repo [EPEL] is available"
+    # Install htop
+    yum install -y htop
+    # Check the packages were installed
+    PKG_INSTALLED=$( yum list installed|grep "htop" | wc -l )
+    if [ ${PKG_INSTALLED} -gt 0 ]; then
+      log_success_msg "Package was installed"
+    else
+      log_failure_msg "Package was NOT installed"
+      # We need the packages installed so exiting if the package was not installed
+      exit 1
+    fi
+  else
+    log_failure_msg "Yum repo [EPEL] is NOT available"
+    # We need the packages in the repo so exiting if the repo is not available
+    exit 1
+  fi
 }
 
 # ================================================================================
@@ -107,20 +146,17 @@ install_htop() {
 install_vmtools() {
   echo ''
   echo 'Install the latest VMware Tools...'
-  rpm --import http://packages.vmware.com/tools/keys/VMWARE-PACKAGING-GPG-DSA-KEY.pub
-  rpm --import http://packages.vmware.com/tools/keys/VMWARE-PACKAGING-GPG-RSA-KEY.pub
-  echo "[vmware-tools]">/etc/yum.repos.d/vmware-tools.repo
-  echo "name=VMware Tools">>/etc/yum.repos.d/vmware-tools.repo
-  echo "baseurl=http://packages.vmware.com/tools/esx/latest/rhel6/x86_64">>/etc/yum.repos.d/vmware-tools.repo
-  echo "enabled=1">>/etc/yum.repos.d/vmware-tools.repo
-  echo "gpgcheck=1">>/etc/yum.repos.d/vmware-tools.repo
-  # Install VMware Tools
-  yum install vmware-tools-esx-kmods.x86_64 vmware-tools-esx-nox.x86_64 -y
-  
-#  curl http://packages.vmware.com/tools/esx/5.5p01/repos/vmware-tools-repo-RHEL6-9.4.0-1.el6.x86_64.rpm -o /tmp/vmware-tools-repo-RHEL6-9.4.0-1.el6.x86_64.rpm
-#  rpm -Uhv /tmp/vmware-tools-repo-RHEL6-9.4.0-1.el6.x86_64.rpm
-  
-  # Verify the VMware Tools were installed
+  # There is now an open source VM tools available in CentOS v6/v7
+  yum install -y open-vm-tools
+  # Check the packages were installed
+  PKG_INSTALLED=$( yum list installed|grep "open-vm-tools" | wc -l )
+  if [ ${PKG_INSTALLED} -gt 0 ]; then
+    log_success_msg "Package was installed"
+  else
+    log_failure_msg "Package was NOT installed"
+    # We need the packages installed so exiting if the package was not installed
+    exit 1
+  fi
 }
 
 # ================================================================================
@@ -140,7 +176,8 @@ create_users() {
   #echo 'up4git,MyWebGrocer2013#_p4git,500,gp4admin,Account for running the Perforce GitFusion instance under,/sbin/nologin'>>~/users.txt
   #echo 'up4commons,MyWebGrocer2013#_p4commons,500,gp4admin,Account for running the Perforce Commons processes under,/sbin/nologin'>>~/users.txt
 
-  curl -L -u ${GITHUB_PRIV_OAUTH_KEY}:x-oauth-basic https://raw.github.com/patrickmslatteryvt/shell/master/bash/create_users.sh -o ~/create_users.sh
+  GH_FILE="https://api.github.com/repos/patrickmslatteryvt/shell/contents/bash/create_users.sh"
+  curl --header "Authorization: token ${GITHUB_OAUTH_KEY}" --header "Accept: application/vnd.github.v3.raw" --location $GH_FILE -o ~/create_users.sh
   echo
   chmod -c +x ~/create_users.sh
   echo
@@ -426,6 +463,7 @@ done
 sed -i '/p4v.tgz/s/^/# /g' $P4BIN_DIR/SHA256SUMS
 sed -i '/perfmerge/s/^/# /g' $P4BIN_DIR/SHA256SUMS
 sed -i '/p4ftpd/s/^/# /g' $P4BIN_DIR/SHA256SUMS
+sed -i '/perfsplit/s/^/# /g' $P4BIN_DIR/SHA256SUMS
 # Do the same for the p4web binary
 sed -i '/p4web/!s/^/# /g' $P4BIN_DIR/SHA256SUMS.r12.1
 
@@ -461,7 +499,8 @@ chmod -c u+x $P4BIN_DIR/p4*
 chmod -c u-x $P4BIN_DIR/p4*.tgz
 
 # Rename the binaries so that they have the version string in their name (
-curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic https://raw.github.com/patrickmslatteryvt/mi-perforce/master/rename_p4_binaries.sh -o ~/rename_p4_binaries.sh
+GH_FILE="https://api.github.com/repos/patrickmslatteryvt/mi-perforce/contents/rename_p4_binaries.sh"
+curl --header "Authorization: token ${GITHUB_OAUTH_KEY}" --header "Accept: application/vnd.github.v3.raw" --location $GH_FILE -o ~/rename_p4_binaries.sh
 chmod -c +x ~/rename_p4_binaries.sh
 ~/rename_p4_binaries.sh
 
