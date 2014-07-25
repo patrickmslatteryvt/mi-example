@@ -144,6 +144,14 @@ echo 'Address:      local'>>/tmp/p4tmp
 echo 'Map:    /p4/1/depots/MWG/...'>>/tmp/p4tmp
 p4 depot -i</tmp/p4tmp
 
+# Create a new depot named "3rdparty"
+echo 'Depot:  3rdparty'>/tmp/p4tmp
+echo 'Description: 	Created by p4_superuser.'>>/tmp/p4tmp
+echo 'Type:   local'>>/tmp/p4tmp
+echo 'Address:      local'>>/tmp/p4tmp
+echo 'Map:    /p4/1/depots/3rdparty/...'>>/tmp/p4tmp
+p4 depot -i</tmp/p4tmp
+
 # Create the base typemap (need more definitions)
 echo 'TypeMap:'>/tmp/p4tmp
 echo '  text //....asp'>>/tmp/p4tmp
