@@ -229,11 +229,7 @@ kill -s TERM $(ps aux | grep "/p4/1/bin/p4broker" | grep -v grep | awk '{print $
 # Stop p4d
 kill -s TERM $(ps aux | grep "/p4/1/bin/p4d" | grep -v grep | awk '{print $2}')
 
-
-http://perforce.devdmz.mywebgrocer.com:8080/MWG/kickstarts/ws02gw01.ks
-
-
-p4 serverid
+# p4 serverid
 
 # Install Nginx
 # http://nginx.org/packages/keys/nginx_signing.key
@@ -311,4 +307,4 @@ chmod -c 400 /etc/ssl/private_keys/*.key
 
 systemctl start nginx.service
 
-  
+http://perforce.devdmz.mywebgrocer.com/MWG/kickstarts/ws02gw01.ks
