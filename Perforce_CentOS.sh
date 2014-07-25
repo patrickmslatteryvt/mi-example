@@ -395,7 +395,7 @@ create_p4_dirs() {
 
 mkdir -p /depotdata/p4/{1,2}/{checkpoints,depots,bin,etc,tmp}
 mkdir -p /metadata/p4/{1,2}/{root,offline_db}
-mkdir -p /p4logs/p4/{1,2}/logs
+mkdir -p /logs/p4/{1,2}/logs
 mkdir -p /p4/{1,2}
 [[ -d $P4BIN_DIR ]] || mkdir -p $P4BIN_DIR
 # If the home directory does not exist then exit
@@ -412,7 +412,7 @@ mkdir -p /home/uperforce/{p4-broker,depot}
 #     /tmp            -->        /depotdata/p4/1/tmp
 #     /root           -->        /metadata/p4/1/root
 #     /offline_db     -->        /metadata/p4/1/offline_db
-#     /logs           -->        /p4logs/p4/1/logs
+#     /logs           -->        /logs/p4/1/logs
 
 ln -s /depotdata/p4/common/bin /p4/common
 # THIS ISN'T WORKING!!!
@@ -434,12 +434,12 @@ done
 
 for INSTANCE in 1 2
 do
-  ln -s /p4logs/p4/${INSTANCE}/logs /p4/${INSTANCE}/logs
+  ln -s /logs/p4/${INSTANCE}/logs /p4/${INSTANCE}/logs
 done
 
 chown -Rc uperforce:gp4admin /depotdata
 chown -Rc uperforce:gp4admin /metadata
-chown -Rc uperforce:gp4admin /p4logs
+chown -Rc uperforce:gp4admin /logs
 chown -Rc uperforce:gp4admin /home/uperforce
 
 }
@@ -518,13 +518,13 @@ for INSTANCE in 1 2
 do
   for LOGFILE in p4d.log p4d_audit.log p4broker.log p4web.log
   do
-    touch /p4logs/p4/${INSTANCE}/logs/${LOGFILE}
+    touch /logs/p4/${INSTANCE}/logs/${LOGFILE}
   done
 done
 
 chown -Rc uperforce:gp4admin /depotdata
 chown -Rc uperforce:gp4admin /metadata
-chown -Rc uperforce:gp4admin /p4logs
+chown -Rc uperforce:gp4admin /logs
 chown -Rc uperforce:gp4admin /p4
 
 }
@@ -539,7 +539,7 @@ config_p4_initd() {
   for SERVICE in p4broker p4d p4d_sideload p4web
   do
     # Don't download if the services already exist
-    [[ -f $P4BIN_DIR/${SERVICE} ]] || curl -L -u ${GITHUB_OAUTH_KEY}:x-oauth-basic $P4SCRIPTS_DOWNLOAD/init.d/${SERVICE} -o /etc/init.d/${SERVICE}
+    [[ -f $P4BIN_DIR/${SERVICE} ]] || curl --header "Authorization: token ${GITHUB_OAUTH_KEY}" --header "Accept: application/vnd.github.v3.raw" --location https://api.github.com/repos/patrickmslatteryvt/mi-perforce/contents/init.d/${SERVICE} -o /etc/init.d/${SERVICE}
     # Make the Perforce init scripts executable
     chmod -c +x /etc/init.d/${SERVICE}
     # Create the RHEL services
@@ -729,3 +729,15 @@ config_postfix
 # 
 
 echo "Perforce installation complete, please configure the system before use."
+
+# /depotdata/p4/common/bin/
+# p4broker.2014.1.849681
+# p4d.2014.1.886167
+# p4web.2012.1.732581
+
+# ./p4d.2013.3.784164 -d -A auditlog -J journal -L log -p port -r root
+# /depotdata/p4/common/bin/p4d.2013.3.784164 -d -A /p4logs/1/audit.log -J /p4logs/1/p4d.journal -L /p4logs/1/p4d.log -p 1667 -r /metadata/1
+# ps aux|grep "p4"
+# /depotdata/p4/common/bin/p4d.2013.3.784164 -d -A /p4logs/1/audit.log -J /p4logs/1/journal -L /p4logs/1/p4d.log -p 1667 -r /metadata/1
+# ${P4LOG}
+

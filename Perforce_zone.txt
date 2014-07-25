@@ -291,7 +291,12 @@ sudo rm /var/svc/log/application-perforce-p4p:default.log
 
 # ================================================================================
 
+# SmartOS
 export P4EDITOR=/opt/local/bin/nano
+# Linux
+export P4EDITOR=/bin/nano
+
+ln -sfn /p4/1/bin/p4 /usr/bin/p4
 
 # Users must use ticket-based authentication
 /metadata/p4 -p 1666 -u superuser configure set security=3
