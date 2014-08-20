@@ -1,0 +1,31 @@
+[Unit]
+Description=Perforce
+Documentation=http://www.perforce.com/perforce/doc.current/manuals/p4sag/
+# After=
+Requires=network-online.target
+Before=shutdown.target reboot.target halt.target
+# ConditionFileNotEmpty=/jira/prd/configured
+# RequiresMountsFor=/mnt/vaultbackup
+# ConditionPathExists=
+# ConditionPathIsReadWrite=
+# ConditionFileIsExecutable=
+
+[Service] 
+Type=forking
+ExecStart=/p4/1/bin/p4d -d -A /p4/1/logs/audit.log -J /p4/1/logs/p4d.journal -L /p4/1/logs/p4d.log -p 1667 -r /p4/1/root
+ExecStop=/bin/kill -s QUIT $MAINPID
+TimeoutSec=300
+User=uperforce
+Group=gp4admin
+Slice=p4.slice
+GuessMainPID=1
+# RestartSec=300
+CPUAccounting=true
+CPUShares=2000
+MemoryAccounting=true
+MemoryLimit=3G
+BlockIOAccounting=true
+BlockIOWeight=1000
+
+[Install]
+WantedBy=multi-user.target

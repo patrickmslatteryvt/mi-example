@@ -508,7 +508,7 @@ for INSTANCE in 1 2
 do
   for EXECUTABLE in p4d p4broker p4web p4
   do
-    ln -s $P4BIN_DIR/${EXECUTABLE}.????.?.?????? /p4/${INSTANCE}/bin/${EXECUTABLE}
+    ln -sf $P4BIN_DIR/${EXECUTABLE}.????.?.?????? /p4/${INSTANCE}/bin/${EXECUTABLE}
   done
 done
 

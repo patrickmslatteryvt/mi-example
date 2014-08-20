@@ -136,20 +136,28 @@ echo 'Address:      local'>>/tmp/p4tmp
 echo 'Map:    /p4/1/depots/p4-unload/...'>>/tmp/p4tmp
 p4 depot -i</tmp/p4tmp
 
+# Create a new depot named "Perforce", see the PDS doc
+echo 'Depot:  Perforce'>/tmp/p4tmp
+echo 'Description: 	Created by p4_superuser.'>>/tmp/p4tmp
+echo 'Type:   local'>>/tmp/p4tmp
+echo 'Address:      local'>>/tmp/p4tmp
+echo 'Map:    /p4/1/depots/Perforce/...'>>/tmp/p4tmp
+p4 depot -i</tmp/p4tmp
+
+# Create a new depot named "3rdparty", see the PDS doc
+echo 'Depot:  3rdparty'>/tmp/p4tmp
+echo 'Description: 	Created by p4_superuser.'>>/tmp/p4tmp
+echo 'Type:   local'>>/tmp/p4tmp
+echo 'Address:      local'>>/tmp/p4tmp
+echo 'Map:    /p4/1/depots/3rdparty/...'>>/tmp/p4tmp
+p4 depot -i</tmp/p4tmp
+
 # Create a new depot named "MWG"
 echo 'Depot:  MWG'>/tmp/p4tmp
 echo 'Description: 	Created by p4_superuser.'>>/tmp/p4tmp
 echo 'Type:   local'>>/tmp/p4tmp
 echo 'Address:      local'>>/tmp/p4tmp
 echo 'Map:    /p4/1/depots/MWG/...'>>/tmp/p4tmp
-p4 depot -i</tmp/p4tmp
-
-# Create a new depot named "3rdparty"
-echo 'Depot:  3rdparty'>/tmp/p4tmp
-echo 'Description: 	Created by p4_superuser.'>>/tmp/p4tmp
-echo 'Type:   local'>>/tmp/p4tmp
-echo 'Address:      local'>>/tmp/p4tmp
-echo 'Map:    /p4/1/depots/3rdparty/...'>>/tmp/p4tmp
 p4 depot -i</tmp/p4tmp
 
 # Create the base typemap (need more definitions)

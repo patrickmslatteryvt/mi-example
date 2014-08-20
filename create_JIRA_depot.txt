@@ -1,0 +1,16 @@
+su uperforce
+cd ~
+
+export P4EDITOR=/bin/nano
+export P4CHARSET=utf8
+export P4USER=superuser
+
+p4 login
+
+# Create a new depot named "JIRA"
+echo 'Depot:  JIRA'>/tmp/p4tmp
+echo 'Description: 	Created by p4_superuser.'>>/tmp/p4tmp
+echo 'Type:   local'>>/tmp/p4tmp
+echo 'Address:      local'>>/tmp/p4tmp
+echo 'Map:    /p4/1/depots/JIRA/...'>>/tmp/p4tmp
+p4 depot -i</tmp/p4tmp

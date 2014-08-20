@@ -1,0 +1,55 @@
+su - uperforce -s /bin/bash -c "/p4/1/bin/p4d -d -A /p4/1/logs/audit.log -J /p4/1/logs/p4d.journal -L /p4/1/logs/p4d.log -p 1667 -r /p4/1/root"
+su - uperforce -s /bin/bash -c "/p4/1/bin/p4broker -d -c /p4/1/etc/p4broker.conf"
+/p4/1/bin/p4web -w 8080 -b -m /p4/1/etc/P4WEBMIMEFILE -s sar -U uperforce -p 1666 -c p4_www -u p4_www -L /p4/1/logs/p4web.log -C utf8 -P MyWebGrocer2013#_www &
+systemctl start nginx.service
+
+kill -s TERM $(ps aux | grep "/p4/1/bin/p4web" | grep -v grep | awk '{print $2}')
+kill -s TERM $(ps aux | grep "/p4/1/bin/p4broker" | grep -v grep | awk '{print $2}')
+kill -s TERM $(ps aux | grep "/p4/1/bin/p4d" | grep -v grep | awk '{print $2}')
+
+Repodata is over 2 weeks old. Install yum-cron? Or run: yum makecache fast
+
+rm -f p4.2014.1.821990
+p4broker.2014.1.895936
+p4d.2014.1.899321
+p4ftpd.2014.1.821990
+p4p.2014.1.895936
+
+p4.2014.1.821990
+p4broker.2014.1.849681
+p4d.2014.1.886167
+p4p.2014.1.821990
+p4web.2012.1.732581
+
+
+/usr/lib/firewalld/services/perforce.xml
+<?xml version="1.0" encoding="utf-8"?>
+<service>
+  <short>Perforce</short>
+  <description>Perforce 1666</description>
+  <port protocol="tcp" port="1666"/>
+</service>
+
+systemctl start firewalld.service
+
+firewall-cmd --permanent --zone=internal --change-interface=ens192
+firewall-cmd --set-default-zone=internal
+firewall-cmd --permanent --zone=internal --remove-service=dhcpv6-client
+firewall-cmd --permanent --zone=internal --remove-service=ipp-client
+firewall-cmd --permanent --zone=internal --remove-service=mdns
+firewall-cmd --permanent --zone=internal --add-service=samba-client
+firewall-cmd --permanent --zone=internal --add-service=dhcp
+firewall-cmd --permanent --zone=internal --add-service=http
+firewall-cmd --permanent --zone=internal --add-service=https
+firewall-cmd --permanent --zone=internal --add-service=ssh
+firewall-cmd --permanent --zone=internal --add-service=perforce
+
+firewall-cmd --permanent --zone=internal --add-icmp-block=destination-unreachable
+firewall-cmd --permanent --zone=internal --add-icmp-block=parameter-problem
+firewall-cmd --permanent --zone=internal --add-icmp-block=redirect
+firewall-cmd --permanent --zone=internal --add-icmp-block=router-advertisement
+firewall-cmd --permanent --zone=internal --add-icmp-block=router-solicitation
+firewall-cmd --permanent --zone=internal --add-icmp-block=source-quench
+firewall-cmd --permanent --zone=internal --add-icmp-block=time-exceeded
+firewall-cmd --reload
+firewall-cmd --zone=internal --list-all
